@@ -5,6 +5,8 @@
 struct Room {
     int id;
     char type[20];
+    int guest_id;
+    bool reserved;
 };
 
 void reserve();
@@ -16,14 +18,41 @@ void search();
 /* Function to keep the program runing */
 char mygetch();
 
-char fname[] = {"vesta.dat"};
+char roomsdb[] = {"/home/as/gastgeber/data/roomsdb.dat"};
 
 void main() {
+
+    FILE *fp;
+    fp = fopen(roomsdb, "rb");
+    struct Room room;
+
+    if(fp == NULL) {
+        fp = fopen(roomsdb, "wb");
+        for(int i = 1; i <= 100; i++) {
+            room.id = i;
+            room.guest_id = 0;
+            room.reserved = false;
+            fwrite(&room, sizeof(room), 1, fp);
+        }
+        fclose(fp);
+    } else {
+        while(1) {
+            fread(&room, sizeof(room), 1, fp);
+            if(feof(fp)) {
+                break;
+            }
+            printf("Room ID: %d\n", room.id);
+            printf("Room Type: %s\n", room.type);
+            printf("Guest ID: %d\n", room.guest_id);
+            printf("Room Reserved: %s\n", room.reserved ? "true" : "false");
+        }
+        fclose(fp);
+    }
 
     int choice;
 
     while(1) {
-        system("clear");
+        //system("clear");
         printf("*****************************************************\n");
         printf("*                  Welcome to Vesta                 *\n");
         printf("*       The most Advanced and client oriented       *\n");
@@ -46,32 +75,60 @@ void main() {
                 break;
             case 0 : exit(0);
                 break;
+            default :
+                break;
         }
-        mygetch();
+        getc(stdin);
     }
 }
 
 void reserve() {
 
     struct Room room;
+    FILE *fp;
+    fp = fopen(roomsdb, "rb");
+
+    int room_id, found = 0;
 
     system("clear");
     printf("*************************************\n");
     printf("*       Hotel Room reservation.     *\n");
     printf("*************************************\n\n");
-    printf("Enter Room Number(id):\n");
-    scanf("%d", &room.id);
-    printf("Enter Room Type: ");
-    scanf("%s", &room.type);
+    
+    while(1) {
+        printf("Enter Room id:\n");  
+        int test = scanf("%d", &room_id);
+        
+        if(test == 0) {
+            printf("Invalid Room ID.\n");
+            scanf("%*[^\n]");
+            printf("Enter again a correct Room ID:\n");
+            test = scanf("%d", &room_id);
+        } else {
+            while(1) {
+                fread(&room, sizeof(room), 1, fp);
+                if(feof(fp)) {
+                    break;
+                }
+                if(room.id == room_id) {
+                    found = 1;
+                    printf("Room ID: %d\n", room.id);
+                    printf("Room Type: %s\n", room.type);
+                    printf("Guest ID: %d\n", room.guest_id);
+                    printf("Room Reserved: %s\n", room.reserved ? "true" : "false");
+                    break;
+                }
+            }
+            if(found == 0) {
+                printf("No Room found with the given ID.\n");
+            }
+        }
+        getc(stdin);
+    }
+    fclose(fp);
+    printf("Press Enter to continue...\n");
 
-    printf("Room %d is type %s", room.id, room.type);
+    int next = getc(stdin);
+    printf("Next = %d", next);
 }
 
-char mygetch() {
-    char val;
-    char rel;
-
-    scanf("%c",&val);
-    scanf("%c",&rel);
-    return (val);
-}
