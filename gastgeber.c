@@ -212,7 +212,6 @@ void displayAllRooms(struct Room room) {
     printf("|\n");
     printf("------------------------------------------------------------------------------------\n");
 }
-
 void displayInt(int id) {
 
     char converted[30];
