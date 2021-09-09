@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <string.h>
+#include "input_functions/user_input_experimental.c"
 
 struct Room {
     int id;
@@ -16,15 +17,21 @@ struct Customer {
     char nationality[30];
     bool stammgast;
 };
-
+/* functionality functions */
 void reserve();
 void display();
 void displayAll();
 void modify();
 void clearRes();
 void search();
+/* Display functions */
 void displayMainLogo();
 void displayRoomInfoLogo();
+void displayRoomInfo(struct Room room);
+void displayAllRoomsLogo();
+void displayAllRooms(struct Room room);
+void displayInt(int id);
+void displayStr(char *str);
 
 char roomsdb[] = {"/home/as/gastgeber/data/roomsdb.dat"};
 
@@ -44,21 +51,19 @@ void main() {
         }
         fclose(fp);
     } else {
+        displayAllRoomsLogo();
         while(1) {
             fread(&room, sizeof(room), 1, fp);
             if(feof(fp)) {
                 break;
             }
-            printf(" --------------------------------------------------------\n");
-            printf("|  Room ID  |  Room Type  |  Guest ID  |  Room Reserved  |\n");
-            printf(" --------------------------------------------------------\n");
-            printf("|    %d     |    %s       |    %d      |       %s        |\n", room.id, room.type, room.guest_id, room.reserved ? "true" : "false");
-            printf(" --------------------------------------------------------\n");
+            displayAllRooms(room);
         }
         fclose(fp);
     }
 
     int choice;
+    char c;
 
     while(1) {
 
@@ -70,13 +75,16 @@ void main() {
                 break;
             case 2 : display();
                 break;
+            case 3 : displayAll();
+                break;
             case 0 : system("clear");
                 exit(0);
                 break;
             default :
                 break;
         }
-        getc(stdin);
+        //getc(stdin);
+        while(c = getc(stdin) != '\n' && c != '\t');
     }
 }
 
@@ -93,43 +101,27 @@ void display() {
 
     displayRoomInfoLogo();
 
-    char room_id[63]; 
-    int found = 0, check = 0;
+    int room_id; 
+    int found = 0;
     char c; 
     while(c = getc(stdin) != '\n' && c != '\t');
     
-    while(check == 0) {
+    while(found == 0) {
     
         printf("Enter Room ID(1-99):\n");  
-        fgets(room_id, 63, stdin);
+        room_id = getnuminput();
         
-        if (strlen(room_id) < 1 || strlen(room_id) > 4) {
-            check = 0;
-            displayRoomInfoLogo();
+        if (room_id < 1 || room_id > 100) {
             printf("Invalid Room ID.\n");
-            continue;
-        } else if (sscanf(room_id, "%d", &check) != 1) {
-            check = 0;
-            displayRoomInfoLogo();
-            printf("Invalid Room ID.Provide a number.\n");
-            continue;
-        } else if (check < 1 || check > 100) {
-            check = 0;
-            displayRoomInfoLogo();
-            printf("Room ID's range is 1 to 99.\n");
             continue;
         } else {
             while(1) {
                 fread(&room, sizeof(room), 1, fp);
                 if(feof(fp)) {
-                    break;
-                }
-                if(room.id == check) {
-                    printf(" ------------------------------------------------------------------------------\n");
-                    printf("|Room ID            |Room Type          |Guest ID           |Room Reserved     |\n");
-                    printf(" ------------------------------------------------------------------------------\n");
-                    printf("|%d                 |%s                 |%d                 |%s                |\n", room.id, room.type, room.guest_id, room.reserved ? "true" : "false");
-                    printf(" ------------------------------------------------------------------------------\n");
+                    break;            
+                } else if(room.id == room_id) {
+                    displayRoomInfo(room);
+                    found = 1;
                 }
             }
         }
@@ -138,9 +130,31 @@ void display() {
     printf("Press Enter to continue...\n");
 }
 
+void displayAll() {
+
+    struct Room room;
+    FILE *fp;
+    fp = fopen(roomsdb, "rb");
+    
+    displayAllRoomsLogo();
+    
+    while(1) {
+        fread(&room, sizeof(room), 1, fp);
+        if(feof(fp)) {
+            break;            
+        } else {
+            displayAllRooms(room);
+        }
+    }
+    fclose(fp);
+    printf("Press Enter to continue...\n");
+
+    char c = getc(stdin);
+}
+
 /* Display functions for logos and signs. */
 void displayMainLogo() {
-    //system("clear");
+    system("clear");
     printf("*****************************************************\n");
     printf("*                  Welcome to Vesta                 *\n");
     printf("*       The most Advanced and client oriented       *\n");
@@ -162,4 +176,71 @@ void displayRoomInfoLogo() {
         printf("*    Display Room Informations.     *\n");
         printf("*************************************\n\n");
 }
+void displayRoomInfo(struct Room room) {
+    printf(" -----------------------------------------------------------------------------------\n");
+    printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |\n");
+    printf(" -----------------------------------------------------------------------------------\n");
+    printf("|");
+    displayInt(room.id);
+    printf("|");
+    displayStr(room.type);
+    printf("|");
+    displayInt(room.guest_id);
+    printf("|");
+    displayStr(room.reserved ? "true" : "false");
+    printf("|\n");
+    printf("------------------------------------------------------------------------------------\n");
+}
+void displayAllRoomsLogo() {
+        system("clear");
+        printf("*************************************\n");
+        printf("*  Display All Rooms Informations.  *\n");
+        printf("*************************************\n\n");
+        printf(" -----------------------------------------------------------------------------------\n");
+        printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |\n");
+        printf(" -----------------------------------------------------------------------------------\n");
+}
+void displayAllRooms(struct Room room) {
+    printf("|");
+    displayInt(room.id);
+    printf("|");
+    displayStr(room.type);
+    printf("|");
+    displayInt(room.guest_id);
+    printf("|");
+    displayStr(room.reserved ? "true" : "false");
+    printf("|\n");
+    printf("------------------------------------------------------------------------------------\n");
+}
 
+void displayInt(int id) {
+
+    char converted[30];
+
+    sprintf(converted, "%d", id);
+    int d = (20 - strlen(converted)) / 2;
+
+    for(int i = 0; i <= 20 - strlen(converted); i++) {
+        if(i < d) {
+            printf(" ");
+        } else if(i > d) {
+            printf(" ");
+        } else {
+            printf("%s", converted);
+        }
+    }
+}
+void displayStr(char *str) {
+
+    int d = (20 - strlen(str)) / 2;
+
+    for(int i = 0; i <= 20 - strlen(str); i++) {
+        if(i < d) {
+            printf(" ");
+        } else if(i > d) {
+            printf(" ");
+        } else {
+            printf("%s", str);
+        }
+    }
+}
