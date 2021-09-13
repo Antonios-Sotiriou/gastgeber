@@ -124,6 +124,22 @@ void reserve() {
                     } else {
                         printf("Enter Customer ID: \n");
                         scanf("%d", &room.guest_id);
+                        getc(stdin);
+                        int from_date = 0;
+                        while(from_date == 0) {
+                            printf("Room reserve from date: \n");
+                            if(getformatedDate(room.from_date) == 1) {
+                                from_date = 1;
+                            }
+                        }
+                        int to_date = 0;
+                        while(to_date == 0) {
+                            printf("To date: \n");
+                            if(getformatedDate(room.to_date) == 1) {
+                                printf("Room Succesfully reserved!\n");
+                                to_date = 1;
+                            }
+                        }
                         found = 1;
                     }
                 }

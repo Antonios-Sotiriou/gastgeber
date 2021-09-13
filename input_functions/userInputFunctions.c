@@ -1,7 +1,7 @@
 #include <time.h>
 
 int getnuminput();
-char getformatedDate();
+int getformatedDate(char *room_date);
 
 int getnuminput() {
 
@@ -25,7 +25,7 @@ int getnuminput() {
     }
     return atoi(cleared_num);
 }
-char getformatedDate() { 
+int getformatedDate(char *room_date) { 
 
     char input[40];
     int day;
@@ -38,11 +38,8 @@ char getformatedDate() {
 
     time(&current_time);
 
-    printf("Current time is: %d\n", current_time);
-    printf("Current time is: %s\n", ctime(&current_time));
-
     struct tm *mytime = localtime(&current_time);
-    printf("%i/%i/%i\n", mytime -> tm_mday, mytime -> tm_mon + 1, mytime -> tm_year + 1900);
+    //printf("%i/%i/%i\n", mytime -> tm_mday, mytime -> tm_mon + 1, mytime -> tm_year + 1900);
 
     fgets(input, 40, stdin);
     int test = sscanf(input, "%d/%d/%d", &day, &month, &year);
@@ -50,7 +47,7 @@ char getformatedDate() {
     if(test == 3) {
         if(day < 0 || day > 31) {
             printf("Give  a correct day!\n");
-            return;
+            return 0;
         } else if(day > 0 && day < 10) {
             sprintf(converted_day, "0%d/", day);
         } else if(day > 9 && day <= 31) {
@@ -58,7 +55,7 @@ char getformatedDate() {
         }
         if(month < 0 || month > 12) {
             printf("Give a correct month!\n");
-            return;
+            return 0;
         } else if(month > 0 && month < 10) {
             sprintf(converted_month, "0%d/", month);
         } else if(month > 9) {
@@ -66,11 +63,14 @@ char getformatedDate() {
         }
         if(year < mytime -> tm_year + 1900) {
             printf("Give a year in the present or future!\n");
-            return;
+            return 0;
         } else if(year >= mytime -> tm_year + 1900) {
             sprintf(converted_year, "%d", year);
         }
     } else {
         printf("The date you entered is in wrong format!\n");
     }
+    sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
+    return 1;
 }
+
