@@ -1,5 +1,3 @@
-#include <time.h>
-
 int getnuminput();
 int getformatedDate(char *room_date);
 

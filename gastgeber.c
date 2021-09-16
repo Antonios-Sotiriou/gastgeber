@@ -2,24 +2,12 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <string.h>
-#include "input_functions/userInputFunctions.c"
-#include "compare_functions/compareFunctions.c"
+#include <time.h>
+#include "input_functions/userInputFunctions.h"
+#include "compare_functions/compareFunctions.h"
+#include "structures/room.h"
+#include "structures/guest.h"
 
-struct Room {
-    int id;
-    char type[20];
-    int guest_id;
-    bool reserved;
-    char from_date[20];
-    char to_date[20];
-};
-struct Customer {
-    int id;
-    char first_name[30];
-    char last_name[30];
-    char nationality[30];
-    bool stammgast;
-};
 /* functionality functions */
 void reserve();
 void display();
@@ -123,7 +111,7 @@ void reserve() {
                     if(room.reserved == true) {
                         printf("Room is already reserved!\n");
                     } else {
-                        printf("Enter Customer ID: \n");
+                        printf("Enter Guest ID: \n");
                         scanf("%d", &room.guest_id);
                         getc(stdin);
                         int from_date = 0;
@@ -334,3 +322,4 @@ void displayStr(char *str) {
         }
     }
 }
+

@@ -32,3 +32,4 @@ int compareDates(char *from_date, char *to_date) {
         return 0;
     }
 }
+
