@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include "input_functions/userInputFunctions.c"
+#include "compare_functions/compareFunctions.c"
 
 struct Room {
     int id;
@@ -135,7 +136,7 @@ void reserve() {
                         int to_date = 0;
                         while(to_date == 0) {
                             printf("To date: \n");
-                            if(getformatedDate(room.to_date) == 1) {
+                            if(getformatedDate(room.to_date) == 1 && compareDates(room.from_date, room.to_date) == 1) {
                                 printf("Room Succesfully reserved!\n");
                                 to_date = 1;
                             }

@@ -61,14 +61,24 @@ int getformatedDate(char *room_date) {
         } else if(month > 9) {
             sprintf(converted_month, "%d/", month);
         }
-        if(year < mytime -> tm_year + 1900) {
-            printf("Give a year in the present or future!\n");
-            return 0;
-        } else if(year >= mytime -> tm_year + 1900) {
+        if(year > mytime -> tm_year + 1900) {
             sprintf(converted_year, "%d", year);
+        } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) > 0) {
+            sprintf(converted_year, "%d", year);
+        } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) == 0) {
+            if(day - mytime -> tm_mday >= 0) {
+                sprintf(converted_year, "%d", year);
+            } else {
+                printf("This day is in the past!\n");
+                return 0;
+            }
+        } else {
+            printf("Provide a date from today to the future!\n");
+            return 0;
         }
     } else {
         printf("The date you entered is in wrong format!\n");
+        return 0;
     }
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
     return 1;
