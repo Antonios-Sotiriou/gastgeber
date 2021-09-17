@@ -27,6 +27,8 @@ int compareDates(char *from_date, char *to_date) {
             printf("This day is in the past!\n");
             return 0;         
         }
+    } else if(to_year > from_year) {
+        return 1;
     } else {
         printf("To date is older than from date\n");
         return 0;
