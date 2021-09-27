@@ -1,18 +1,29 @@
+#ifdef _WIN32
+    #include <Windows.h>
+#else
+    #include <unistd.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
-#include <ncurses.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include "input_functions/userInputFunctions.h"
 #include "compare_functions/compareFunctions.h"
 #include "structures/room.h"
 #include "structures/guest.h"
+#include "structures/day.h"
+#include "structures/reservations.h"
+#include "header_files/paths.h"
+#include "init_dbs/init_databases.h"
+#include "reserve_functions/reserveAvailabillity.h"
 
 /* functionality functions */
 void reserve();
 void display();
 void displayAll();
 void modify();
+void displayReservations();
 void clearRes();
 void search();
 /* Display functions */
@@ -22,36 +33,19 @@ void displayRoomInfoLogo();
 void displayRoomInfo(struct Room room);
 void displayAllRoomsLogo();
 void displayAllRooms(struct Room room);
+void displayAllReservationsLogo();
+void displayAllReservations(struct Reservation reservation);
 void displayInt(int id);
 void displayStr(char *str);
 
-char roomsdb[] = {"/home/as/gastgeber/data/roomsdb.dat"};
+void main(int argc, char *argv[]) {
 
-void main() {
-
-    FILE *fp;
-    fp = fopen(roomsdb, "rb");
-    struct Room room;
-
-    if(fp == NULL) {
-        fp = fopen(roomsdb, "wb");
-        for(int i = 1; i <= 100; i++) {
-            room.id = i;
-            room.guest_id = 0;
-            room.reserved = false;
-            fwrite(&room, sizeof(room), 1, fp);
-        }
-        fclose(fp);
-    } else {
-        displayAllRoomsLogo();
-        while(1) {
-            fread(&room, sizeof(room), 1, fp);
-            if(feof(fp)) {
-                break;
-            }
-            displayAllRooms(room);
-        }
-        fclose(fp);
+    if(argc > 1 && strcmp(argv[1], "init") == 0) {
+        createDaysDb();
+        createRoomsDb();
+        createReservationsDb();
+        printf("argv: %s", argv[1]);
+        getc(stdin);
     }
 
     int choice;
@@ -69,33 +63,37 @@ void main() {
                 break;
             case 3 : displayAll();
                 break;
+            case 6 : displayReservations();
+                break;
             case 0 : system("clear");
                 exit(0);
                 break;
             default :
                 break;
         }
-        //getc(stdin);
         while(c = getc(stdin) != '\n' && c != '\t');
     }
 }
 
 void reserve() {
 
-    struct Room room;
+    struct Reservation reservation;
     FILE *fp, *fp1;
-    fp = fopen(roomsdb, "rb");
-    fp1 = fopen("/home/as/gastgeber/data/journal.dat", "wb");
+    fp = fopen(reservationsdb, "rb");
+    fp1 = fopen("/home/as/gastgeber/data/journal.dat", "ab");
 
     displayRoomReservationLogo();
 
     int room_id;
     int found = 0;
+    // counter function which finds the last reservation record!
+    int next_id = getNextEntry();
+
     char c;
     while(c = getc(stdin) != '\n' && c != '\t');
-    
+
     while(found == 0) {
-    
+
         printf("Enter Room ID(1-99):\n");  
         room_id = getnuminput();
         
@@ -103,52 +101,48 @@ void reserve() {
             printf("Invalid Room ID.\n");
             continue;
         } else {
-            while(1) {
-                fread(&room, sizeof(room), 1, fp);
-                if(feof(fp)) {
-                    break;            
-                } else if(room.id == room_id) {
-                    if(room.reserved == true) {
-                        printf("Room is already reserved!\n");
+            reservation.id = next_id;
+            reservation.room.id = room_id;
+            
+            printf("Enter Guest ID: \n");
+            scanf("%d", &reservation.guest.id);
+            getc(stdin);
+            int from_date = 0;
+            while(from_date == 0) {
+                printf("Room reserve from date: \n");
+                if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
+                    from_date = 1;
+                }
+            }
+            int to_date = 0;
+            while(to_date == 0) {
+                printf("To date: \n");
+                if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
+                    if(checkAllDates(reservation) == 0) {
+                        printf("Room Succesfully reserved!\n");
+                        to_date = 1;
+                        fwrite(&reservation, sizeof(reservation), 1, fp1);
                     } else {
-                        printf("Enter Guest ID: \n");
-                        scanf("%d", &room.guest_id);
-                        getc(stdin);
-                        int from_date = 0;
-                        while(from_date == 0) {
-                            printf("Room reserve from date: \n");
-                            if(getformatedDate(room.from_date) == 1) {
-                                from_date = 1;
-                            }
-                        }
-                        int to_date = 0;
-                        while(to_date == 0) {
-                            printf("To date: \n");
-                            if(getformatedDate(room.to_date) == 1 && compareDates(room.from_date, room.to_date) == 1) {
-                                printf("Room Succesfully reserved!\n");
-                                to_date = 1;
-                            }
-                        }
-                        found = 1;
+                        break;
                     }
                 }
-                fwrite(&room, sizeof(room), 1, fp1);
             }
+            found = 1;
         }
     }
     fclose(fp);
     fclose(fp1);
 
     if(found == 1) {
-        fp = fopen(roomsdb, "wb");
+        fp = fopen(reservationsdb, "ab");
         fp1 = fopen("/home/as/gastgeber/data/journal.dat", "rb");
 
         while(1) {
-            fread(&room, sizeof(room), 1, fp1);
+            fread(&reservation, sizeof(reservation), 1, fp1);
             if(feof(fp1)) {
                 break;
             } 
-            fwrite(&room, sizeof(room), 1, fp);
+            fwrite(&reservation, sizeof(reservation), 1, fp);
         }
     }
     fclose(fp1);
@@ -217,6 +211,28 @@ void displayAll() {
     char c = getc(stdin);
 }
 
+void displayReservations() {
+
+    struct Reservation res;
+    FILE *fp;
+    fp = fopen(reservationsdb, "rb");
+
+    displayAllReservationsLogo();
+
+    while(1) {
+        fread(&res, sizeof(res), 1, fp);
+        if(feof(fp)) {
+            break;            
+        } else {
+            displayAllReservations(res);
+        }
+    }
+    fclose(fp);
+    printf("Press Enter to continue...\n");
+
+    char c = getc(stdin);
+}
+
 /* Display functions for logos and signs. */
 void displayMainLogo() {
     system("clear");
@@ -231,8 +247,9 @@ void displayMainLogo() {
     printf("2. Display room info\n");
     printf("3. Display all rooms\n");
     printf("4. Modify a room\n");
-    printf("5. Clear room Reservation\n");
-    printf("6. Search\n");
+    printf("6. Display all Reservations\n");
+    printf("7. Clear room Reservation\n");
+    printf("8. Search\n");
     printf("0. Exit\n\n");
 }
 void displayRoomReservationLogo() {
@@ -291,6 +308,29 @@ void displayAllRooms(struct Room room) {
     printf("|\n");
     printf("------------------------------------------------------------------------------------------------------------------------------\n");
 }
+void displayAllReservationsLogo() {
+    system("clear");
+    printf("*************************************\n");
+    printf("*      Display All Reservations.    *\n");
+    printf("*************************************\n\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
+    printf("|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
+}
+void displayAllReservations(struct Reservation reservation) {
+    printf("|");
+    displayInt(reservation.id);
+    printf("|");
+    displayInt(reservation.room.id);
+    printf("|");
+    displayInt(reservation.guest.id);
+    printf("|");
+    displayStr(reservation.from_date);
+    printf("|");
+    displayStr(reservation.to_date);
+    printf("|\n");
+    printf("---------------------------------------------------------------------------------------------------------\n");
+}
 void displayInt(int id) {
 
     char converted[30];
@@ -322,4 +362,5 @@ void displayStr(char *str) {
         }
     }
 }
+
 
