@@ -1,3 +1,6 @@
+/********************
+* Build in libraries
+*********************/
 #ifdef _WIN32
     #include <Windows.h>
 #else
@@ -8,6 +11,15 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+/*********************
+ * Global constants 
+ ********************/
+#define STARTING_YEAR 2021
+#define FINISHING_YEAR 2121
+#define TOTAL_ROOMS 100
+/*******************************************************
+ * My own libraries, collection of functions and structs
+ ******************************************************/
 #include "input_functions/userInputFunctions.h"
 #include "compare_functions/compareFunctions.h"
 #include "structures/room.h"
@@ -35,6 +47,8 @@ void displayAllRoomsLogo();
 void displayAllRooms(struct Room room);
 void displayAllReservationsLogo();
 void displayAllReservations(struct Reservation reservation);
+void displayAnnuallyAvailabillityLogo();
+void displayAnnuallyAvailabillity();
 void displayInt(int id);
 void displayStr(char *str);
 
@@ -63,7 +77,9 @@ void main(int argc, char *argv[]) {
                 break;
             case 3 : displayAll();
                 break;
-            case 6 : displayReservations();
+            case 5 : displayReservations();
+                break;
+            case 7 : displayAnnuallyAvailabillity();
                 break;
             case 0 : system("clear");
                 exit(0);
@@ -97,7 +113,7 @@ void reserve() {
         printf("Enter Room ID(1-99):\n");  
         room_id = getnuminput();
         
-        if (room_id < 1 || room_id > 100) {
+        if (room_id < 1 || room_id > TOTAL_ROOMS) {
             printf("Invalid Room ID.\n");
             continue;
         } else {
@@ -170,7 +186,7 @@ void display() {
         printf("Enter Room ID(1-99):\n");  
         room_id = getnuminput();
         
-        if (room_id < 1 || room_id > 100) {
+        if (room_id < 1 || room_id > TOTAL_ROOMS) {
             printf("Invalid Room ID.\n");
             continue;
         } else {
@@ -247,8 +263,9 @@ void displayMainLogo() {
     printf("2. Display room info\n");
     printf("3. Display all rooms\n");
     printf("4. Modify a room\n");
-    printf("6. Display all Reservations\n");
-    printf("7. Clear room Reservation\n");
+    printf("5. Display all Reservations\n");
+    printf("6. Clear room Reservation\n");
+    printf("7. Display Annually Reservations\n");
     printf("8. Search\n");
     printf("0. Exit\n\n");
 }
@@ -330,6 +347,50 @@ void displayAllReservations(struct Reservation reservation) {
     displayStr(reservation.to_date);
     printf("|\n");
     printf("---------------------------------------------------------------------------------------------------------\n");
+}
+void displayAnnuallyAvailabillityLogo() {
+    system("clear");
+    printf("*************************************\n");
+    printf("*       Annually Reservations.      *\n");
+    printf("*************************************\n\n");   
+}
+void displayAnnuallyAvailabillity() {
+
+    struct Day day;
+    FILE *fp;
+    fp = fopen(daysdb, "rb");
+
+    int input_year;
+    char str_year[5];
+
+    displayAnnuallyAvailabillityLogo();
+    printf("Which year would you like to display? ");
+
+    char c;
+    while(c = getc(stdin) != '\n' && c != '\t');
+
+    input_year = getInteger(48, 5);
+
+    if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
+        printf("Year out of range: %d\n", input_year);
+    } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
+        sprintf(str_year, "%d", input_year);
+        while(1) {
+            fread(&day, sizeof(day), 1, fp);
+            if(feof(fp)) {
+                break;
+            } else if(strcmp(day.year, str_year) == 0) {
+                // display all year number of rooms by day.
+                if(strcmp(day.month, "01") == 0) {
+                    printf("|%s", day.day);
+                }
+            }
+        }
+    } else  if(input_year == 0) {
+        printf("Undefined year parsing...!\n");
+    }
+    fclose(fp);
+    printf("\nPress Enter to continue...\n");
 }
 void displayInt(int id) {
 
