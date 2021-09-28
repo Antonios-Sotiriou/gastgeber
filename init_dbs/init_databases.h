@@ -20,7 +20,7 @@ void createDaysDb() {
         char *week_days[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
         int id_counter = 1;
-        for(year = 2021; year <= 2121; year++) {
+        for(year = STARTING_YEAR; year <= FINISHING_YEAR; year++) {
             sprintf(day.year, "%d", year);
 
             if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
@@ -85,7 +85,7 @@ void createRoomsDb() {
     if(fp == NULL) {
         fp = fopen(roomsdb, "wb");
         printf("Creating rooms Database.Please wait.\n");
-        for(int i = 1; i <= 100; i++) {
+        for(int i = 1; i <= TOTAL_ROOMS; i++) {
             room.id = i;
             room.guest_id = 0;
             room.reserved = false;

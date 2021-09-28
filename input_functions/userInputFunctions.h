@@ -1,5 +1,6 @@
 int getnuminput();
 int getformatedDate(char *room_date);
+int getInteger(int str_len, int int_len);
 
 int getnuminput() {
 
@@ -80,5 +81,34 @@ int getformatedDate(char *room_date) {
     }
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
     return 1;
+}
+
+int getInteger(int str_len, int int_len) {
+
+    /**************************************
+     * Return a number of the provided int_len.To avoid input overflow give
+     * always a str_len a little bigger than int_len so we can also check if
+     * user input exceeds the required int_len.
+     * ************************************/
+    
+    int year_input = 0;
+    char str_year[str_len + 1];
+
+    fgets(str_year, sizeof(str_year), stdin);
+
+    if(strlen(str_year) - 1 >= int_len) {
+        printf("Invalid number length!\n");
+        return 0;
+    } else {
+        for(int i = 0; i <= strlen(str_year) - 1; i++) {
+            if(str_year[i] >= 48 && str_year[i] <= 57) {
+                year_input = year_input * 10 + str_year[i] - '0';
+            } else if (str_year[i] != '\n') {
+                printf("Please check the syntax! \n");
+                return 0;
+            }
+        }
+    }
+    return year_input;  
 }
 
