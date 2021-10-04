@@ -15,7 +15,8 @@ void createDaysDb() {
         printf("Creating days Database.Please wait.\n");
 
         int year;
-        char *months[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+        char *months_nums[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+        char *months_names[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         char *week_days[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
@@ -35,7 +36,8 @@ void createDaysDb() {
 
                 int num_of_days = month_days[i];
 
-                sprintf(day.month, "%s", months[i]);
+                sprintf(day.month_num, "%s", months_nums[i]);
+                sprintf(day.month_name, "%s", months_names[i]);
 
                 for(int i = 1; i <= num_of_days; i++) {
 
@@ -52,10 +54,10 @@ void createDaysDb() {
                     } else {
                        sprintf(day.day, "%d", i);
                     }
-                    sprintf(day.date, "%s/%s/%s", day.day, day.month, day.year);
+                    sprintf(day.date, "%s/%s/%s", day.day, day.month_num, day.year);
                     id_counter++;
                     // Initializing day.room_id array with huge numbers which are gonna replaced by room IDs when a reservation takes place.
-                    for(int x = 0; x <= 101; x++) {
+                    for(int x = 0; x <= TOTAL_ROOMS + 1; x++) {
                         day.room_id[x] = x + 1000000;
                     }
                     fwrite(&day, sizeof(day), 1, fp);
@@ -135,7 +137,7 @@ int getNextEntry() {
         if(feof(fp)) {
             break;            
         } else {
-            ++next_id;
+            next_id = reservation.id + 1;
         }
     }
     fclose(fp);

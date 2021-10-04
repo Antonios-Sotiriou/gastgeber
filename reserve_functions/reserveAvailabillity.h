@@ -15,7 +15,7 @@ int checkFromDate(struct Reservation res) {
         if(feof(fp)) {
             break;
         } else if(strcmp(day.date, res.from_date) == 0) {
-
+            starting_point = day.id;
             for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                 // Check if the room id is already in the days rooms ids.
                 if(day.room_id[i] == res.room.id) {
@@ -26,14 +26,18 @@ int checkFromDate(struct Reservation res) {
         }
     }
     fclose(fp);
-
+    
+    if(starting_point <= 0 || starting_point > 36500) {
+        printf("Check the dates please.\nMaybe you Provided a day that is not exists in this year.\nFor example 29 of February or 31 of November.\n");
+        return 1;
+    }
     return 0;
 }
 
 int checkAllDates(struct Reservation res) {
 
     struct Day day;
-    FILE *fp, *fp1;
+    FILE *fp;
     fp = fopen(daysdb, "rb");
 
     int starting_point;
@@ -48,6 +52,11 @@ int checkAllDates(struct Reservation res) {
         } else if(strcmp(day.date, res.to_date) == 0) {
             finishing_point = day.id;
         }
+    }
+
+    if(finishing_point <= 0 || finishing_point > 36500) {
+        printf("Check the dates please.\nMaybe you Provided a day that is not exists in this year.\nFor example 29 of February or 31 of November.\n");
+        return 1;
     }
     // Go to the beggining of the file and readall data again
     int num_of_days = 0;
