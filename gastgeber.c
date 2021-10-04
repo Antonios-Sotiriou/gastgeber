@@ -17,6 +17,16 @@
 #define STARTING_YEAR 2021
 #define FINISHING_YEAR 2121
 #define TOTAL_ROOMS 100
+/*********************
+ * Color Initialisation
+ ********************/
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
@@ -29,28 +39,17 @@
 #include "header_files/paths.h"
 #include "init_dbs/init_databases.h"
 #include "reserve_functions/reserveAvailabillity.h"
+#include "delete_functions/deleteReservation.h"
+#include "display_functions/displayFunctions.h"
 
 /* functionality functions */
 void reserve();
-void display();
-void displayAll();
+void displayRoom();
+void displayAllRooms();
 void modify();
 void displayReservations();
-void clearRes();
-void search();
-/* Display functions */
-void displayMainLogo();
-void displayRoomReservationLogo();
-void displayRoomInfoLogo();
-void displayRoomInfo(struct Room room);
-void displayAllRoomsLogo();
-void displayAllRooms(struct Room room);
-void displayAllReservationsLogo();
-void displayAllReservations(struct Reservation reservation);
-void displayAnnuallyAvailabillityLogo();
+void deleteReservation();
 void displayAnnuallyAvailabillity();
-void displayInt(int id);
-void displayStr(char *str);
 
 void main(int argc, char *argv[]) {
 
@@ -73,11 +72,13 @@ void main(int argc, char *argv[]) {
         switch(choice) {
             case 1 : reserve();
                 break;
-            case 2 : display();
+            case 2 : displayRoom();
                 break;
-            case 3 : displayAll();
+            case 3 : displayAllRooms();
                 break;
             case 5 : displayReservations();
+                break;
+            case 6 : deleteReservation();
                 break;
             case 7 : displayAnnuallyAvailabillity();
                 break;
@@ -168,7 +169,7 @@ void reserve() {
     printf("Press Enter to continue...\n");
 }
 
-void display() {
+void displayRoom() {
 
     struct Room room;
     FILE *fp;
@@ -205,7 +206,7 @@ void display() {
     printf("Press Enter to continue...\n");
 }
 
-void displayAll() {
+void displayAllRooms() {
 
     struct Room room;
     FILE *fp;
@@ -218,7 +219,7 @@ void displayAll() {
         if(feof(fp)) {
             break;            
         } else {
-            displayAllRooms(room);
+            displayAllRoomsInfo(room);
         }
     }
     fclose(fp);
@@ -240,7 +241,7 @@ void displayReservations() {
         if(feof(fp)) {
             break;            
         } else {
-            displayAllReservations(res);
+            displayAllReservationsInfo(res);
         }
     }
     fclose(fp);
@@ -249,114 +250,63 @@ void displayReservations() {
     char c = getc(stdin);
 }
 
-/* Display functions for logos and signs. */
-void displayMainLogo() {
-    system("clear");
-    printf("*****************************************************\n");
-    printf("*                  Welcome to Vesta                 *\n");
-    printf("*       The most Advanced and client oriented       *\n");
-    printf("*             Hotel Managment Software              *\n");
-    printf("*                                                   *\n");
-    printf("*****************************************************\n\n");
-    printf("Choose your action...\n\n");
-    printf("1. Reserve a room\n");
-    printf("2. Display room info\n");
-    printf("3. Display all rooms\n");
-    printf("4. Modify a room\n");
-    printf("5. Display all Reservations\n");
-    printf("6. Clear room Reservation\n");
-    printf("7. Display Annually Reservations\n");
-    printf("8. Search\n");
-    printf("0. Exit\n\n");
+void deleteReservation() {
+
+    struct Reservation res;
+    FILE *fp;
+    fp = fopen(reservationsdb, "rb");
+
+    char c;
+    while(c = getc(stdin) != '\n' && c != '\t');
+
+    displayDeleteResLogo();
+    printf("Enter Reservation's id you want to delete: ");
+    int res_id = getInteger(48, 10);
+    int found = 0;
+
+    while(found == 0) {
+        fread(&res, sizeof(res), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else if(res.id == res_id && res_id != 0) {
+            printf("Reservation's Id to be deleted: %d\n", res.id);
+            printf("Reservation's Room ID: %d\n", res.room.id);
+            printf("Reservation's Guests's ID: %d\n", res.guest.id);
+            printf("Reservation's From Date: %s\n", res.from_date);
+            printf("Reservation's To Date: %s\n", res.to_date);
+            printf("Are you sure you want to delete the Reservation: [Y/N]? ");
+            char c = getc(stdin);
+            if(c == 'Y' || c == 'y') {
+                getResDatesToDelete(res);
+                printf("Deleting Reservation...\n\n");
+                getc(stdin);
+                found = 1;
+            } else {
+                printf("Reservation deletion canceled.");
+                getc(stdin);
+                found = -1;
+            }
+        }
+    }
+    fclose(fp);
+    if(found == 0 && res_id != 0) {
+        printf("No Reservation found with this ID: %d\n", found);
+    } else if(found == 1) {
+        applyReservationDelete(res_id);
+        printf("Reservation has been deleted.\n");
+    } else if(found == -1) {
+        printf("\n");
+    }
+
+    printf("Press Enter to continue...\n");
 }
-void displayRoomReservationLogo() {
-    system("clear");
-    printf("*************************************\n");
-    printf("*      Room Reservation Panel.      *\n");
-    printf("*************************************\n\n");   
-}
-void displayRoomInfoLogo() {
-    system("clear");
-    printf("*************************************\n");
-    printf("*    Display Room Informations.     *\n");
-    printf("*************************************\n\n");
-}
-void displayRoomInfo(struct Room room) {
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |     From Date      |      To Date       |\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("|");
-    displayInt(room.id);
-    printf("|");
-    displayStr(room.type);
-    printf("|");
-    displayInt(room.guest_id);
-    printf("|");
-    displayStr(room.reserved ? "true" : "false");
-    printf("|");
-    displayStr(room.from_date);
-    printf("|");
-    displayStr(room.to_date);
-    printf("|\n");
-    printf("------------------------------------------------------------------------------------------------------------------------------\n");
-}
-void displayAllRoomsLogo() {
-    system("clear");
-    printf("*************************************\n");
-    printf("*  Display All Rooms Informations.  *\n");
-    printf("*************************************\n\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |     From Date      |      To Date       |\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-}
-void displayAllRooms(struct Room room) {
-    printf("|");
-    displayInt(room.id);
-    printf("|");
-    displayStr(room.type);
-    printf("|");
-    displayInt(room.guest_id);
-    printf("|");
-    displayStr(room.reserved ? "true" : "false");
-    printf("|");
-    displayStr(room.from_date);
-    printf("|");
-    displayStr(room.to_date);
-    printf("|\n");
-    printf("------------------------------------------------------------------------------------------------------------------------------\n");
-}
-void displayAllReservationsLogo() {
-    system("clear");
-    printf("*************************************\n");
-    printf("*      Display All Reservations.    *\n");
-    printf("*************************************\n\n");
-    printf(" --------------------------------------------------------------------------------------------------------\n");
-    printf("|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n");
-    printf(" --------------------------------------------------------------------------------------------------------\n");
-}
-void displayAllReservations(struct Reservation reservation) {
-    printf("|");
-    displayInt(reservation.id);
-    printf("|");
-    displayInt(reservation.room.id);
-    printf("|");
-    displayInt(reservation.guest.id);
-    printf("|");
-    displayStr(reservation.from_date);
-    printf("|");
-    displayStr(reservation.to_date);
-    printf("|\n");
-    printf("---------------------------------------------------------------------------------------------------------\n");
-}
-void displayAnnuallyAvailabillityLogo() {
-    system("clear");
-    printf("*************************************\n");
-    printf("*       Annually Reservations.      *\n");
-    printf("*************************************\n\n");   
-}
+
 void displayAnnuallyAvailabillity() {
 
     struct Day day;
+    struct Day *st_arr;
+    st_arr = malloc(sizeof(struct Day));
+    
     FILE *fp;
     fp = fopen(daysdb, "rb");
 
@@ -370,6 +320,8 @@ void displayAnnuallyAvailabillity() {
     while(c = getc(stdin) != '\n' && c != '\t');
 
     input_year = getInteger(48, 5);
+    int i = 0;
+    int dynamic_inc = 1;
 
     if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
         printf("Year out of range: %d\n", input_year);
@@ -380,48 +332,20 @@ void displayAnnuallyAvailabillity() {
             if(feof(fp)) {
                 break;
             } else if(strcmp(day.year, str_year) == 0) {
-                // display all year number of rooms by day.
-                if(strcmp(day.month, "01") == 0) {
-                    printf("|%s", day.day);
-                }
+                // Dynamically allocate memory for the array and create the struct array.
+                st_arr = (struct Day *)realloc(st_arr, sizeof(struct Day) * dynamic_inc);
+                st_arr[i] = day;
+                i++;
+                // create a multiplier for each item to increase array size accordingly.
+                dynamic_inc++;
             }
         }
-    } else  if(input_year == 0) {
+    } else if(input_year == 0) {
         printf("Undefined year parsing...!\n");
     }
     fclose(fp);
+    // Process and display.
+    displayRoomsPerDay(st_arr, i);
     printf("\nPress Enter to continue...\n");
 }
-void displayInt(int id) {
-
-    char converted[30];
-
-    sprintf(converted, "%d", id);
-    int d = (20 - strlen(converted)) / 2;
-
-    for(int i = 0; i <= 20 - strlen(converted); i++) {
-        if(i < d) {
-            printf(" ");
-        } else if(i > d) {
-            printf(" ");
-        } else {
-            printf("%s", converted);
-        }
-    }
-}
-void displayStr(char *str) {
-
-    int d = (20 - strlen(str)) / 2;
-
-    for(int i = 0; i <= 20 - strlen(str); i++) {
-        if(i < d) {
-            printf(" ");
-        } else if(i > d) {
-            printf(" ");
-        } else {
-            printf("%s", str);
-        }
-    }
-}
-
 
