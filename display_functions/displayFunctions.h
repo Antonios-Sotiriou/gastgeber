@@ -9,7 +9,11 @@ void displayAllReservationsLogo();
 void displayAllReservationsInfo(struct Reservation reservation);
 void displayDeleteResLogo();
 void displayAnnuallyAvailabillityLogo();
-void displayRoomsPerDay(struct Day *st_arr, int i);
+void displayRoomsPerDay(struct Day st_arr[], int i);
+void displayRoomAnnuallyReservationsLogo();
+void displayRoomAnnuallyReservationsInfo(int room_id, int input_year);
+void displayAllRoomsAnnuallyReservationsLogo();
+void displayAllRoomsAnnuallyReservationsInfo(int input_year);
 /* Global Display functions */
 void displayInt(int id, int dis_len);
 void displayStr(char *str, int dis_len);
@@ -29,8 +33,9 @@ void displayMainLogo() {
     printf("4. Modify a room\n");
     printf("5. Display all Reservations\n");
     printf("6. Delete room Reservation\n");
-    printf("7. Display Annually Reservations\n");
-    printf("8. Search\n");
+    printf("7. Display Annually Availabillity\n");
+    printf("8. Display Room Annually Reservations\n");
+    printf("9. Display all Rooms Annually Reservations\n");
     printf("0. Exit\n\n");
 }
 void displayRoomReservationLogo() {
@@ -62,7 +67,7 @@ void displayRoomInfo(struct Room room) {
     printf("|");
     displayStr(room.to_date, 20);
     printf("|\n");
-    printf("------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------------------------------------------\n\n");
 }
 void displayAllRoomsLogo() {
     system("clear");
@@ -124,13 +129,13 @@ void displayAnnuallyAvailabillityLogo() {
     printf("*       Annually Reservations.      *\n");
     printf("*************************************\n\n");   
 }
-void displayRoomsPerDay(struct Day *st_arr, int i) {
+void displayRoomsPerDay(struct Day st_arr[], int i) {
     
     for(int x = 0; x <= i - 1; x++) {
         char month[11];
         int month_days = 0;
         if(strcmp(st_arr[x].day, "01") == 0) {
-            printf("\n\n\t\t\t\t\t\t\t\t\t%s\n", st_arr[x].month_name);
+            printf(ANSI_COLOR_GREEN "\n\n\t\t\t\t\t\t\t\t\t%s\n" ANSI_COLOR_RESET, st_arr[x].month_name);
             while (strcmp(st_arr[x].month_name, month) != 0) {
                 sprintf(month, "%s", st_arr[x].month_name);
                 for(int d = 0; d <= i - 1; d++) {
@@ -160,6 +165,7 @@ void displayRoomsPerDay(struct Day *st_arr, int i) {
             printf("|");
         }
     }
+    printf("\n");
     free(st_arr);  
 }
 void displayInt(int id, int dis_len) {
@@ -193,3 +199,65 @@ void displayStr(char *str, int dis_len) {
         }
     }
 }
+void displayRoomAnnuallyReservationsLogo() {
+    system("clear");
+    printf("*************************************\n");
+    printf("*    Annually Room Reservations.    *\n");
+    printf("*************************************\n\n");   
+}
+void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
+
+    struct Day day;
+
+    FILE *fp;
+    fp = fopen(daysdb, "rb");
+    
+    int days_counter = 0;
+    char str_year[5];
+    sprintf(str_year, "%d", input_year);
+
+    printf("Displaying Year %d\n", input_year);
+    printf("Room Availabillity for Room ID: %d\n", room_id);
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else if(strcmp(day.year, str_year) == 0) {
+            if(strcmp(day.day, "01") == 0) {
+                printf("\n|");
+                displayStr(day.month_name, 11);
+                printf("|");
+            }
+            days_counter++;
+            int room_booked = 0;
+            for(int i = 0; i <= sizeof(day.room_id) / sizeof(int); i++) {
+                if(day.room_id[i] == room_id) {
+                    room_booked = 1;
+                    break;
+                }
+            }
+            if(room_booked == 1) {
+                printf(ANSI_COLOR_GREEN_BG "%s" ANSI_COLOR_RESET, day.day);
+                printf("|");
+            } else {
+                printf("%s", day.day);
+                printf("|");
+            }
+        }
+    }
+    fclose(fp);
+
+    printf("\n\nDays counter: %d\n\n", days_counter);
+}
+void displayAllRoomsAnnuallyReservationsLogo() {
+    system("clear");
+    printf("*********************************************\n");
+    printf("*    Annually Reservations for all Rooms    *\n");
+    printf("*********************************************\n\n");   
+}
+void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
+
+}
+
+
