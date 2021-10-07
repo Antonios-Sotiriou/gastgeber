@@ -186,13 +186,12 @@ void displayRoom() {
     displayRoomInfoLogo();
 
     int room_id; 
-    int found = 0;
     char c; 
     while(c = getc(stdin) != '\n' && c != '\t');
     
     printf("Enter Room ID(1-99):\n");  
     room_id = getnuminput(5);
-    
+        
     if (room_id < 1 || room_id > TOTAL_ROOMS) {
         printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
     } else {
@@ -202,7 +201,6 @@ void displayRoom() {
                 break;            
             } else if(room.id == room_id) {
                 displayRoomInfo(room);
-                found = 1;
             }
         }
     }
