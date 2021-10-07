@@ -22,6 +22,7 @@
  ********************/
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_GREEN_BG "\x1b[48;5;40m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
 #define ANSI_COLOR_BLUE    "\x1b[34m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
@@ -50,6 +51,8 @@ void modify();
 void displayReservations();
 void deleteReservation();
 void displayAnnuallyAvailabillity();
+void displayRoomAnnuallyReservations();
+void displayAllRoomsAnnuallyReservations();
 
 void main(int argc, char *argv[]) {
 
@@ -82,6 +85,10 @@ void main(int argc, char *argv[]) {
                 break;
             case 7 : displayAnnuallyAvailabillity();
                 break;
+            case 8 : displayRoomAnnuallyReservations();
+                break;
+            case 9 : displayAllRoomsAnnuallyReservations();
+                break;
             case 0 : system("clear");
                 exit(0);
                 break;
@@ -112,10 +119,11 @@ void reserve() {
     while(found == 0) {
 
         printf("Enter Room ID(1-99):\n");  
-        room_id = getnuminput();
+        room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf("Invalid Room ID.\n");
+            system("clear");
+            printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
             continue;
         } else {
             reservation.id = next_id;
@@ -136,7 +144,7 @@ void reserve() {
                 printf("To date: \n");
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     if(checkAllDates(reservation) == 0) {
-                        printf("Room Succesfully reserved!\n");
+                        printf(ANSI_COLOR_GREEN "Room Succesfully reserved!\n\n" ANSI_COLOR_RESET);
                         to_date = 1;
                         fwrite(&reservation, sizeof(reservation), 1, fp1);
                     } else {
@@ -178,32 +186,27 @@ void displayRoom() {
     displayRoomInfoLogo();
 
     int room_id; 
-    int found = 0;
     char c; 
     while(c = getc(stdin) != '\n' && c != '\t');
     
-    while(found == 0) {
-    
-        printf("Enter Room ID(1-99):\n");  
-        room_id = getnuminput();
+    printf("Enter Room ID(1-99):\n");  
+    room_id = getnuminput(5);
         
-        if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf("Invalid Room ID.\n");
-            continue;
-        } else {
-            while(1) {
-                fread(&room, sizeof(room), 1, fp);
-                if(feof(fp)) {
-                    break;            
-                } else if(room.id == room_id) {
-                    displayRoomInfo(room);
-                    found = 1;
-                }
+    if (room_id < 1 || room_id > TOTAL_ROOMS) {
+        printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
+    } else {
+        while(1) {
+            fread(&room, sizeof(room), 1, fp);
+            if(feof(fp)) {
+                break;            
+            } else if(room.id == room_id) {
+                displayRoomInfo(room);
             }
         }
     }
     fclose(fp);
-    printf("Press Enter to continue...\n");
+
+    printf("\nPress Enter to continue...\n");
 }
 
 void displayAllRooms() {
@@ -211,9 +214,12 @@ void displayAllRooms() {
     struct Room room;
     FILE *fp;
     fp = fopen(roomsdb, "rb");
+
+    char c; 
+    while(c = getc(stdin) != '\n' && c != '\t');
     
     displayAllRoomsLogo();
-    
+
     while(1) {
         fread(&room, sizeof(room), 1, fp);
         if(feof(fp)) {
@@ -223,9 +229,8 @@ void displayAllRooms() {
         }
     }
     fclose(fp);
-    printf("Press Enter to continue...\n");
 
-    char c = getc(stdin);
+    printf("\nPress Enter to continue...\n");
 }
 
 void displayReservations() {
@@ -274,7 +279,7 @@ void deleteReservation() {
             printf("Reservation's Guests's ID: %d\n", res.guest.id);
             printf("Reservation's From Date: %s\n", res.from_date);
             printf("Reservation's To Date: %s\n", res.to_date);
-            printf("Are you sure you want to delete the Reservation: [Y/N]? ");
+            printf(ANSI_COLOR_RED "Are you sure you want to delete the Reservation: [Y/N]? " ANSI_COLOR_RESET);
             char c = getc(stdin);
             if(c == 'Y' || c == 'y') {
                 getResDatesToDelete(res);
@@ -282,7 +287,7 @@ void deleteReservation() {
                 getc(stdin);
                 found = 1;
             } else {
-                printf("Reservation deletion canceled.");
+                printf(ANSI_COLOR_GREEN "Reservation deletion canceled." ANSI_COLOR_RESET);
                 getc(stdin);
                 found = -1;
             }
@@ -324,7 +329,7 @@ void displayAnnuallyAvailabillity() {
     int dynamic_inc = 1;
 
     if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
-        printf("Year out of range: %d\n", input_year);
+        printf(ANSI_COLOR_RED "\nYear out of range: %d\n" ANSI_COLOR_RESET, input_year);
     } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
         sprintf(str_year, "%d", input_year);
         while(1) {
@@ -333,7 +338,7 @@ void displayAnnuallyAvailabillity() {
                 break;
             } else if(strcmp(day.year, str_year) == 0) {
                 // Dynamically allocate memory for the array and create the struct array.
-                st_arr = (struct Day *)realloc(st_arr, sizeof(struct Day) * dynamic_inc);
+                st_arr = realloc(st_arr, sizeof(struct Day) * dynamic_inc);
                 st_arr[i] = day;
                 i++;
                 // create a multiplier for each item to increase array size accordingly.
@@ -341,11 +346,44 @@ void displayAnnuallyAvailabillity() {
             }
         }
     } else if(input_year == 0) {
-        printf("Undefined year parsing...!\n");
+        printf(ANSI_COLOR_RED "\nUndefined year parsing...!\n" ANSI_COLOR_RESET);
     }
     fclose(fp);
     // Process and display.
     displayRoomsPerDay(st_arr, i);
-    printf("\nPress Enter to continue...\n");
+    printf("\nPress Enter to continue...");
 }
 
+void displayRoomAnnuallyReservations() {
+
+    displayRoomAnnuallyReservationsLogo();
+
+    char c;
+    while(c = getc(stdin) != '\n' && c != '\t');
+
+    printf("Enter room ID you want to display: ");
+    int room_id = getInteger(48, 5);
+    if(room_id <= 0 || room_id > TOTAL_ROOMS) {
+        printf(ANSI_COLOR_RED "\nProvide a correct room ID.\nYou can check the room IDs from option 3 in main menu.\n\n" ANSI_COLOR_RESET);
+    } else {
+        printf("Room ID: %d\n", room_id);
+        printf("Enter which year you want to display: ");
+        int input_year = getInteger(48, 5);
+        if ((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
+            printf(ANSI_COLOR_RED "\nProvide a correct year.\nAre you sure year is in range of Software STARTING_YEAR - FINISHING_YEAR?\n\n" ANSI_COLOR_RESET);
+        } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
+            printf("Year: %d\nDisplaying Room Annually Reservations...\n\n", input_year);
+            displayRoomAnnuallyReservationsInfo(room_id, input_year);
+        }
+    }
+
+    printf("Press Enter to continue...");
+}
+
+void displayAllRoomsAnnuallyReservations() {
+
+    displayAllRoomsAnnuallyReservationsLogo();
+
+    char c; 
+    while(c = getc(stdin) != '\n' && c != '\t');
+}

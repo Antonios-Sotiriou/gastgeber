@@ -1,14 +1,18 @@
-int getnuminput();
+int getnuminput(int max_len);
 int getformatedDate(char *room_date);
 int getInteger(int str_len, int int_len);
 
-int getnuminput() {
+int getnuminput(int max_len) {
 
-    char input[10];
-    char cleared_num[10];
+    char input[48];
+    char cleared_num[48];
 
     fgets(input, sizeof(input), stdin);
 
+    if(strlen(input) - 1 > max_len) {
+        printf(ANSI_COLOR_RED "\nInvalid number length!\n" ANSI_COLOR_RESET);
+        return 0;
+    }
     for(int i = 0, d = 0; i <= strlen(input) - 1; i++) {
         // CHECKING FOR ALPHABET
         if ((input[i] >= 65 && input[i] <= 90) || (input[i] >= 97 && input[i] <= 122)) {
@@ -45,7 +49,7 @@ int getformatedDate(char *room_date) {
 
     if(test == 3) {
         if(day < 0 || day > 31) {
-            printf("Give  a correct day!\n");
+            printf(ANSI_COLOR_RED "\nGive  a correct day!\n" ANSI_COLOR_RESET);
             return 0;
         } else if(day > 0 && day < 10) {
             sprintf(converted_day, "0%d/", day);
@@ -53,7 +57,7 @@ int getformatedDate(char *room_date) {
             sprintf(converted_day, "%d/", day);
         }
         if(month < 0 || month > 12) {
-            printf("Give a correct month!\n");
+            printf(ANSI_COLOR_RED "\nGive a correct month!\n" ANSI_COLOR_RESET);
             return 0;
         } else if(month > 0 && month < 10) {
             sprintf(converted_month, "0%d/", month);
@@ -68,15 +72,15 @@ int getformatedDate(char *room_date) {
             if(day - mytime -> tm_mday >= 0) {
                 sprintf(converted_year, "%d", year);
             } else {
-                printf("This day is in the past!\n");
+                printf(ANSI_COLOR_RED "\nThis day is in the past!\n" ANSI_COLOR_RESET);
                 return 0;
             }
         } else {
-            printf("Provide a date from today to the future!\n");
+            printf(ANSI_COLOR_RED "\nProvide a date from today to the future!\n" ANSI_COLOR_RESET);
             return 0;
         }
     } else {
-        printf("The date you entered is in wrong format!\n");
+        printf(ANSI_COLOR_RED "\nThe date you entered is in wrong format!\n" ANSI_COLOR_RESET);
         return 0;
     }
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
@@ -97,14 +101,14 @@ int getInteger(int str_len, int int_len) {
     fgets(str_year, sizeof(str_year), stdin);
 
     if(strlen(str_year) - 1 >= int_len) {
-        printf("Invalid number length!\n");
+        printf(ANSI_COLOR_RED "\nInvalid number length!\n" ANSI_COLOR_RESET);
         return 0;
     } else {
         for(int i = 0; i <= strlen(str_year) - 1; i++) {
             if(str_year[i] >= 48 && str_year[i] <= 57) {
                 year_input = year_input * 10 + str_year[i] - '0';
             } else if (str_year[i] != '\n') {
-                printf("Please check the syntax! \n");
+                printf(ANSI_COLOR_RED "\nPlease check the syntax! \n" ANSI_COLOR_RESET);
                 return 0;
             }
         }

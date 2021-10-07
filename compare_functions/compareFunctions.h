@@ -21,16 +21,16 @@ int compareDates(char *from_date, char *to_date) {
         if(to_day > from_day) {
             return 1;
         } else if(to_day == from_day) {
-            printf("Same from and to days.You must provide a day in the future.You can't check in and check out the same day!\n");
+            printf(ANSI_COLOR_RED "\nSame from and to days.You must provide a day in the future.\nYou can't check in and check out the same day!\n" ANSI_COLOR_RESET);
             return 0;
         } else {
-            printf("This day is in the past!\n");
+            printf(ANSI_COLOR_RED "\nThis day is in the past!\n" ANSI_COLOR_RESET);
             return 0;         
         }
     } else if(to_year > from_year) {
         return 1;
     } else {
-        printf("To date is older than from date\n");
+        printf(ANSI_COLOR_RED "\nTo date is older than from date\n" ANSI_COLOR_RESET);
         return 0;
     }
 }
