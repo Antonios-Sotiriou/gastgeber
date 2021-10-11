@@ -22,7 +22,9 @@
  ********************/
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_GREEN_BG "\x1b[48;5;40m"
+#define ANSI_COLOR_GREEN_BG "\x1b[48;5;34m"
+#define ANSI_COLOR_RED_BG "\x1b[48;5;196m"
+#define ANSI_COLOR_BLUE_BG "\x1b[48;5;21m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
 #define ANSI_COLOR_BLUE    "\x1b[34m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
@@ -386,4 +388,17 @@ void displayAllRoomsAnnuallyReservations() {
 
     char c; 
     while(c = getc(stdin) != '\n' && c != '\t');
+
+    printf("Enter which year you want to display: ");
+    int input_year = getInteger(48, 5);
+
+    if ((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
+        printf(ANSI_COLOR_RED "\nProvide a correct year.\nAre you sure year is in range of Software STARTING_YEAR - FINISHING_YEAR?\n\n" ANSI_COLOR_RESET);
+    } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
+        printf("Year: %d\nDisplaying Room Annually Reservations...\n\n", input_year);
+        displayAllRoomsAnnuallyReservationsInfo(input_year);
+    }
+
+    printf("Press Enter to continue...");
 }
+

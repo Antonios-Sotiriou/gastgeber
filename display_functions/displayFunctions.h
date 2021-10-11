@@ -258,6 +258,74 @@ void displayAllRoomsAnnuallyReservationsLogo() {
 }
 void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
 
+    struct Day day;
+    struct Room room;
+
+    FILE *fp, *fp1, *fp2;
+    fp = fopen(daysdb, "rb");
+    fp1 = fopen(roomsdb, "rb");
+    fp2 = fopen("/home/as/gastgeber/data/output.txt", "w");
+    //fp2 = fopen("/dev/pts/1", "w");
+    
+    int days_counter = 0;
+    char str_year[5];
+    sprintf(str_year, "%d", input_year);
+
+    printf("Displaying Year %d\n", input_year);
+    fprintf(fp2, "Displaying Year %d\n", input_year);
+    printf("|  Room IDs |");
+    fprintf(fp2, "|  Room IDs |");
+
+    while(1) {
+        fread(&room, sizeof(room), 1, fp1);
+        if(feof(fp1)) {
+            break;
+        } else {
+            displayInt(room.id, 5);
+            printf("|");
+            fprintf(fp2, " %3d ", room.id);
+            fprintf(fp2, "|");
+        }
+    }
+    fclose(fp1);
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else if(strcmp(day.year, str_year) == 0) {
+            if(strcmp(day.day, "01") == 0) {
+                printf("\n|");
+                fprintf(fp2, "\n|");
+                displayStr(day.month_name, 11);
+                fprintf(fp2, " %9s ", day.month_name);
+                printf("|");
+                fprintf(fp2, "|");
+            }
+            printf("\n");
+            fprintf(fp2, "\n");
+            printf("|     %s    |", day.day);
+            fprintf(fp2, "|     %2s    |", day.day);
+            days_counter++;
+            for(int i = 1; i <= TOTAL_ROOMS; i++) {
+                if(day.room_id[i] > 0 && day.room_id[i] <= TOTAL_ROOMS) {
+                    printf(" ");
+                    fprintf(fp2, " ");
+                    printf(ANSI_COLOR_GREEN_BG " X " ANSI_COLOR_RESET);
+                    fprintf(fp2, " X ");
+                    printf(" |");
+                    fprintf(fp2, " |");
+                } else {
+                    printf("     |");
+                    fprintf(fp2, "     |");
+                }
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp2);
+
+    printf("\n\nDays counter: %d\n\n", days_counter);
 }
 
 
