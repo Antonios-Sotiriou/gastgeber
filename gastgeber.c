@@ -10,40 +10,30 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <time.h>
 /*********************
  * Global constants 
  ********************/
-#define STARTING_YEAR 2021
-#define FINISHING_YEAR 2121
-#define TOTAL_ROOMS 100
+#include "header_files/global_vars.h"
 /*********************
  * Color Initialisation
  ********************/
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_GREEN_BG "\x1b[48;5;34m"
-#define ANSI_COLOR_RED_BG "\x1b[48;5;196m"
-#define ANSI_COLOR_BLUE_BG "\x1b[48;5;21m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+#include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "input_functions/userInputFunctions.h"
-#include "compare_functions/compareFunctions.h"
+#include "header_files/paths.h"
+
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
 #include "structures/reservations.h"
-#include "header_files/paths.h"
-#include "init_dbs/init_databases.h"
-#include "reserve_functions/reserveAvailabillity.h"
-#include "delete_functions/deleteReservation.h"
-#include "display_functions/displayFunctions.h"
+
+#include "header_files/userinput.h"
+#include "header_files/display.h"
+#include "header_files/comparedates.h"
+#include "header_files/init_dbs.h"
+#include "header_files/reserve.h"
+#include "header_files/delete_reservation.h"
 
 /* functionality functions */
 void reserve();
@@ -56,7 +46,7 @@ void displayAnnuallyAvailabillity();
 void displayRoomAnnuallyReservations();
 void displayAllRoomsAnnuallyReservations();
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
     if(argc > 1 && strcmp(argv[1], "init") == 0) {
         createDaysDb();
@@ -97,7 +87,7 @@ void main(int argc, char *argv[]) {
             default :
                 break;
         }
-        while(c = getc(stdin) != '\n' && c != '\t');
+        while((c = getc(stdin) != '\n') && c != '\t');
     }
 }
 
@@ -116,7 +106,7 @@ void reserve() {
     int next_id = getNextEntry();
 
     char c;
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
 
     while(found == 0) {
 
@@ -189,7 +179,7 @@ void displayRoom() {
 
     int room_id; 
     char c; 
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
     
     printf("Enter Room ID(1-99):\n");  
     room_id = getnuminput(5);
@@ -218,7 +208,7 @@ void displayAllRooms() {
     fp = fopen(roomsdb, "rb");
 
     char c; 
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
     
     displayAllRoomsLogo();
 
@@ -254,7 +244,7 @@ void displayReservations() {
     fclose(fp);
     printf("Press Enter to continue...\n");
 
-    char c = getc(stdin);
+    getc(stdin);
 }
 
 void deleteReservation() {
@@ -264,7 +254,7 @@ void deleteReservation() {
     fp = fopen(reservationsdb, "rb");
 
     char c;
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
 
     displayDeleteResLogo();
     printf("Enter Reservation's id you want to delete: ");
@@ -324,7 +314,7 @@ void displayAnnuallyAvailabillity() {
     printf("Which year would you like to display? ");
 
     char c;
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
 
     input_year = getInteger(48, 5);
     int i = 0;
@@ -361,7 +351,7 @@ void displayRoomAnnuallyReservations() {
     displayRoomAnnuallyReservationsLogo();
 
     char c;
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
 
     printf("Enter room ID you want to display: ");
     int room_id = getInteger(48, 5);
@@ -387,7 +377,7 @@ void displayAllRoomsAnnuallyReservations() {
     displayAllRoomsAnnuallyReservationsLogo();
 
     char c; 
-    while(c = getc(stdin) != '\n' && c != '\t');
+    while((c = getc(stdin) != '\n') && c != '\t');
 
     printf("Enter which year you want to display: ");
     int input_year = getInteger(48, 5);
