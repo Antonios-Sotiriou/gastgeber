@@ -3,7 +3,6 @@
 *********************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 /*********************
  * Global constants 
@@ -37,7 +36,7 @@ void displayMainLogo() {
     printf("1. Reserve a room\n");
     printf("2. Display room info\n");
     printf("3. Display all rooms\n");
-    printf("4. Modify a room\n");
+    printf("4. Modify Room or Guest\n");
     printf("5. Display all Reservations\n");
     printf("6. Delete room Reservation\n");
     printf("7. Display Annually Availabillity\n");
@@ -58,48 +57,61 @@ void displayRoomInfoLogo() {
     printf("*************************************\n\n");
 }
 void displayRoomInfo(struct Room room) {
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |     From Date      |      To Date       |\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------\n");
+    printf("|      Room ID       |     Room Name      |      Room Type     |\n");
+    printf(" --------------------------------------------------------------\n");
     printf("|");
     displayInt(room.id, 20);
     printf("|");
+    displayStr(room.name, 20);
+    printf("|");
     displayStr(room.type, 20);
-    printf("|");
-    displayInt(room.guest_id, 20);
-    printf("|");
-    displayStr(room.reserved ? "true" : "false", 20);
-    printf("|");
-    displayStr(room.from_date, 20);
-    printf("|");
-    displayStr(room.to_date, 20);
     printf("|\n");
-    printf("------------------------------------------------------------------------------------------------------------------------------\n\n");
+    printf(" --------------------------------------------------------------\n\n");
 }
 void displayAllRoomsLogo() {
     system("clear");
     printf("*************************************\n");
     printf("*  Display All Rooms Informations.  *\n");
     printf("*************************************\n\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Type      |      Guest ID      |    Room Reserved   |     From Date      |      To Date       |\n");
-    printf(" -----------------------------------------------------------------------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------\n");
+    printf("|      Room ID       |     Room Name      |      Room Type     |\n");
+    printf(" --------------------------------------------------------------\n");
 }
 void displayAllRoomsInfo(struct Room room) {
     printf("|");
     displayInt(room.id, 20);
     printf("|");
+    displayStr(room.name, 20);
+    printf("|");
     displayStr(room.type, 20);
-    printf("|");
-    displayInt(room.guest_id, 20);
-    printf("|");
-    displayStr(room.reserved ? "true" : "false", 20);
-    printf("|");
-    displayStr(room.from_date, 20);
-    printf("|");
-    displayStr(room.to_date, 20);
     printf("|\n");
-    printf("------------------------------------------------------------------------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------\n");
+}
+void displayModifyLogo() {
+    system("clear");
+    printf("*****************************************************\n");
+    printf("*                Modification Panel                 *\n");
+    printf("*          Choose what you want to modify           *\n");
+    printf("*                                                   *\n");
+    printf("*****************************************************\n\n");
+    printf("Choose your action...\n\n");
+    printf("1. Modify a room\n");
+    printf("2. Modify Guest Info\n");
+    printf("0. Go Back\n\n");
+}
+void displayModifyRoomChoices() {
+    printf("Choose what to modify...\n\n");
+    printf("1. Modify Room Name\n");
+    printf("2. Modify Room Type\n");
+    printf("3. Modify Room Name and Type\n");
+    printf("0. Go Back\n\n");
+}
+void displayModifyRoomLogo() {
+    system("clear");
+    printf("*************************************\n");
+    printf("*      Room Modification Panel.     *\n");
+    printf("*************************************\n\n");
 }
 void displayAllReservationsLogo() {
     system("clear");

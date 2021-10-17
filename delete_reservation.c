@@ -2,7 +2,6 @@
 * Build in libraries
 *********************/
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 /*********************
  * Global constants 
@@ -53,7 +52,7 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     struct Day day;
     FILE *fp, *fp1;
     fp = fopen(daysdb, "rb");
-    fp1 = fopen("/home/as/c_programs/dbs/journal.dat", "wb");
+    fp1 = fopen(journal_sec, "wb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -71,7 +70,7 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp1);
 
     fp = fopen(daysdb, "wb");
-    fp1 = fopen("/home/as/c_programs/dbs/journal.dat", "rb");
+    fp1 = fopen(journal_sec, "rb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp1);
@@ -83,7 +82,7 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove("/home/as/c_programs/dbs/journal.dat");
+    remove(journal_sec);
 }
 
 void applyReservationDelete(int res_id) {
@@ -92,7 +91,7 @@ void applyReservationDelete(int res_id) {
     FILE *fp, *fp1;
 
     fp = fopen(reservationsdb, "rb");
-    fp1 = fopen("/home/as/gastgeber/data/journal.dat", "wb");
+    fp1 = fopen(journal_sec, "wb");
     while(1) {
         fread(&res, sizeof(res), 1, fp);
         if(feof(fp)) {
@@ -104,7 +103,7 @@ void applyReservationDelete(int res_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp1 = fopen("/home/as/gastgeber/data/journal.dat", "rb");
+    fp1 = fopen(journal_sec, "rb");
     fp = fopen(reservationsdb, "wb");
     while(1) {
          fread(&res, sizeof(res), 1, fp1);
@@ -117,6 +116,6 @@ void applyReservationDelete(int res_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove("/home/as/gastgeber/data/journal.dat");
+    remove(journal_sec);
 }
 

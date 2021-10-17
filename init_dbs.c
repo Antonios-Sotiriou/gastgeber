@@ -3,7 +3,6 @@
 *********************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
@@ -108,8 +107,8 @@ void createRoomsDb() {
         printf("Creating rooms Database.Please wait.\n");
         for(int i = 1; i <= TOTAL_ROOMS; i++) {
             room.id = i;
-            room.guest_id = 0;
-            room.reserved = false;
+            sprintf(room.name, "%s", "None");
+            sprintf(room.type, "%s", "None");
             fwrite(&room, sizeof(room), 1, fp);
         }
         fclose(fp);

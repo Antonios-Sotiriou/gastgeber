@@ -127,4 +127,36 @@ int getInteger(int str_len, int int_len) {
     }
     return year_input;  
 }
+char* getString(int str_len) {
+
+    /**********************************************************************
+     * Return a string of given length without spaes in between
+     **********************************************************************/
+
+    char str_input[48];
+    char *cleaned_str = malloc(sizeof(char));
+
+    fgets(str_input, sizeof(str_input), stdin);
+    int i;
+    int dynamic_inc = 1;
+    // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.
+    for(i = 0; i <= strlen(str_input) - 2; i++) {
+        if(str_input[i] == ' ' || str_input[i] == '\t') {
+            printf("Spaces are not allowed between.\n");
+            return 0;
+        } else if(str_input[i] == '\n') {
+            continue;
+        } else {
+            cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);
+            cleaned_str[i] = str_input[i];
+            dynamic_inc++;
+        }
+    } // Here checking the string size + 1 to give an extra place for the \0 char.
+    if(strlen(cleaned_str) > str_len) {
+        printf("Invalid length.\nMust be %d characters long.", str_len);
+        return 0;
+    } else {
+        return cleaned_str;
+    }
+}
 

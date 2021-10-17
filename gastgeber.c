@@ -8,7 +8,6 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 /*********************
  * Global constants 
@@ -34,6 +33,7 @@
 #include "header_files/init_dbs.h"
 #include "header_files/reserve.h"
 #include "header_files/delete_reservation.h"
+#include "header_files/modify.h"
 
 /* functionality functions */
 void reserve();
@@ -71,6 +71,8 @@ int main(int argc, char *argv[]) {
                 break;
             case 3 : displayAllRooms();
                 break;
+            case 4 : modify();
+                break;
             case 5 : displayReservations();
                 break;
             case 6 : deleteReservation();
@@ -96,7 +98,7 @@ void reserve() {
     struct Reservation reservation;
     FILE *fp, *fp1;
     fp = fopen(reservationsdb, "rb");
-    fp1 = fopen("/home/as/gastgeber/data/journal.dat", "ab");
+    fp1 = fopen(journal_main, "ab");
 
     displayRoomReservationLogo();
 
@@ -152,7 +154,7 @@ void reserve() {
 
     if(found == 1) {
         fp = fopen(reservationsdb, "ab");
-        fp1 = fopen("/home/as/gastgeber/data/journal.dat", "rb");
+        fp1 = fopen(journal_main, "rb");
 
         while(1) {
             fread(&reservation, sizeof(reservation), 1, fp1);
@@ -165,7 +167,7 @@ void reserve() {
     fclose(fp1);
     fclose(fp);
 
-    remove("/home/as/gastgeber/data/journal.dat");
+    remove(journal_main);
     printf("Press Enter to continue...\n");
 }
 
@@ -221,6 +223,30 @@ void displayAllRooms() {
         }
     }
     fclose(fp);
+
+    printf("\nPress Enter to continue...\n");
+}
+
+void modify() {
+
+    
+    displayModifyLogo();
+    
+    int choice;
+    scanf("%d", &choice);
+
+    switch(choice) {
+        case 1 : modifyRoom();
+            break;
+        case 2 : system("clear");
+            printf("Option not implemented yet.\n");
+            getc(stdin);
+            break;
+        case 0 : system("clear");
+            break;
+        default :
+            break;
+    }
 
     printf("\nPress Enter to continue...\n");
 }
