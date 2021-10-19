@@ -84,8 +84,9 @@ void createDaysDb() {
             }
         }
         fclose(fp);
-        system("clear");
         printf("Days database successfully created!\n");
+    } else {
+        printf("Days database already exists.\n");
     }
 }
 
@@ -109,11 +110,14 @@ void createRoomsDb() {
             room.id = i;
             sprintf(room.name, "%s", "None");
             sprintf(room.type, "%s", "None");
+            room.capacity = 0;
+            room.price = 0;
             fwrite(&room, sizeof(room), 1, fp);
         }
         fclose(fp);
-        system("clear");
         printf("Rooms database successfully created!\n");
+    } else {
+        printf("Rooms database already exists.\n");
     }
 }
 
@@ -125,7 +129,7 @@ void createReservationsDb() {
 
     if(fp == NULL) {
         fp = fopen(reservationsdb, "wb");
-        printf("Creating reservations Database.Please wait.\n");
+        printf("Creating Reservations Database.Please wait.\n");
         
         reservation.id = 0;
         reservation.room.id = 0;
@@ -135,12 +139,36 @@ void createReservationsDb() {
         fwrite(&reservation, sizeof(reservation), 1, fp);
 
         fclose(fp);
-        system("clear");
         printf("Reservations database successfully created!\n");
+    } else {
+        printf("Reservations database already exists.\n");
     }
 }
 
-int getNextEntry() {
+void createGuestsDb() {
+
+    FILE *fp;
+    fp = fopen(guestsdb, "rb");
+    struct Guest guest;
+
+    if(fp == NULL) {
+        fp = fopen(guestsdb, "wb");
+        printf("Creating Guests Database.Please wait.\n");
+        
+        guest.id = 0;
+        sprintf(guest.first_name, "%s", "None");
+        sprintf(guest.last_name, "%s", "None");
+        sprintf(guest.nationality, "%s", "None");
+        fwrite(&guest, sizeof(guest), 1, fp);
+
+        fclose(fp);
+        printf("Guests database successfully created!\n");
+    } else {
+        printf("Guests database already exists.\n");
+    }
+}
+
+int getNextReservationEntry() {
 
     struct Reservation reservation;
     FILE *fp;
@@ -154,6 +182,26 @@ int getNextEntry() {
             break;            
         } else {
             next_id = reservation.id + 1;
+        }
+    }
+    fclose(fp);
+    return next_id;
+}
+
+int getNextGuestEntry() {
+
+    struct Guest guest;
+    FILE *fp;
+    fp = fopen(guestsdb, "rb");
+    
+    // counter to find the last reservation record!
+    int next_id = 0;
+    while(1) {
+        fread(&guest, sizeof(guest), 1, fp);
+        if(feof(fp)) {
+            break;            
+        } else {
+            next_id = guest.id + 1;
         }
     }
     fclose(fp);

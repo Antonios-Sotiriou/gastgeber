@@ -34,11 +34,14 @@
 #include "header_files/reserve.h"
 #include "header_files/delete_reservation.h"
 #include "header_files/modify.h"
+#include "header_files/handle_guest.h"
 
 /* functionality functions */
 void reserve();
 void displayRoom();
 void displayAllRooms();
+void displayGuest();
+void displayAllGuests();
 void modify();
 void displayReservations();
 void deleteReservation();
@@ -52,6 +55,7 @@ int main(int argc, char *argv[]) {
         createDaysDb();
         createRoomsDb();
         createReservationsDb();
+        createGuestsDb();
         printf("argv: %s", argv[1]);
         getc(stdin);
     }
@@ -71,17 +75,21 @@ int main(int argc, char *argv[]) {
                 break;
             case 3 : displayAllRooms();
                 break;
-            case 4 : modify();
+            case 4 : displayGuest();
                 break;
-            case 5 : displayReservations();
+            case 5 : displayAllGuests();
                 break;
-            case 6 : deleteReservation();
+            case 6 : modify();
                 break;
-            case 7 : displayAnnuallyAvailabillity();
+            case 7 : displayReservations();
                 break;
-            case 8 : displayRoomAnnuallyReservations();
+            case 8 : deleteReservation();
                 break;
-            case 9 : displayAllRoomsAnnuallyReservations();
+            case 9 : displayAnnuallyAvailabillity();
+                break;
+            case 10 : displayRoomAnnuallyReservations();
+                break;
+            case 11 : displayAllRoomsAnnuallyReservations();
                 break;
             case 0 : system("clear");
                 exit(0);
@@ -96,16 +104,15 @@ int main(int argc, char *argv[]) {
 void reserve() {
 
     struct Reservation reservation;
-    FILE *fp, *fp1;
-    fp = fopen(reservationsdb, "rb");
-    fp1 = fopen(journal_main, "ab");
+    FILE *fp;
+    fp = fopen(reservationsdb, "ab");
 
     displayRoomReservationLogo();
 
     int room_id;
     int found = 0;
     // counter function which finds the last reservation record!
-    int next_id = getNextEntry();
+    int next_id = getNextReservationEntry();
 
     char c;
     while((c = getc(stdin) != '\n') && c != '\t');
@@ -122,15 +129,17 @@ void reserve() {
         } else {
             reservation.id = next_id;
             reservation.room.id = room_id;
-            
-            printf("Enter Guest ID: \n");
-            scanf("%d", &reservation.guest.id);
-            getc(stdin);
+            // Check if guest already exists,if exists he must be marked as Repeated Guest else if not create after success reservation.
+            reservation.guest = handleGuest();
+
             int from_date = 0;
             while(from_date == 0) {
                 printf("Room reserve from date: \n");
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
+                } else {
+                    printf("\nPress Enter to continue...\n");
+                    return;
                 }
             }
             int to_date = 0;
@@ -138,9 +147,11 @@ void reserve() {
                 printf("To date: \n");
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     if(checkAllDates(reservation) == 0) {
-                        printf(ANSI_COLOR_GREEN "Room Succesfully reserved!\n\n" ANSI_COLOR_RESET);
+                        printf(ANSI_COLOR_GREEN "Room Succesfully reserved!\n" ANSI_COLOR_RESET);
+                        // Write also the Guest to guests database.
+                        createGuestEntry(reservation);
                         to_date = 1;
-                        fwrite(&reservation, sizeof(reservation), 1, fp1);
+                        fwrite(&reservation, sizeof(reservation), 1, fp);
                     } else {
                         break;
                     }
@@ -150,25 +161,8 @@ void reserve() {
         }
     }
     fclose(fp);
-    fclose(fp1);
 
-    if(found == 1) {
-        fp = fopen(reservationsdb, "ab");
-        fp1 = fopen(journal_main, "rb");
-
-        while(1) {
-            fread(&reservation, sizeof(reservation), 1, fp1);
-            if(feof(fp1)) {
-                break;
-            } 
-            fwrite(&reservation, sizeof(reservation), 1, fp);
-        }
-    }
-    fclose(fp1);
-    fclose(fp);
-
-    remove(journal_main);
-    printf("Press Enter to continue...\n");
+    printf("\nPress Enter to continue...\n");
 }
 
 void displayRoom() {
@@ -227,8 +221,68 @@ void displayAllRooms() {
     printf("\nPress Enter to continue...\n");
 }
 
-void modify() {
+void displayGuest() {
 
+    struct Guest guest;
+    FILE *fp;
+    fp = fopen(guestsdb, "rb");
+
+    displayGuestInfoLogo();
+
+    int guest_id;
+    int found = 0;
+    char c; 
+    while((c = getc(stdin) != '\n') && c != '\t');
+    
+    printf("Enter Guest ID:\n");  
+    guest_id = getnuminput(8);
+        
+    if (guest_id <= 0) {
+        printf(ANSI_COLOR_RED "\nInvalid Guest ID.\n" ANSI_COLOR_RESET);
+    } else {
+        while(found == 0) {
+            fread(&guest, sizeof(guest), 1, fp);
+            if(feof(fp)) {
+                break;            
+            } else if(guest.id == guest_id) {
+                displayGuestInfo(guest);
+                found = 1;
+            }
+        }
+    }
+    fclose(fp);
+    if(found == 0) {
+        printf("No Guest found with the given ID.\nDisplay all guests with option 5 of main menu to check the Guests IDs.\n");
+    }
+
+    printf("\nPress Enter to continue...\n");  
+}
+
+void displayAllGuests() {
+
+    struct Guest guest;
+    FILE *fp;
+    fp = fopen(guestsdb, "rb");
+
+    char c; 
+    while((c = getc(stdin) != '\n') && c != '\t');
+    
+    displayAllGuestsLogo();
+
+    while(1) {
+        fread(&guest, sizeof(guest), 1, fp);
+        if(feof(fp)) {
+            break;            
+        } else {
+            displayAllGuestsInfo(guest);
+        }
+    }
+    fclose(fp);
+
+    printf("\nPress Enter to continue...\n");
+}
+
+void modify() {
     
     displayModifyLogo();
     

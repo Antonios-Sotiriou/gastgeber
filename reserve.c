@@ -10,7 +10,7 @@
 /*********************
  * Color Initialisation
  ********************/
-
+#include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
@@ -40,7 +40,7 @@ int checkFromDate(struct Reservation res) {
             for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                 // Check if the room id is already in the days rooms ids.
                 if(day.room_id[i] == res.room.id) {
-                    printf("Room is already reserved for this date: %s\n", day.date);
+                    printf(ANSI_COLOR_RED "Room is already reserved for this date: %s\n" ANSI_COLOR_RESET, day.date);
                     return 1;
                 }
             }
@@ -93,7 +93,7 @@ int checkAllDates(struct Reservation res) {
                 for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                     // Check if the room id is already in the days rooms ids.
                     if(day.room_id[i] == res.room.id) {
-                       printf("Room is already reserved for those dates: %s\n", day.date);
+                       printf(ANSI_COLOR_RED "Room is already reserved for those dates: %s\n" ANSI_COLOR_RESET, day.date);
                        num_of_days++;
                     }
                 }
@@ -109,9 +109,11 @@ int checkAllDates(struct Reservation res) {
         char c = getc(stdin);
         if(c == 'Y' || c == 'y') {
             applyReservation(starting_point, finishing_point, res.room.id);
+            printf(ANSI_COLOR_GREEN "\nReservation applied success.\n" ANSI_COLOR_RESET);
             getc(stdin);
             return 0;
         } else {
+            printf(ANSI_COLOR_RED "\nReservation Canceled!\n" ANSI_COLOR_RESET);
             getc(stdin);
             return 1;
         }

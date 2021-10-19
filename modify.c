@@ -59,7 +59,7 @@ void modifyRoom() {
 
                 displayModifyRoomChoices();
 
-                char *room_name = malloc(sizeof(char));
+                char *room_name;
                 char *room_type;
                 int choice;
                 scanf("%d", &choice);

@@ -5,7 +5,9 @@ int get_first_day(int year);
 void createDaysDb();
 void createRoomsDb();
 void createReservationsDb();
-int getNextEntry();
+void createGuestsDb();
+int getNextReservationEntry();
+int getNextGuestEntry();
 
 #endif /* INIT_DBS_H */
 

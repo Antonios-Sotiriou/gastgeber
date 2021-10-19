@@ -130,7 +130,7 @@ int getInteger(int str_len, int int_len) {
 char* getString(int str_len) {
 
     /**********************************************************************
-     * Return a string of given length without spaes in between
+     * Return a string of given length without spaces in between
      **********************************************************************/
 
     char str_input[48];
@@ -142,7 +142,7 @@ char* getString(int str_len) {
     // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.
     for(i = 0; i <= strlen(str_input) - 2; i++) {
         if(str_input[i] == ' ' || str_input[i] == '\t') {
-            printf("Spaces are not allowed between.\n");
+            printf("\nSpaces are not allowed between.\n");
             return 0;
         } else if(str_input[i] == '\n') {
             continue;
@@ -151,7 +151,9 @@ char* getString(int str_len) {
             cleaned_str[i] = str_input[i];
             dynamic_inc++;
         }
-    } // Here checking the string size + 1 to give an extra place for the \0 char.
+    } 
+    cleaned_str[i] = '\0';
+    // Here checking the string size + 1 to give an extra place for the \0 char.
     if(strlen(cleaned_str) > str_len) {
         printf("Invalid length.\nMust be %d characters long.", str_len);
         return 0;
