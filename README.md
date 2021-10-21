@@ -8,7 +8,8 @@ To do so run the following command:
 ```
 make all
 ```
-If compiling will be success run the executable with the  **init**  argument to create the databases.
+If compiling will be success run the executable with the  **init**  argument to create the databases.<br>
+Before you run this command please delete all files from data folder so new databases can be created for you.
 ```
 ./gastgeber init
 ```
