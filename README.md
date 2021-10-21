@@ -1,4 +1,4 @@
-# Hotel Reservations Software.
+# Hotel Reservations Software. Version 2.0.0
 ### The compiler used to run this software is "gcc (Debian 10.3.0-9) 10.3.0"
 Only standard C Libraries have been used to develop this software.<br><br>
 After you download the software you have to compile the main file to be able to run it.<br>
