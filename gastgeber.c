@@ -3,8 +3,10 @@
 *********************/
 #ifdef _WIN32
     #include <Windows.h>
+    #define clear_scr() system("cls")
 #else
     #include <unistd.h>
+    #define clear_scr() system("clear")
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 11 : displayAllRoomsAnnuallyReservations();
                 break;
-            case 0 : system("clear");
+            case 0 : clear_scr();
                 exit(0);
                 break;
             default :
@@ -99,6 +101,7 @@ int main(int argc, char *argv[]) {
         }
         while((c = getc(stdin) != '\n') && c != '\t');
     }
+    return 1;
 }
 
 void reserve() {
@@ -123,7 +126,7 @@ void reserve() {
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            system("clear");
+            clear_scr();
             printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
             continue;
         } else {
@@ -292,11 +295,9 @@ void modify() {
     switch(choice) {
         case 1 : modifyRoom();
             break;
-        case 2 : system("clear");
-            printf("Option not implemented yet.\n");
-            getc(stdin);
+        case 2 : modifyGuest();
             break;
-        case 0 : system("clear");
+        case 0 : clear_scr();
             break;
         default :
             break;

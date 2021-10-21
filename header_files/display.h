@@ -15,6 +15,8 @@ void displayAllGuestsInfo(struct Guest guest);
 void displayModifyLogo();
 void displayModifyRoomLogo();
 void displayModifyRoomChoices();
+void displayModifyGuestLogo();
+void displayModifyGuestChoices();
 void displayAllReservationsLogo();
 void displayAllReservationsInfo(struct Reservation reservation);
 void displayDeleteResLogo();
