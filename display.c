@@ -1,6 +1,11 @@
 /********************
 * Build in libraries
 *********************/
+#ifdef _WIN32
+    #define clear_scr() system("cls")
+#else
+    #define clear_scr() system("clear")
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,9 +30,9 @@
 #include "header_files/display.h"
 
 void displayMainLogo() {
-    system("clear");
+    clear_scr();
     printf("*****************************************************\n");
-    printf("*                  Welcome to Vesta                 *\n");
+    printf("*                Welcome to GastGeber               *\n");
     printf("*       The most Advanced and client oriented       *\n");
     printf("*             Hotel Managment Software              *\n");
     printf("*                                                   *\n");
@@ -36,47 +41,53 @@ void displayMainLogo() {
     printf("1. Reserve a room\n");
     printf("2. Display room info\n");
     printf("3. Display all rooms\n");
-    printf("4. Modify Room or Guest\n");
-    printf("5. Display all Reservations\n");
-    printf("6. Delete room Reservation\n");
-    printf("7. Display Annually Availabillity\n");
-    printf("8. Display Room Annually Reservations\n");
-    printf("9. Display all Rooms Annually Reservations\n");
+    printf("4. Display Guest info\n");
+    printf("5. Display all Guests\n");
+    printf("6. Modify Room or Guest\n");
+    printf("7. Display all Reservations\n");
+    printf("8. Delete room Reservation\n");
+    printf("9. Display Annually Availabillity\n");
+    printf("10. Display Room Annually Reservations\n");
+    printf("11. Display all Rooms Annually Reservations\n");
     printf("0. Exit\n\n");
 }
 void displayRoomReservationLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*      Room Reservation Panel.      *\n");
     printf("*************************************\n\n");   
 }
 void displayRoomInfoLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*    Display Room Informations.     *\n");
     printf("*************************************\n\n");
 }
 void displayRoomInfo(struct Room room) {
-    printf(" --------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Name      |      Room Type     |\n");
-    printf(" --------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
+    printf("|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
     printf("|");
     displayInt(room.id, 20);
     printf("|");
     displayStr(room.name, 20);
     printf("|");
     displayStr(room.type, 20);
+    printf("|");
+    displayInt(room.capacity, 20);
+    printf("|");
+    displayInt(room.price, 20);
     printf("|\n");
-    printf(" --------------------------------------------------------------\n\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n\n");
 }
 void displayAllRoomsLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*  Display All Rooms Informations.  *\n");
     printf("*************************************\n\n");
-    printf(" --------------------------------------------------------------\n");
-    printf("|      Room ID       |     Room Name      |      Room Type     |\n");
-    printf(" --------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
+    printf("|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
 }
 void displayAllRoomsInfo(struct Room room) {
     printf("|");
@@ -85,11 +96,57 @@ void displayAllRoomsInfo(struct Room room) {
     displayStr(room.name, 20);
     printf("|");
     displayStr(room.type, 20);
+    printf("|");
+    displayInt(room.capacity, 20);
+    printf("|");
+    displayInt(room.price, 20);
     printf("|\n");
-    printf(" --------------------------------------------------------------\n");
+    printf(" --------------------------------------------------------------------------------------------------------\n");
+}
+void displayGuestInfoLogo() {
+    clear_scr();
+    printf("*************************************\n");
+    printf("*    Display Guest Informations.    *\n");
+    printf("*************************************\n\n");   
+}
+void displayGuestInfo(struct Guest guest) {
+    printf(" -----------------------------------------------------------------------------------\n");
+    printf("|     Guest ID       |     First Name     |      last Type     |    Nationality     |\n");
+    printf(" -----------------------------------------------------------------------------------\n");
+    printf("|");
+    displayInt(guest.id, 20);
+    printf("|");
+    displayStr(guest.first_name, 20);
+    printf("|");
+    displayStr(guest.last_name, 20);
+    printf("|");
+    displayStr(guest.nationality, 20);
+    printf("|\n");
+    printf(" -----------------------------------------------------------------------------------\n\n");
+}
+void displayAllGuestsLogo() {
+    clear_scr();
+    printf("*************************************\n");
+    printf("*  Display All Guests Informations. *\n");
+    printf("*************************************\n\n");
+    printf(" -----------------------------------------------------------------------------------\n");
+    printf("|     Guest ID       |     First Name     |      last Name     |    Nationality     |\n");
+    printf(" -----------------------------------------------------------------------------------\n");    
+}
+void displayAllGuestsInfo(struct Guest guest) {
+    printf("|");
+    displayInt(guest.id, 20);
+    printf("|");
+    displayStr(guest.first_name, 20);
+    printf("|");
+    displayStr(guest.last_name, 20);
+    printf("|");
+    displayStr(guest.nationality, 20);
+    printf("|\n");
+    printf(" -----------------------------------------------------------------------------------\n");   
 }
 void displayModifyLogo() {
-    system("clear");
+    clear_scr();
     printf("*****************************************************\n");
     printf("*                Modification Panel                 *\n");
     printf("*          Choose what you want to modify           *\n");
@@ -100,21 +157,37 @@ void displayModifyLogo() {
     printf("2. Modify Guest Info\n");
     printf("0. Go Back\n\n");
 }
-void displayModifyRoomChoices() {
-    printf("Choose what to modify...\n\n");
-    printf("1. Modify Room Name\n");
-    printf("2. Modify Room Type\n");
-    printf("3. Modify Room Name and Type\n");
-    printf("0. Go Back\n\n");
-}
 void displayModifyRoomLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*      Room Modification Panel.     *\n");
     printf("*************************************\n\n");
 }
+void displayModifyRoomChoices() {
+    printf("Choose what to modify...\n\n");
+    printf("1. Modify Room Name\n");
+    printf("2. Modify Room Type\n");
+    printf("3. Modify Room Capacity\n");
+    printf("4. Modify Room Price\n");
+    printf("5. Modify All\n");
+    printf("0. Go Back\n\n");
+}
+void displayModifyGuestLogo() {
+    clear_scr();
+    printf("*************************************\n");
+    printf("*     Guest Modification Panel.     *\n");
+    printf("*************************************\n\n");
+}
+void displayModifyGuestChoices() {
+    printf("Choose what to modify...\n\n");
+    printf("1. Modify Guest First Name\n");
+    printf("2. Modify Guest Last Name\n");
+    printf("3. Modify Guest Nationality\n");
+    printf("4. Modify All\n");
+    printf("0. Go Back\n\n");
+}
 void displayAllReservationsLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*      Display All Reservations.    *\n");
     printf("*************************************\n\n");
@@ -137,13 +210,13 @@ void displayAllReservationsInfo(struct Reservation reservation) {
     printf("---------------------------------------------------------------------------------------------------------\n");
 }
 void displayDeleteResLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*         Delete Reservation.       *\n");
     printf("*************************************\n\n");
 }
 void displayAnnuallyAvailabillityLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*       Annually Reservations.      *\n");
     printf("*************************************\n\n");   
@@ -219,7 +292,7 @@ void displayStr(char *str, int dis_len) {
     }
 }
 void displayRoomAnnuallyReservationsLogo() {
-    system("clear");
+    clear_scr();
     printf("*************************************\n");
     printf("*    Annually Room Reservations.    *\n");
     printf("*************************************\n\n");   
@@ -270,7 +343,7 @@ void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
     printf("\n\nDays counter: %d\n\n", days_counter);
 }
 void displayAllRoomsAnnuallyReservationsLogo() {
-    system("clear");
+    clear_scr();
     printf("*********************************************\n");
     printf("*    Annually Reservations for all Rooms    *\n");
     printf("*********************************************\n\n");   
@@ -283,7 +356,7 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
     FILE *fp, *fp1, *fp2;
     fp = fopen(daysdb, "rb");
     fp1 = fopen(roomsdb, "rb");
-    fp2 = fopen("/home/as/gastgeber/data/output.txt", "w");
+    fp2 = fopen(output, "w");
     //fp2 = fopen("/dev/pts/1", "w");
     
     int days_counter = 0;
