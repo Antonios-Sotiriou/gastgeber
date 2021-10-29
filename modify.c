@@ -74,7 +74,7 @@ void modifyRoom() {
                 switch(choice) {
                     case 1 : clear_scr();
                         printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(15);
+                        room_name = getString(20);
                         if(room_name != 0) {
                             sprintf(room.name, "%s", room_name);
                             free(room_name);
@@ -84,8 +84,8 @@ void modifyRoom() {
                             return;
                         }
                     case 2 : clear_scr();
-                        printf("%sGive a new Room Type without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_type = getString(15);
+                        printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                        room_type = getSpString(20);
                         if(room_type != 0) {
                             sprintf(room.type, "%s", room_type);
                             free(room_type);
@@ -104,12 +104,12 @@ void modifyRoom() {
                         break;
                     case 5 : clear_scr();
                         printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(15);
+                        room_name = getString(20);
                         if(room_name != 0) {
                             sprintf(room.name, "%s", room_name);
                             free(room_name);
-                            printf("%sGive a new Room Type without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                            room_type = getString(15);
+                            printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            room_type = getSpString(20);
                             if(room_type != 0) {
                                 sprintf(room.type, "%s", room_type);
                                 free(room_type);
@@ -207,46 +207,52 @@ void modifyGuest() {
             
             switch(choice) {
                 case 1 : clear_scr();
-                    printf("%sSet Guest First Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
                     /*********************  Must be implement a string function that accepts also spaces here. Guest can have more than 1 name. ******************/
-                    guest_first_name = getString(15);
+                    guest_first_name = getSpString(20);
                     if(guest_first_name != 0) {
                         sprintf(guest.first_name, "%s", guest_first_name);
                         
                         break;
                     } else {
+                        printf("\n");
+                        return;
                     }
                 case 2 : clear_scr();
-                    printf("%sSet Guest Last Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_last_name = getString(15);
+                    printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                    guest_last_name = getSpString(20);
                     if(guest_last_name != 0) {
                         sprintf(guest.last_name, "%s", guest_last_name);
                         free(guest_last_name);
                         break;
                     } else {
+                        printf("\n");
+                        return;
                     }
                 case 3 : clear_scr();
                     printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_nationality = getString(15);
+                    guest_nationality = getSpString(20);
                     if(guest_nationality != 0) {
                         sprintf(guest.nationality, "%s", guest_nationality);
                         free(guest_nationality);
                         break;
                     } else {
+                        printf("\n");
+                        return;
                     }
                 case 4 : clear_scr();
-                    printf("%sSet Guest First Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_first_name = getString(15);
+                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                    guest_first_name = getSpString(20);
                     if(guest_first_name != 0) {
                         sprintf(guest.first_name, "%s", guest_first_name);
                         free(guest_first_name);
-                        printf("%sSet Guest Last Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        guest_last_name = getString(15);
+                        printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                        guest_last_name = getSpString(20);
                         if(guest_last_name != 0) {
                             sprintf(guest.last_name, "%s", guest_last_name);
                             free(guest_last_name);
                             printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                            guest_nationality = getString(15);
+                            guest_nationality = getSpString(20);
                             if(guest_nationality != 0) {
                                 sprintf(guest.nationality, "%s", guest_nationality);
                                 free(guest_nationality);
