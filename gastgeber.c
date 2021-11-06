@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 /*********************
  * Global constants 
  ********************/
@@ -65,10 +66,12 @@ int main(int argc, char *argv[]) {
     int choice;
     char c;
 
+    signal(SIGWINCH, &displayMainLogo);
+
     while(1) {
 
         displayMainLogo();
-        scanf("%d", &choice);
+        scanf("%2d", &choice);
 
         switch(choice) {
             case 1 : reserve();
