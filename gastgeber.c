@@ -16,9 +16,9 @@
  * Global constants 
  ********************/
 #include "header_files/global_vars.h"
-/*********************
- * Color Initialisation
- ********************/
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 #include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
@@ -66,11 +66,12 @@ int main(int argc, char *argv[]) {
     int choice;
     char c;
 
-    signal(SIGWINCH, &displayMainLogo);
+    signal(SIGWINCH, (void*)&displayMainLogo);
 
     while(1) {
 
-        displayMainLogo();
+        char *positioning = displayMainLogo();
+        printf("%s           >>> ", positioning);
         scanf("%2d", &choice);
 
         switch(choice) {
@@ -99,10 +100,11 @@ int main(int argc, char *argv[]) {
             case 0 : clear_scr();
                 exit(0);
                 break;
-            default :
+            default : 
                 break;
         }
         while((c = getc(stdin) != '\n') && c != '\t');
+        free(positioning);
     }
     return 1;
 }
@@ -125,13 +127,13 @@ void reserve() {
 
     while(found == 0) {
 
-        printf("Enter Room ID(1-99):\n");  
+        printf("Enter Room ID(%d-%d): ", 1, TOTAL_ROOMS);  
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
             clear_scr();
             printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
-            continue;
+            break;
         } else {
             reservation.id = next_id;
             reservation.room.id = room_id;
@@ -183,7 +185,7 @@ void displayRoom() {
     char c; 
     while((c = getc(stdin) != '\n') && c != '\t');
     
-    printf("Enter Room ID(1-99):\n");  
+    printf("Enter Room ID(%d-%d): ", 1, TOTAL_ROOMS);  
     room_id = getnuminput(5);
         
     if (room_id < 1 || room_id > TOTAL_ROOMS) {

@@ -7,9 +7,9 @@
  * Global constants 
  ********************/
 #include "header_files/global_vars.h"
-/*********************
- * Color Initialisation
- ********************/
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 #include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs

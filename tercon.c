@@ -10,9 +10,9 @@
  * Global constants 
  ********************/
 
-/*********************
- * Color Initialisation
- ********************/
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 #include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
@@ -21,27 +21,24 @@
 Terminal tercon_init_rows_cols() {
 
     Terminal term;
-    //signal(SIGWINCH, &tercon_win_size_changed);
 
     int rows = 0;
     int cols = 0;
 
     tercon_get_cols_rows(&cols, &rows);
-    //tercon_move_y_x(0, (cols - 53) / 2);
 
     term.rows = rows;
-    term.columns = (cols - 53) / 2;
+    term.columns = cols;
 
     return term;
 }
 
-void tercon_clear_screen()
-{
+void tercon_clear_screen() {
+
     printf("\x1b[H\x1b[J");
 }
 
-void tercon_get_cols_rows(int *cols, int *rows)
-{
+void tercon_get_cols_rows(int *cols, int *rows) {
 
     struct winsize size;
     ioctl(1, TIOCGWINSZ, &size);
@@ -50,14 +47,12 @@ void tercon_get_cols_rows(int *cols, int *rows)
     *cols = size.ws_col;
 }
 
-void tercon_move_y_x(int y, int x)
-{
+void tercon_move_y_x(int y, int x) {
 
     printf("\x1b[%d;%dH", y, x);
 }
 
-void tercon_win_size_changed()
-{
+void tercon_win_size_changed() {
 
     int rows = 0;
     int cols = 0;
@@ -68,20 +63,17 @@ void tercon_win_size_changed()
     tercon_move_y_x(rows / 2, cols / 2);
 }
 
-void tercon_enter_alt_screen()
-{
+void tercon_enter_alt_screen() {
 
     printf("\x1b[?1049h");
 }
 
-void tercon_exit_alt_screen()
-{
+void tercon_exit_alt_screen() {
 
     printf("\x1b[?1049l");
 }
 
-void tercon_echo_off()
-{
+void tercon_echo_off() {
 
     struct termios term;
     tcgetattr(1, &term);
@@ -89,8 +81,7 @@ void tercon_echo_off()
     tcsetattr(1, TCSANOW, &term);
 }
 
-void tercon_echo_on()
-{
+void tercon_echo_on() {
 
     struct termios term;
     tcgetattr(1, &term);

@@ -13,9 +13,9 @@
  * Global constants 
  ********************/
 #include "header_files/global_vars.h"
-/*********************
- * Color Initialisation
- ********************/
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 #include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
@@ -30,30 +30,34 @@
 #include "header_files/tercon.h"
 #include "header_files/display.h"
 
-void displayMainLogo() {
+char *displayMainLogo() {
     //tercon_clear_screen();
     clear_scr();
     Terminal term;
     term = tercon_init_rows_cols();
-    printf("\x1b[%d;%dH*****************************************************\n", 1, term.columns);
-    printf("\x1b[%d;%dH*                Welcome to GastGeber               *\n", 2, term.columns);
-    printf("\x1b[%d;%dH*       The most Advanced and client oriented       *\n", 3, term.columns);
-    printf("\x1b[%d;%dH*             Hotel Managment Software              *\n", 4, term.columns);
-    printf("\x1b[%d;%dH*                                                   *\n", 5, term.columns);
-    printf("\x1b[%d;%dH*****************************************************\n\n", 6, term.columns);
-    printf("\x1b[%d;%dH*******   Choose your action   **********************\n\n", 7, term.columns);
-    printf("\x1b[%d;%dH          1. Reserve a room                          \n", 8, term.columns);
-    printf("\x1b[%d;%dH          2. Display room info                       \n", 9, term.columns);
-    printf("\x1b[%d;%dH          3. Display all rooms                       \n", 10, term.columns);
-    printf("\x1b[%d;%dH          4. Display Guest info                      \n", 11, term.columns);
-    printf("\x1b[%d;%dH          5. Display all Guests                      \n", 12, term.columns);
-    printf("\x1b[%d;%dH          6. Modify Room or Guest                    \n", 13, term.columns);
-    printf("\x1b[%d;%dH          7. Display all Reservations                \n", 14, term.columns);
-    printf("\x1b[%d;%dH          8. Delete room Reservation                 \n", 15, term.columns);
-    printf("\x1b[%d;%dH          9. Display Annually Availabillity          \n", 16, term.columns);
-    printf("\x1b[%d;%dH          10. Display Room Annually Reservations     \n", 17, term.columns);
-    printf("\x1b[%d;%dH          11. Display all Rooms Annually Reservations\n", 18, term.columns);
-    printf("\x1b[%d;%dH          0. Exit                                    \n\n", 19, term.columns);
+    char *positioning = malloc(sizeof(char));
+    printf("\x1b[%d;%dH*****************************************************\n", 1, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*                Welcome to GastGeber               *\n", 2, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*       The most Advanced and client oriented       *\n", 3, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*             Hotel Managment Software              *\n", 4, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*                                                   *\n", 5, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*****************************************************\n\n", 6, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH*******   Choose your action   **********************\n\n", 7, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          1. Reserve a room                          \n", 8, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          2. Room info                               \n", 9, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          3. All rooms                               \n", 10, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          4. Guest info                              \n", 11, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          5. All Guests                              \n", 12, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          6. Modify Room or Guest                    \n", 13, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          7. All Reservations                        \n", 14, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          8. Delete room Reservation                 \n", 15, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          9. Annually Availabillity                  \n", 16, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          10. Room Annually Reservations             \n", 17, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          11. all Rooms Annually Reservations        \n", 18, (term.columns - 53) / 2);
+    printf("\x1b[%d;%dH          0. Exit                                    \n\n", 19, (term.columns - 53) / 2);
+
+    sprintf(positioning, "\x1b[%d;%dH", 20, (term.columns - 53) / 2);
+    return positioning;
 }
 void displayRoomReservationLogo() {
     clear_scr();
