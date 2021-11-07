@@ -2,7 +2,7 @@
 #define DISPLAY_H
 
 /* Display functions */
-void displayMainLogo();
+char *displayMainLogo();
 void displayRoomReservationLogo();
 void displayRoomInfoLogo();
 void displayRoomInfo(struct Room room);

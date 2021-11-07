@@ -1,11 +1,6 @@
 #ifndef TERCON_H
 #define TERCON_H
 
-typedef struct {
-    int rows;
-    int columns;
-} Terminal;
-
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_GREEN_BG "\x1b[48;5;34m"
@@ -24,6 +19,11 @@ typedef struct {
 #define ANSI_COLOR_RESET "\x1b[0m"
 #define ANSI_CLEAR_SCREEN "\x1b[H\x1b[J"
 #define ANSI_MOVE_CURSOR_TO "\x1b[%d;%dH"
+
+typedef struct {
+    int rows;
+    int columns;
+} Terminal;
 
 Terminal tercon_init_rows_cols();
 void tercon_clear_screen();
