@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <signal.h>
 /*********************
  * Global constants 
@@ -66,14 +67,12 @@ int main(int argc, char *argv[]) {
     int choice;
     char c;
 
-    signal(SIGWINCH, (void*)&displayMainLogo);
-
     while(1) {
 
         char *positioning = displayMainLogo();
-        printf("%s           >>> ", positioning);
+        printf("%s          >>> ", positioning);
         scanf("%2d", &choice);
-
+        
         switch(choice) {
             case 1 : reserve();
                 break;
@@ -115,7 +114,7 @@ void reserve() {
     FILE *fp;
     fp = fopen(reservationsdb, "ab");
 
-    displayRoomReservationLogo();
+    char *positioning = displayRoomReservationLogo();
 
     int room_id;
     int found = 0;
@@ -127,18 +126,20 @@ void reserve() {
 
     while(found == 0) {
 
-        printf("Enter Room ID(%d-%d): ", 1, TOTAL_ROOMS);  
+        printf("%sEnter Room ID(%d-%d): ", positioning, 1, TOTAL_ROOMS);  
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            clear_scr();
-            printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, 11, 70);
             break;
         } else {
             reservation.id = next_id;
             reservation.room.id = room_id;
             // Check if guest already exists,if exists he must be marked as Repeated Guest else if not create after success reservation.
             reservation.guest = handleGuest();
+            if (!reservation.guest.active) {
+                break;
+            }
 
             int from_date = 0;
             while(from_date == 0) {
