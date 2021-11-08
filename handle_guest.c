@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
@@ -39,9 +40,19 @@ struct Guest handleGuest() {
     int next_id = getNextGuestEntry();
 
     printf("Guest First Name: ");
-    char *first_name = getString(15);
+    char *first_name = getSpString(20);
+    if (first_name == NULL) {
+        printf(ANSI_COLOR_RED "Guest must have a First Name.\n" ANSI_COLOR_RESET);
+        guest.active = false;
+        return guest;
+    }
     printf("Guest Last Name: ");
-    char *last_name = getString(15);
+    char *last_name = getSpString(20);
+    if (last_name == NULL) {
+        printf(ANSI_COLOR_RED "Guest must have a Last Name.\n" ANSI_COLOR_RESET);
+        guest.active = false;
+        return guest;
+    }
 
     int found = 0;
     while(found == 0) {
@@ -50,6 +61,8 @@ struct Guest handleGuest() {
             break;
         } else if(comparestr(guest.first_name, first_name) == 0 && comparestr(guest.last_name, last_name) == 0) { // Guests can have the same name.Must be implement another check mechanism! 
             printf("\nGuest already exists in database.\nReservation must be marked as Repeated Guest!\n\n");
+            guest.active = true;
+            guest.repeated_guest = true;
             found = 1;
         }
     }
