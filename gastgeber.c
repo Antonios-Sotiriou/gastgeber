@@ -114,7 +114,7 @@ void reserve() {
     FILE *fp;
     fp = fopen(reservationsdb, "ab");
 
-    char *positioning = displayRoomReservationLogo();
+    Terminal term = displayRoomReservationLogo();
 
     int room_id;
     int found = 0;
@@ -126,36 +126,49 @@ void reserve() {
 
     while(found == 0) {
 
-        printf("%sEnter Room ID(%d-%d): ", positioning, 1, TOTAL_ROOMS);  
+        printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", 11, (term.columns - 51) / 2, 1, TOTAL_ROOMS);  
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, 11, 70);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, 13, (term.columns - 51) / 2);
             break;
         } else {
             reservation.id = next_id;
             reservation.room.id = room_id;
             // Check if guest already exists,if exists he must be marked as Repeated Guest else if not create after success reservation.
             reservation.guest = handleGuest();
-            if (!reservation.guest.active) {
+            if (reservation.guest.active == false) {
                 break;
             }
 
             int from_date = 0;
             while(from_date == 0) {
-                printf("Room reserve from date: \n");
+                if (reservation.guest.repeated_guest) {
+                    tercon_move_y_x(20, (term.columns - 51 ) /2);
+                    term.cursor_y = 20;
+                } else {
+                    tercon_move_y_x(16, (term.columns - 51 ) /2);
+                    term.cursor_y = 16;
+                }
+                printf("Room reserve from date: ");
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
                 } else {
-                    printf("\nPress Enter to continue...\n");
+                    term.cursor_y += 1;
+                    tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
+                    printf("Press Enter to continue...\n");
                     return;
                 }
             }
             int to_date = 0;
             while(to_date == 0) {
-                printf("To date: \n");
+                term.cursor_y += 1;
+                tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
+                printf("To date: ");
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     if(checkAllDates(reservation) == 0) {
+                        term.cursor_y += 2;
+                        tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
                         printf(ANSI_COLOR_GREEN "Room Succesfully reserved!\n" ANSI_COLOR_RESET);
                         // Write also the Guest to guests database.
                         createGuestEntry(reservation);
@@ -171,7 +184,9 @@ void reserve() {
     }
     fclose(fp);
 
-    printf("\nPress Enter to continue...\n");
+    term.cursor_y += 1;
+    tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
+    printf("Press Enter to continue...\n");
 }
 
 void displayRoom() {

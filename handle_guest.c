@@ -36,19 +36,24 @@ struct Guest handleGuest() {
     struct Guest guest;
     FILE *fp;
     fp = fopen(guestsdb, "rb");
+    Terminal term = tercon_init_rows_cols();
 
     int next_id = getNextGuestEntry();
 
+    tercon_move_y_x(13, (term.columns - 51 ) /2);
     printf("Guest First Name: ");
     char *first_name = getSpString(20);
     if (first_name == NULL) {
+        tercon_move_y_x(15, (term.columns - 51 ) /2);
         printf(ANSI_COLOR_RED "Guest must have a First Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         return guest;
     }
+    tercon_move_y_x(14, (term.columns - 51 ) /2);
     printf("Guest Last Name: ");
     char *last_name = getSpString(20);
     if (last_name == NULL) {
+        tercon_move_y_x(16, (term.columns - 51 ) /2);
         printf(ANSI_COLOR_RED "Guest must have a Last Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         return guest;
@@ -60,7 +65,11 @@ struct Guest handleGuest() {
         if(feof(fp)) {
             break;
         } else if(comparestr(guest.first_name, first_name) == 0 && comparestr(guest.last_name, last_name) == 0) { // Guests can have the same name.Must be implement another check mechanism! 
-            printf("\nGuest already exists in database.\nReservation must be marked as Repeated Guest!\n\n");
+            tercon_move_y_x(18, (term.columns - 51 ) /2);
+            printf(ANSI_COLOR_GREEN "Guest already exists in database." ANSI_COLOR_RESET);
+            tercon_move_y_x(19, (term.columns - 51 ) /2);
+            printf(ANSI_COLOR_GREEN "Guest marked as Repeated Guest!\n" ANSI_COLOR_RESET);
+            // that must be removes because all the guests will be inactive by default
             guest.active = true;
             guest.repeated_guest = true;
             found = 1;
@@ -69,11 +78,13 @@ struct Guest handleGuest() {
     fclose(fp);
 
     if(found == 0) {
+        tercon_move_y_x(15, (term.columns - 51 ) /2);
         printf("Guest Nationality: ");
-        char *nationality = getString(15);
+        char *nationality = getSpString(20);
         sprintf(guest.first_name, "%s", first_name);
         sprintf(guest.last_name, "%s", last_name);
         sprintf(guest.nationality, "%s", nationality);
+        guest.active = true;
         free(nationality);
         guest.id = next_id;
     }

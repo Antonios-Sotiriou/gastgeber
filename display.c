@@ -61,11 +61,12 @@ char *displayMainLogo() {
     sprintf(positioning, "\x1b[%d;%dH", 22, (term.columns - 51) / 2);
     return positioning;
 }
-char *displayRoomReservationLogo() {
+Terminal displayRoomReservationLogo() {
+    
     clear_scr();
     Terminal term;
     term = tercon_init_rows_cols();
-    char *positioning = malloc(sizeof(char));
+
     printf("\x1b[%d;%dH***************************************************\n", 1, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH_________   /  \\   |        |____________         \n", 2, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH  _____  | /    \\  |    ____|            |        \n", 3, (term.columns - 51) / 2);
@@ -76,8 +77,7 @@ char *displayRoomReservationLogo() {
     printf("\x1b[%d;%dH_________|       \\___\\______|  |___|        \x1b[32mPanel\x1b[0m\n", 8, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH***************************************************\n", 9, (term.columns - 51) / 2);
 
-    sprintf(positioning, "\x1b[%d;%dH", 10, (term.columns - 51) / 2);
-    return positioning;
+    return term;
 }
 void displayRoomInfoLogo() {
     clear_scr();

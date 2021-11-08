@@ -3,7 +3,7 @@
 
 /* Display functions */
 char *displayMainLogo();
-char *displayRoomReservationLogo();
+Terminal displayRoomReservationLogo();
 void displayRoomInfoLogo();
 void displayRoomInfo(struct Room room);
 void displayAllRoomsLogo();

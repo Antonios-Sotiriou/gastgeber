@@ -23,6 +23,8 @@
 typedef struct {
     int rows;
     int columns;
+    int cursor_x;
+    int cursor_y;
 } Terminal;
 
 Terminal tercon_init_rows_cols();
