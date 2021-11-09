@@ -1,7 +1,7 @@
 # Compile all c files to gastgeber executable!
 
 CC = gcc
-CFLAGS = -Wall #-Werror -g 
+CFLAGS = -Wall -Werror -g 
 OBJ = gastgeber
 RM = rm
 

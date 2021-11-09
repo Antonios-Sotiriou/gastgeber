@@ -19,10 +19,12 @@ int getnuminput(int max_len) {
     char input[48];
     char cleared_num[48];
 
+    Terminal term = tercon_init_rows_cols();
+
     fgets(input, sizeof(input), stdin);
 
     if(strlen(input) - 1 > max_len) {
-        printf(ANSI_COLOR_RED "\nInvalid number length!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         return 0;
     }
     for(int i = 0, d = 0; i <= strlen(input) - 1; i++) {
@@ -145,7 +147,7 @@ char* getString(int str_len) {
             printf("\nSpaces are not allowed between.\n");
             return 0;
         } else if(str_input[i] == 0) {
-            //printf("\nNo input Provided.\n");
+            printf("\nNo input Provided.\n");
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);
@@ -177,7 +179,7 @@ char* getSpString(int str_len) {
     // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.
     for(i = 0; i <= strlen(str_input) - 2; i++) {
         if(str_input[i] == 0) {
-            //printf("\nNo input Provided.\n");
+            printf("\nNo input Provided.\n");
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);
