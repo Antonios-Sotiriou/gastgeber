@@ -40,6 +40,7 @@ struct Guest handleGuest() {
 
     int next_id = getNextGuestEntry();
 
+    // Move cursor to the right position
     tercon_move_y_x(13, (term.columns - 51 ) /2);
     printf("Guest First Name: ");
     char *first_name = getSpString(20);

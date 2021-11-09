@@ -52,10 +52,13 @@ int getformatedDate(char *room_date) {
     char converted_day[20];
     char converted_month[20];
     char converted_year[20];
+    
+    Terminal term = tercon_init_rows_cols();
 
     time(&current_time);
 
     struct tm *mytime = localtime(&current_time);
+    // for debugging purposes...
     //printf("%i/%i/%i\n", mytime -> tm_mday, mytime -> tm_mon + 1, mytime -> tm_year + 1900);
 
     fgets(input, 40, stdin);
@@ -63,7 +66,7 @@ int getformatedDate(char *room_date) {
 
     if(test == 3) {
         if(day < 0 || day > 31) {
-            printf(ANSI_COLOR_RED "\nGive  a correct day!\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
             return 0;
         } else if(day > 0 && day < 10) {
             sprintf(converted_day, "0%d/", day);
@@ -71,7 +74,7 @@ int getformatedDate(char *room_date) {
             sprintf(converted_day, "%d/", day);
         }
         if(month < 0 || month > 12) {
-            printf(ANSI_COLOR_RED "\nGive a correct month!\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct month!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
             return 0;
         } else if(month > 0 && month < 10) {
             sprintf(converted_month, "0%d/", month);
@@ -86,15 +89,15 @@ int getformatedDate(char *room_date) {
             if(day - mytime -> tm_mday >= 0) {
                 sprintf(converted_year, "%d", year);
             } else {
-                printf(ANSI_COLOR_RED "\nThis day is in the past!\n" ANSI_COLOR_RESET);
+                printf(ANSI_COLOR_RED "\x1b[%d;%dH                            This day is in the past!                            \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
                 return 0;
             }
         } else {
-            printf(ANSI_COLOR_RED "\nProvide a date from today to the future!\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dH                    Provide a date from today to the future!                    \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
             return 0;
         }
     } else {
-        printf(ANSI_COLOR_RED "\nThe date you entered is in wrong format!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dH                    The date you entered is in wrong format!                    \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
         return 0;
     }
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);

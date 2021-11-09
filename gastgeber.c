@@ -153,9 +153,8 @@ void reserve() {
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
                 } else {
-                    term.cursor_y += 1;
-                    tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
-                    printf("Press Enter to continue...");
+                    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
                     return;
                 }
             }
@@ -183,7 +182,7 @@ void reserve() {
     }
     fclose(fp);
 
-    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) /2);
+    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
     printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
 }
 
