@@ -57,9 +57,10 @@ char *displayMainLogo() {
     printf("\x1b[%d;%dH          10. Room Annually Reservations           \n", 19, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          11. all Rooms Annually Reservations      \n", 20, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          0. Exit                                  \n", 21, (term.columns -51) / 2);
-    printf("\x1b[%d;%dH ________________________________________________________________________________",term.rows - 2, (term.columns - 82) / 2);
+    printf("\x1b[%d;%dH ________________________________________________________________________________",term.rows - 3, (term.columns - 82) / 2);
+    printf("\x1b[%d;%dH|                                                                                |",term.rows - 2, (term.columns - 82) / 2);
     printf("\x1b[%d;%dH|                                                                                |",term.rows - 1, (term.columns - 82) / 2);
-    printf("\x1b[%d;%dH|                                                                                |",term.rows , (term.columns - 82) / 2);
+    printf("\x1b[%d;%dH|                                                                                |",term.rows, (term.columns - 82) / 2);
 
     sprintf(positioning, "\x1b[%d;%dH", 22, (term.columns - 51) / 2);
     return positioning;
@@ -79,7 +80,8 @@ Terminal displayRoomReservationLogo() {
     printf("\x1b[%d;%dH |____|  |/     \\   \\       |  |   | \x1b[32mReservations\x1b[0m\n", 7, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH_________|       \\___\\______|  |___|        \x1b[32mPanel\x1b[0m\n", 8, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH***************************************************\n", 9, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH ________________________________________________________________________________",term.rows - 2, (term.columns - 82) / 2);
+    printf("\x1b[%d;%dH ________________________________________________________________________________",term.rows - 3, (term.columns - 82) / 2);
+    printf("\x1b[%d;%dH|                                                                                |",term.rows - 2, (term.columns - 82) / 2);
     printf("\x1b[%d;%dH|                                                                                |",term.rows - 1, (term.columns - 82) / 2);
     printf("\x1b[%d;%dH|                                                                                |",term.rows, (term.columns - 82) / 2);
 

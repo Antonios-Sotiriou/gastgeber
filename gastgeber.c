@@ -68,11 +68,10 @@ int main(int argc, char *argv[]) {
     char c;
 
     while(1) {
-
         char *positioning = displayMainLogo();
         printf("%s          >>> ", positioning);
         scanf("%2d", &choice);
-        
+
         switch(choice) {
             case 1 : reserve();
                 break;
@@ -130,7 +129,7 @@ void reserve() {
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 15) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 15) / 2);
             break;
         } else {
             reservation.id = next_id;
@@ -184,8 +183,8 @@ void reserve() {
     }
     fclose(fp);
 
-    tercon_move_y_x(term.rows - 3, (term.columns - 51 ) /2);
-    printf("Press Enter to continue...");
+    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) /2);
+    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
 }
 
 void displayRoom() {
