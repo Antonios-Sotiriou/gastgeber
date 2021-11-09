@@ -145,7 +145,7 @@ char* getString(int str_len) {
             printf("\nSpaces are not allowed between.\n");
             return 0;
         } else if(str_input[i] == 0) {
-            //printf("\nNo input Provided.\n");
+            printf("\nNo input Provided.\n");
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);
@@ -177,7 +177,7 @@ char* getSpString(int str_len) {
     // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.
     for(i = 0; i <= strlen(str_input) - 2; i++) {
         if(str_input[i] == 0) {
-            //printf("\nNo input Provided.\n");
+            printf("\nNo input Provided.\n");
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);

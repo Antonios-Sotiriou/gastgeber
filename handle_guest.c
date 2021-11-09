@@ -44,7 +44,7 @@ struct Guest handleGuest() {
     printf("Guest First Name: ");
     char *first_name = getSpString(20);
     if (first_name == NULL) {
-        tercon_move_y_x(15, (term.columns - 51 ) /2);
+        tercon_move_y_x(term.rows - 1, (term.columns - 28) /2);
         printf(ANSI_COLOR_RED "Guest must have a First Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         return guest;
@@ -53,7 +53,7 @@ struct Guest handleGuest() {
     printf("Guest Last Name: ");
     char *last_name = getSpString(20);
     if (last_name == NULL) {
-        tercon_move_y_x(16, (term.columns - 51 ) /2);
+        tercon_move_y_x(term.rows - 1, (term.columns - 29 ) /2);
         printf(ANSI_COLOR_RED "Guest must have a Last Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         return guest;
@@ -65,11 +65,11 @@ struct Guest handleGuest() {
         if(feof(fp)) {
             break;
         } else if(comparestr(guest.first_name, first_name) == 0 && comparestr(guest.last_name, last_name) == 0) { // Guests can have the same name.Must be implement another check mechanism! 
-            tercon_move_y_x(18, (term.columns - 51 ) /2);
+            tercon_move_y_x(16, (term.columns - 51 ) /2);
             printf(ANSI_COLOR_GREEN "Guest already exists in database." ANSI_COLOR_RESET);
-            tercon_move_y_x(19, (term.columns - 51 ) /2);
+            tercon_move_y_x(17, (term.columns - 51 ) /2);
             printf(ANSI_COLOR_GREEN "Guest marked as Repeated Guest!\n" ANSI_COLOR_RESET);
-            // that must be removes because all the guests will be inactive by default
+            // that must be removed because all the guests will be inactive by default
             guest.active = true;
             guest.repeated_guest = true;
             found = 1;

@@ -159,6 +159,8 @@ void createGuestsDb() {
         sprintf(guest.first_name, "%s", "None");
         sprintf(guest.last_name, "%s", "None");
         sprintf(guest.nationality, "%s", "None");
+        guest.active = false;
+        guest.repeated_guest = false;
         fwrite(&guest, sizeof(guest), 1, fp);
 
         fclose(fp);

@@ -130,14 +130,14 @@ void reserve() {
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, 13, (term.columns - 51) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 15) / 2);
             break;
         } else {
             reservation.id = next_id;
             reservation.room.id = room_id;
             // Check if guest already exists,if exists he must be marked as Repeated Guest else if not create after success reservation.
             reservation.guest = handleGuest();
-            if (reservation.guest.active == false) {
+            if (!reservation.guest.active) {
                 break;
             }
 
@@ -156,7 +156,7 @@ void reserve() {
                 } else {
                     term.cursor_y += 1;
                     tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
-                    printf("Press Enter to continue...\n");
+                    printf("Press Enter to continue...");
                     return;
                 }
             }
@@ -184,9 +184,8 @@ void reserve() {
     }
     fclose(fp);
 
-    term.cursor_y += 1;
-    tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
-    printf("Press Enter to continue...\n");
+    tercon_move_y_x(term.rows - 3, (term.columns - 51 ) /2);
+    printf("Press Enter to continue...");
 }
 
 void displayRoom() {
