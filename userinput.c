@@ -176,13 +176,15 @@ char* getSpString(int str_len) {
     char str_input[48];
     char *cleaned_str = malloc(sizeof(char));
 
+    Terminal term = tercon_init_rows_cols();
+
     fgets(str_input, sizeof(str_input), stdin);
     int i;
     int dynamic_inc = 1;
     // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.
     for(i = 0; i <= strlen(str_input) - 2; i++) {
         if(str_input[i] == 0) {
-            printf("\nNo input Provided.\n");
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input Provided.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 18) / 2);
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);
@@ -193,7 +195,9 @@ char* getSpString(int str_len) {
     cleaned_str[i] = '\0';
     // Here checking the string size + 1 to give an extra place for the \0 char.
     if(strlen(cleaned_str) > str_len) {
-        printf("Invalid length.\nMust be %d characters long.", str_len);
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid length.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 15) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHMust be %d characters long." ANSI_COLOR_RESET, term.rows, (term.columns - 27) / 2, str_len);
         return 0;
     } else {
         return cleaned_str;

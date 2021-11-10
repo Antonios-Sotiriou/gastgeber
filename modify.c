@@ -208,11 +208,10 @@ void modifyGuest() {
             switch(choice) {
                 case 1 : clear_scr();
                     printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    /*********************  Must be implement a string function that accepts also spaces here. Guest can have more than 1 name. ******************/
                     guest_first_name = getSpString(20);
                     if(guest_first_name != 0) {
                         sprintf(guest.first_name, "%s", guest_first_name);
-                        
+                        free(guest_first_name);
                         break;
                     } else {
                         printf("\n");

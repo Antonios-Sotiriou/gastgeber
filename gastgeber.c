@@ -56,22 +56,24 @@ void displayAllRoomsAnnuallyReservations();
 int main(int argc, char *argv[]) {
 
     if(argc > 1 && strcmp(argv[1], "init") == 0) {
+        // Database initialization functions.Can be found in init_dbs.c file.
         createDaysDb();
         createRoomsDb();
         createReservationsDb();
         createGuestsDb();
-        printf("argv: %s", argv[1]);
-        getc(stdin);
     }
 
     int choice;
     char c;
 
     while(1) {
+        // All the functions that start with the word [ display ] and are not part of the following
+        // [ switch ],can be found in display.c file.
         char *positioning = displayMainLogo();
         printf("%s          >>> ", positioning);
         scanf("%2d", &choice);
 
+        // All the [ switch ] functions can be found in this file with this order.
         switch(choice) {
             case 1 : reserve();
                 break;
@@ -114,10 +116,13 @@ void reserve() {
     fp = fopen(reservationsdb, "ab");
 
     Terminal term = displayRoomReservationLogo();
+    term.cursor_x = 0;
+    term.cursor_y = 0;
+    int num_of_days = 0;
 
     int room_id;
     int found = 0;
-    // counter function which finds the last reservation record!
+    // counter function which finds the last reservation record! Can be found in init_dbs.c file
     int next_id = getNextReservationEntry();
 
     char c;
@@ -149,25 +154,33 @@ void reserve() {
                     tercon_move_y_x(16, (term.columns - 51 ) /2);
                     term.cursor_y = 16;
                 }
-                printf("Room reserve from date: ");
+                printf(ANSI_ERASE_LINE "Room reserve from date: ");
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
                 } else {
                     tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
-                    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
-                    return;
+                    printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
+                    char c = getc(stdin);
+                    if (c == 'y' || c == 'Y') {
+                        tercon_clear_error_log();
+                        tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                        printf("\x1b[2K");
+                        getc(stdin);
+                        continue;
+                    } else {
+                        return;
+                    }
                 }
             }
             int to_date = 0;
             while(to_date == 0) {
-                term.cursor_y += 1;
-                tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
-                printf("To date: ");
+                tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) /2);
+                printf(ANSI_ERASE_LINE "To date: ");
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
-                    if(checkAllDates(reservation) == 0) {
-                        term.cursor_y += 2;
-                        tercon_move_y_x(term.cursor_y, (term.columns - 51 ) /2);
-                        printf(ANSI_COLOR_GREEN "Room Succesfully reserved!\n" ANSI_COLOR_RESET);
+                    // we need the num_of_days here to position the cursor if the days are overflow the error printing area.
+                    num_of_days = checkAllDates(reservation);
+                    if(num_of_days == 0) {
+                        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHRoom Succesfully reserved!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
                         // Write also the Guest to guests database.
                         createGuestEntry(reservation);
                         to_date = 1;
@@ -175,15 +188,29 @@ void reserve() {
                     } else {
                         break;
                     }
+                } else {
+                    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                    printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
+                    char c = getc(stdin);
+                    if (c == 'y' || c == 'Y') {
+                        tercon_clear_error_log();
+                        tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                        printf("\x1b[2K");
+                        getc(stdin);
+                        continue;
+                    } else {
+                        return;
+                    }
                 }
             }
             found = 1;
         }
     }
     fclose(fp);
-
-    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
-    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
+    
+    // num_of_days is usefull here to position the cursor dynamically.
+    tercon_move_y_x((term.rows - 4) - num_of_days, (term.columns - 26 ) / 2);
+    printf(ANSI_ERASE_LINE ANSI_BLINK_SLOW "Press Enter to continue...%d" ANSI_BLINK_OFF, num_of_days);
 }
 
 void displayRoom() {

@@ -38,6 +38,15 @@ void tercon_clear_screen() {
     printf("\x1b[H\x1b[J");
 }
 
+void tercon_clear_error_log() {
+
+    Terminal term = tercon_init_rows_cols();
+
+    printf("\x1b[%d;%dH                                                                                ", term.rows -2, (term.columns - 80) / 2);
+    printf("\x1b[%d;%dH                                                                                ", term.rows -1, (term.columns - 80) / 2);
+    printf("\x1b[%d;%dH                                                                                ", term.rows, (term.columns - 80) / 2);
+}
+
 void tercon_get_cols_rows(int *cols, int *rows) {
 
     struct winsize size;

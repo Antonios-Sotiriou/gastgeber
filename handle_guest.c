@@ -41,22 +41,24 @@ struct Guest handleGuest() {
     int next_id = getNextGuestEntry();
 
     // Move cursor to the right position
-    tercon_move_y_x(13, (term.columns - 51 ) /2);
+    tercon_move_y_x(13, (term.columns - 51 ) / 2);
     printf("Guest First Name: ");
     char *first_name = getSpString(20);
     if (first_name == NULL) {
-        tercon_move_y_x(term.rows - 1, (term.columns - 28) /2);
+        tercon_move_y_x(term.rows - 2, (term.columns - 28) / 2);
         printf(ANSI_COLOR_RED "Guest must have a First Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
+        free(first_name);
         return guest;
     }
     tercon_move_y_x(14, (term.columns - 51 ) /2);
     printf("Guest Last Name: ");
     char *last_name = getSpString(20);
     if (last_name == NULL) {
-        tercon_move_y_x(term.rows - 1, (term.columns - 29 ) /2);
+        tercon_move_y_x(term.rows - 2, (term.columns - 29 ) / 2);
         printf(ANSI_COLOR_RED "Guest must have a Last Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
+        free(last_name);
         return guest;
     }
 
