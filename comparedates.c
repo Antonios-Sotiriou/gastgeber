@@ -38,17 +38,17 @@ int compareDates(char *from_date, char *to_date) {
         if(to_day > from_day) {
             return 1;
         } else if(to_day == from_day) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dH           Same from and to days.You must provide a day in the future.          \n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 80) / 2);
-            printf(ANSI_COLOR_RED "\x1b[%d;%dH                 You can't check in and check out the same day!                 \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHSame from and to days.You must provide a day in the future.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 59) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHYou can't check in and check out the same day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
             return 0;
         } else {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dH                            This day is in the past!                            \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHThis day is in the past!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
             return 0;         
         }
     } else if(to_year > from_year) {
         return 1;
     } else {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dH                        To date is older than from date!                            \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHTo date is older than from date!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 32) / 2);
         return 0;
     }
 }

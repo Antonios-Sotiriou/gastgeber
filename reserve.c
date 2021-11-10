@@ -29,27 +29,36 @@ int checkFromDate(struct Reservation res) {
     FILE *fp;
     fp = fopen(daysdb, "rb");
 
+    Terminal term = tercon_init_rows_cols();
+
     int starting_point;
+    int found = 0;
     // While loop to find the startind day;
-    while(1) {
+    while(found == 0) {
         fread(&day, sizeof(day), 1, fp);
         if(feof(fp)) {
             break;
         } else if(strcmp(day.date, res.from_date) == 0) {
             starting_point = day.id;
+            found = 1;
             for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                 // Check if the room id is already in the days rooms ids.
                 if(day.room_id[i] == res.room.id) {
-                    printf(ANSI_COLOR_RED "Room is already reserved for this date: %s\n" ANSI_COLOR_RESET, day.date);
+                    tercon_clear_error_log();
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHRoom is already reserved for this date: %s\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 50) / 2, day.date);
                     return 1;
                 }
             }
+        } else {
+            starting_point = 0;
         }
     }
     fclose(fp);
     
-    if(starting_point <= 0 || starting_point > 36500) {
-        printf("Check the dates please.\nMaybe you Provided a day that is not exists in this year.\nFor example 29 of February or 31 of November.\n");
+    if(starting_point <= 0) {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 44) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHexists in this year.For example 29 of February or 31 of November.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 65) / 2);
         return 1;
     }
     return 0;
@@ -61,22 +70,31 @@ int checkAllDates(struct Reservation res) {
     FILE *fp;
     fp = fopen(daysdb, "rb");
 
+    Terminal term = tercon_init_rows_cols();
+
     int starting_point;
     int finishing_point;
     // While loop to find the startind and ending days ids;
-    while(1) {
+    int found = 0;
+    while(found < 2) {
         fread(&day, sizeof(day), 1, fp);
         if(feof(fp)) {
             break;
         } else if(strcmp(day.date, res.from_date) == 0) {
             starting_point = day.id;
+            found += 1;
         } else if(strcmp(day.date, res.to_date) == 0) {
             finishing_point = day.id;
+            found += 1;
+        } else {
+            finishing_point = 0;
         }
     }
 
-    if(finishing_point <= 0 || finishing_point > 36500) {
-        printf("Check the dates please.\nMaybe you Provided a day that is not exists in this year.\nFor example 29 of February or 31 of November.\n");
+    if(finishing_point <= 0) {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 44) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHexists in this year.For example 29 of February or 31 of November.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 65) / 2);
         return 1;
     }
     // Go to the beggining of the file and readall data again
@@ -93,7 +111,7 @@ int checkAllDates(struct Reservation res) {
                 for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                     // Check if the room id is already in the days rooms ids.
                     if(day.room_id[i] == res.room.id) {
-                       printf(ANSI_COLOR_RED "Room is already reserved for those dates: %s\n" ANSI_COLOR_RESET, day.date);
+                       printf("\x1b[%d;%dH|%s              Room is already reserved for those dates: %s              %s|\n", (term.rows - 2) + i, (term.columns - 82) / 2, ANSI_COLOR_RED, day.date, ANSI_COLOR_RESET);
                        num_of_days++;
                     }
                 }
@@ -103,17 +121,17 @@ int checkAllDates(struct Reservation res) {
     fclose(fp);
 
     if(num_of_days != 0) {
-        return 1;
+        return num_of_days;
     } else {
-        printf("Shall the reservation be applied: [Y/N]? ");
+        printf("\x1b[%d;%dHShall the reservation be applied: [Y/N]? ", term.rows - 4, (term.columns - 41) / 2);
         char c = getc(stdin);
         if(c == 'Y' || c == 'y') {
             applyReservation(starting_point, finishing_point, res.room.id);
-            printf(ANSI_COLOR_GREEN "\nReservation applied success.\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_GREEN "\x1b[%d;%dHReservation applied success.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 28) / 2);
             getc(stdin);
             return 0;
         } else {
-            printf(ANSI_COLOR_RED "\nReservation Canceled!\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation Canceled!\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 21) / 2);
             getc(stdin);
             return 1;
         }
