@@ -33,7 +33,6 @@ void tercon_clear_screen();
 void tercon_clear_error_log();
 void tercon_get_cols_rows(int *cols, int *rows);
 void tercon_move_y_x(int y, int x);
-void tercon_win_size_changed();
 void tercon_enter_alt_screen();
 void tercon_exit_alt_screen();
 void tercon_echo_off();

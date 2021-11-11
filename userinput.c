@@ -66,6 +66,7 @@ int getformatedDate(char *room_date) {
 
     if(test == 3) {
         if(day < 0 || day > 31) {
+            tercon_clear_error_log();
             printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
             return 0;
         } else if(day > 0 && day < 10) {
@@ -74,6 +75,7 @@ int getformatedDate(char *room_date) {
             sprintf(converted_day, "%d/", day);
         }
         if(month < 0 || month > 12) {
+            tercon_clear_error_log();
             printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct month!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
             return 0;
         } else if(month > 0 && month < 10) {
@@ -89,15 +91,18 @@ int getformatedDate(char *room_date) {
             if(day - mytime -> tm_mday >= 0) {
                 sprintf(converted_year, "%d", year);
             } else {
-                printf(ANSI_COLOR_RED "\x1b[%d;%dH                            This day is in the past!                            \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHThis day is in the past!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
                 return 0;
             }
         } else {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dH                    Provide a date from today to the future!                    \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+            tercon_clear_error_log();
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a date from today to the future!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
             return 0;
         }
     } else {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dH                    The date you entered is in wrong format!                    \n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 80) / 2);
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHThe date you entered is in wrong format!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
         return 0;
     }
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
@@ -195,7 +200,6 @@ char* getSpString(int str_len) {
     cleaned_str[i] = '\0';
     // Here checking the string size + 1 to give an extra place for the \0 char.
     if(strlen(cleaned_str) > str_len) {
-        tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid length.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 15) / 2);
         printf(ANSI_COLOR_RED "\x1b[%d;%dHMust be %d characters long." ANSI_COLOR_RESET, term.rows, (term.columns - 27) / 2, str_len);
         return 0;

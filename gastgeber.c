@@ -117,7 +117,7 @@ void reserve() {
 
     Terminal term = displayRoomReservationLogo();
     term.cursor_x = 0;
-    term.cursor_y = 0;
+    term.cursor_y = 11;
     int num_of_days = 0;
 
     int room_id;
@@ -130,7 +130,8 @@ void reserve() {
 
     while(found == 0) {
 
-        printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", 11, (term.columns - 51) / 2, 1, TOTAL_ROOMS);  
+        printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", term.cursor_y, (term.columns - 51) / 2, 1, TOTAL_ROOMS); 
+        term.cursor_y += 1;
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
@@ -148,11 +149,11 @@ void reserve() {
             int from_date = 0;
             while(from_date == 0) {
                 if (reservation.guest.repeated_guest) {
-                    tercon_move_y_x(20, (term.columns - 51 ) /2);
-                    term.cursor_y = 20;
+                    tercon_move_y_x(14, (term.columns - 51 ) /2);
+                    term.cursor_y = 14;
                 } else {
-                    tercon_move_y_x(16, (term.columns - 51 ) /2);
-                    term.cursor_y = 16;
+                    tercon_move_y_x(15, (term.columns - 51 ) /2);
+                    term.cursor_y = 15;
                 }
                 printf(ANSI_ERASE_LINE "Room reserve from date: ");
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
@@ -176,6 +177,7 @@ void reserve() {
             while(to_date == 0) {
                 tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) /2);
                 printf(ANSI_ERASE_LINE "To date: ");
+                int step_count = 0;
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     // we need the num_of_days here to position the cursor if the days are overflow the error printing area.
                     num_of_days = checkAllDates(reservation);
@@ -186,9 +188,12 @@ void reserve() {
                         to_date = 1;
                         fwrite(&reservation, sizeof(reservation), 1, fp);
                     } else {
-                        break;
+                        step_count = 1;
                     }
                 } else {
+                    step_count = 1;
+                }
+                if (step_count != 0) {
                     tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
@@ -207,10 +212,14 @@ void reserve() {
         }
     }
     fclose(fp);
-    
+
     // num_of_days is usefull here to position the cursor dynamically.
-    tercon_move_y_x((term.rows - 4) - num_of_days, (term.columns - 26 ) / 2);
-    printf(ANSI_ERASE_LINE ANSI_BLINK_SLOW "Press Enter to continue...%d" ANSI_BLINK_OFF, num_of_days);
+    if (num_of_days > 1) {
+        tercon_move_y_x((term.rows - 4) - num_of_days, (term.columns - 26 ) / 2);
+    } else {
+        tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+    }
+    printf(ANSI_ERASE_LINE ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
 }
 
 void displayRoom() {
