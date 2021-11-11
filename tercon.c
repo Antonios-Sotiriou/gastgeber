@@ -61,17 +61,6 @@ void tercon_move_y_x(int y, int x) {
     printf("\x1b[%d;%dH", y, x);
 }
 
-void tercon_win_size_changed() {
-
-    int rows = 0;
-    int cols = 0;
-
-    tercon_get_cols_rows(&cols, &rows);
-
-    printf("\x1b[H\x1b[J");
-    tercon_move_y_x(rows / 2, cols / 2);
-}
-
 void tercon_enter_alt_screen() {
 
     printf("\x1b[?1049h");

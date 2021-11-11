@@ -57,8 +57,8 @@ int checkFromDate(struct Reservation res) {
     
     if(starting_point <= 0) {
         tercon_clear_error_log();
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 44) / 2);
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHexists in this year.For example 29 of February or 31 of November.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 65) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day exists in this year\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 64) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHFor example 29 of February or 31 of November.Error: checkFromDate()!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 68) / 2);
         return 1;
     }
     return 0;
@@ -91,10 +91,10 @@ int checkAllDates(struct Reservation res) {
         }
     }
 
-    if(finishing_point <= 0) {
+    if (finishing_point <= 0) {
         tercon_clear_error_log();
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 44) / 2);
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHexists in this year.For example 29 of February or 31 of November.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 65) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day exists in this year.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 64) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHFor example 29 of February or 31 of November.Error: checkAllDates()!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 68) / 2);
         return 1;
     }
     // Go to the beggining of the file and readall data again
