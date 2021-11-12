@@ -86,3 +86,20 @@ void tercon_echo_on() {
     term.c_lflag |= ECHO;
     tcsetattr(1, TCSANOW, &term);
 }
+
+void tercon_en_raw() {
+
+    struct termios term;
+    tcgetattr(1, &term);
+    term.c_lflag &= ~ICANON;
+    tcsetattr(1, TCSANOW, &term);
+}
+
+void tercon_dis_raw() {
+
+    struct termios term;
+    tcgetattr(1, &term);
+    term.c_lflag |= ICANON;
+    tcsetattr(1, TCSANOW, &term);
+}
+

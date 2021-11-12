@@ -37,7 +37,8 @@ void tercon_enter_alt_screen();
 void tercon_exit_alt_screen();
 void tercon_echo_off();
 void tercon_echo_on();
-
+void tercon_en_raw();
+void tercon_dis_raw();
 
 #endif /* TERCON_H */
 

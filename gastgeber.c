@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
         // [ switch ],can be found in display.c file.
         char *positioning = displayMainLogo();
         printf("%s          >>> ", positioning);
+        //tercon_en_raw();
         scanf("%2d", &choice);
 
         // All the [ switch ] functions can be found in this file with this order.
@@ -98,6 +99,7 @@ int main(int argc, char *argv[]) {
             case 11 : displayAllRoomsAnnuallyReservations();
                 break;
             case 0 : clear_scr();
+                //tercon_dis_raw();
                 exit(0);
                 break;
             default : 
