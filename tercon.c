@@ -103,3 +103,11 @@ void tercon_dis_raw() {
     tcsetattr(1, TCSANOW, &term);
 }
 
+void tercon_hide_cursor() {
+    printf("\x1b[?25l");
+}
+
+void tercon_show_cursor() {
+    printf("\x1b[?25h");
+}
+

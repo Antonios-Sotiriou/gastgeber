@@ -56,7 +56,7 @@ char *displayMainLogo() {
     printf("\x1b[%d;%dH          9. Annually Availabillity                \n", 18, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          10. Room Annually Reservations           \n", 19, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          11. all Rooms Annually Reservations      \n", 20, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          0. Exit                                  \n", 21, (term.columns -51) / 2);
+    printf("\x1b[%d;%dH          20. Exit                                 \n", 21, (term.columns -51) / 2);
     printf("\x1b[%d;%dH ________________________________________________________________________________",term.rows - 3, (term.columns - 82) / 2);
     printf("\x1b[%d;%dH|                                                                                |",term.rows - 2, (term.columns - 82) / 2);
     printf("\x1b[%d;%dH|                                                                                |",term.rows - 1, (term.columns - 82) / 2);

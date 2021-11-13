@@ -52,6 +52,7 @@ void deleteReservation();
 void displayAnnuallyAvailabillity();
 void displayRoomAnnuallyReservations();
 void displayAllRoomsAnnuallyReservations();
+void main_error(Terminal term);
 
 int main(int argc, char *argv[]) {
 
@@ -64,15 +65,15 @@ int main(int argc, char *argv[]) {
     }
 
     int choice;
-    char c;
+    Terminal term = tercon_init_rows_cols();
 
     while(1) {
         // All the functions that start with the word [ display ] and are not part of the following
         // [ switch ],can be found in display.c file.
         char *positioning = displayMainLogo();
-        printf("%s          >>> ", positioning);
-        //tercon_en_raw();
-        scanf("%2d", &choice);
+        printf("\x1b[%d;%dH          >>> ", 22, (term.columns - 51) / 2);
+
+        choice = getInteger(48, 4);
 
         // All the [ switch ] functions can be found in this file with this order.
         switch(choice) {
@@ -98,14 +99,20 @@ int main(int argc, char *argv[]) {
                 break;
             case 11 : displayAllRoomsAnnuallyReservations();
                 break;
-            case 0 : clear_scr();
-                //tercon_dis_raw();
+            case 20 : clear_scr();
                 exit(0);
+                break;
+            case -1 :
+                // Error handling and error message printing for invalid integer length.See bottom of the file.
+                main_error(term);
+                break;
+            case -2 :
+                // Error handling and error message printing for no integer input.See bottom of the file.
+                main_error(term);
                 break;
             default : 
                 break;
         }
-        while((c = getc(stdin) != '\n') && c != '\t');
         free(positioning);
     }
     return 1;
@@ -126,9 +133,6 @@ void reserve() {
     int found = 0;
     // counter function which finds the last reservation record! Can be found in init_dbs.c file
     int next_id = getNextReservationEntry();
-
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
 
     while(found == 0) {
 
@@ -221,7 +225,11 @@ void reserve() {
     } else {
         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
     }
+    tercon_echo_off();
     printf(ANSI_ERASE_LINE ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
+    char c;
+    while((c = getc(stdin) != '\n') && c != '\t');
+    tercon_echo_on();
 }
 
 void displayRoom() {
@@ -233,9 +241,6 @@ void displayRoom() {
     displayRoomInfoLogo();
 
     int room_id; 
-    char c; 
-    while((c = getc(stdin) != '\n') && c != '\t');
-    
     printf("Enter Room ID(%d-%d): ", 1, TOTAL_ROOMS);  
     room_id = getnuminput(5);
         
@@ -254,6 +259,8 @@ void displayRoom() {
     fclose(fp);
 
     printf("\nPress Enter to continue...\n");
+    char c; 
+    while((c = getc(stdin) != '\n') && c != '\t');
 }
 
 void displayAllRooms() {
@@ -323,8 +330,8 @@ void displayAllGuests() {
     FILE *fp;
     fp = fopen(guestsdb, "rb");
 
-    char c; 
-    while((c = getc(stdin) != '\n') && c != '\t');
+    // char c; 
+    // while((c = getc(stdin) != '\n') && c != '\t');
     
     displayAllGuestsLogo();
 
@@ -339,6 +346,7 @@ void displayAllGuests() {
     fclose(fp);
 
     printf("\nPress Enter to continue...\n");
+    getc(stdin);
 }
 
 void modify() {
@@ -527,5 +535,19 @@ void displayAllRoomsAnnuallyReservations() {
     }
 
     printf("Press Enter to continue...");
+}
+
+void main_error(Terminal term) {
+
+    char c;
+    tercon_echo_off();
+
+    printf(ANSI_COLOR_GREEN "\x1b[%d;%dHPress Enter to continue..." ANSI_COLOR_RESET, term.rows - 4, (term.columns - 28) / 2);
+    printf("\x1b[%d;%dH          >>> ", 22, (term.columns - 51) / 2);
+
+    while((c = getc(stdin) != '\n') && c != '\t');
+
+    clear_scr();
+    tercon_echo_on();
 }
 
