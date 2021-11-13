@@ -39,6 +39,8 @@ void tercon_echo_off();
 void tercon_echo_on();
 void tercon_en_raw();
 void tercon_dis_raw();
+void tercon_hide_cursor();
+void tercon_show_cursor();
 
 #endif /* TERCON_H */
 
