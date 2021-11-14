@@ -2,6 +2,7 @@
 #define DISPLAY_H
 
 /* Display functions */
+void appLogo();
 char *displayMainLogo();
 Terminal displayRoomReservationLogo();
 void displayRoomInfoLogo();
@@ -29,6 +30,7 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year);
 /* Global Display functions */
 void displayInt(int id, int dis_len);
 void displayStr(char *str, int dis_len);
+void displayErrorLog();
 
 #endif /* DISPLAY_H */
 

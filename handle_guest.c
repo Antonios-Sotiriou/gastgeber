@@ -41,8 +41,8 @@ struct Guest handleGuest() {
     int next_id = getNextGuestEntry();
 
     // Move cursor to the right position
-    tercon_move_y_x(12, (term.columns - 51 ) / 2);
-    printf("Guest First Name: ");
+    tercon_move_y_x(14, (term.columns - 51 ) / 2);
+    printf("  Guest First Name: ");
     char *first_name = getSpString(20);
     if (first_name == NULL) {
         tercon_move_y_x(term.rows - 2, (term.columns - 28) / 2);
@@ -51,8 +51,8 @@ struct Guest handleGuest() {
         free(first_name);
         return guest;
     }
-    tercon_move_y_x(13, (term.columns - 51 ) /2);
-    printf("Guest Last Name: ");
+    tercon_move_y_x(15, (term.columns - 51 ) /2);
+    printf("  Guest Last Name: ");
     char *last_name = getSpString(20);
     if (last_name == NULL) {
         tercon_move_y_x(term.rows - 2, (term.columns - 29 ) / 2);
@@ -79,8 +79,8 @@ struct Guest handleGuest() {
     fclose(fp);
 
     if(found == 0) {
-        tercon_move_y_x(14, (term.columns - 51 ) /2);
-        printf("Guest Nationality: ");
+        tercon_move_y_x(16, (term.columns - 51 ) /2);
+        printf("  Guest Nationality: ");
         char *nationality = getSpString(20);
         sprintf(guest.first_name, "%s", first_name);
         sprintf(guest.last_name, "%s", last_name);
