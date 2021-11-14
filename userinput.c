@@ -125,14 +125,14 @@ int getInteger(int str_len, int int_len) {
     fgets(str_input, sizeof(str_input), stdin);
 
     if(strlen(str_input) - 1 >= int_len) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 22) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         return -1;
     } else {
         for(int i = 0; i <= strlen(str_input) - 1; i++) {
             if(str_input[i] >= 48 && str_input[i] <= 57) {
                 user_input = user_input * 10 + str_input[i] - '0';
             } else if (str_input[i] != '\n') {
-                printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 24) / 2);
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
                 return -2;
             }
         }

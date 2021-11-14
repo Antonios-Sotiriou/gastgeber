@@ -52,7 +52,7 @@ void deleteReservation();
 void displayAnnuallyAvailabillity();
 void displayRoomAnnuallyReservations();
 void displayAllRoomsAnnuallyReservations();
-void main_error(Terminal term);
+void main_error();
 
 int main(int argc, char *argv[]) {
 
@@ -65,14 +65,14 @@ int main(int argc, char *argv[]) {
     }
 
     int choice;
-    Terminal term = tercon_init_rows_cols();
 
     while(1) {
         // All the functions that start with the word [ display ] and are not part of the following
         // [ switch ],can be found in display.c file.
         char *positioning = displayMainLogo();
-        printf("\x1b[%d;%dH          >>> ", 22, (term.columns - 51) / 2);
-
+        printf("%s          >>> ", positioning);
+        // getInteger(int b_l, int i_l) function to get an integer from a buffer that is 48 bytes longand integer has length 4 digits.
+        // Can be found in userinput.c
         choice = getInteger(48, 4);
 
         // All the [ switch ] functions can be found in this file with this order.
@@ -104,11 +104,11 @@ int main(int argc, char *argv[]) {
                 break;
             case -1 :
                 // Error handling and error message printing for invalid integer length.See bottom of the file.
-                main_error(term);
+                main_error();
                 break;
             case -2 :
                 // Error handling and error message printing for no integer input.See bottom of the file.
-                main_error(term);
+                main_error();
                 break;
             default : 
                 break;
@@ -126,7 +126,7 @@ void reserve() {
 
     Terminal term = displayRoomReservationLogo();
     term.cursor_x = 0;
-    term.cursor_y = 11;
+    term.cursor_y = 13;
     int num_of_days = 0;
 
     int room_id;
@@ -136,12 +136,12 @@ void reserve() {
 
     while(found == 0) {
 
-        printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", term.cursor_y, (term.columns - 51) / 2, 1, TOTAL_ROOMS); 
+        printf("\x1b[%d;%dH  Enter Room ID(%d-%d): ", term.cursor_y, (term.columns - 51) / 2, 1, TOTAL_ROOMS); 
         term.cursor_y += 1;
         room_id = getnuminput(5);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 15) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
             break;
         } else {
             reservation.id = next_id;
@@ -155,13 +155,13 @@ void reserve() {
             int from_date = 0;
             while(from_date == 0) {
                 if (reservation.guest.repeated_guest) {
-                    tercon_move_y_x(14, (term.columns - 51 ) /2);
-                    term.cursor_y = 14;
+                    tercon_move_y_x(16, (term.columns - 51 ) /2);
+                    term.cursor_y = 16;
                 } else {
-                    tercon_move_y_x(15, (term.columns - 51 ) /2);
-                    term.cursor_y = 15;
+                    tercon_move_y_x(17, (term.columns - 51 ) /2);
+                    term.cursor_y = 17;
                 }
-                printf(ANSI_ERASE_LINE "Room reserve from date: ");
+                printf(ANSI_ERASE_LINE "  Room reserve from date: ");
                 if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
                 } else {
@@ -182,7 +182,7 @@ void reserve() {
             int to_date = 0;
             while(to_date == 0) {
                 tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) /2);
-                printf(ANSI_ERASE_LINE "To date: ");
+                printf(ANSI_ERASE_LINE "  To date: ");
                 int step_count = 0;
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     // we need the num_of_days here to position the cursor if the days are overflow the error printing area.
@@ -226,7 +226,7 @@ void reserve() {
         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
     }
     tercon_echo_off();
-    printf(ANSI_ERASE_LINE ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
+    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
     char c;
     while((c = getc(stdin) != '\n') && c != '\t');
     tercon_echo_on();
@@ -238,14 +238,15 @@ void displayRoom() {
     FILE *fp;
     fp = fopen(roomsdb, "rb");
 
+    Terminal term = tercon_init_rows_cols();
     displayRoomInfoLogo();
 
     int room_id; 
-    printf("Enter Room ID(%d-%d): ", 1, TOTAL_ROOMS);  
+    printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", 13, (term.columns - 21) / 2, 1, TOTAL_ROOMS);  
     room_id = getnuminput(5);
         
     if (room_id < 1 || room_id > TOTAL_ROOMS) {
-        printf(ANSI_COLOR_RED "\nInvalid Room ID.\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
     } else {
         while(1) {
             fread(&room, sizeof(room), 1, fp);
@@ -258,9 +259,11 @@ void displayRoom() {
     }
     fclose(fp);
 
-    printf("\nPress Enter to continue...\n");
-    char c; 
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    char c;
     while((c = getc(stdin) != '\n') && c != '\t');
+    tercon_echo_on();
 }
 
 void displayAllRooms() {
@@ -268,9 +271,6 @@ void displayAllRooms() {
     struct Room room;
     FILE *fp;
     fp = fopen(roomsdb, "rb");
-
-    char c; 
-    while((c = getc(stdin) != '\n') && c != '\t');
     
     displayAllRoomsLogo();
 
@@ -284,7 +284,9 @@ void displayAllRooms() {
     }
     fclose(fp);
 
-    printf("\nPress Enter to continue...\n");
+    printf("\nPress Enter to continue...");
+    char c; 
+    while((c = getc(stdin) != '\n') && c != '\t');
 }
 
 void displayGuest() {
@@ -537,9 +539,10 @@ void displayAllRoomsAnnuallyReservations() {
     printf("Press Enter to continue...");
 }
 
-void main_error(Terminal term) {
+void main_error() {
 
     char c;
+    Terminal term = tercon_init_rows_cols();
     tercon_echo_off();
 
     printf(ANSI_COLOR_GREEN "\x1b[%d;%dHPress Enter to continue..." ANSI_COLOR_RESET, term.rows - 4, (term.columns - 28) / 2);

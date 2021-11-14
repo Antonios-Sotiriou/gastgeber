@@ -19,6 +19,7 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 #define ANSI_CLEAR_SCREEN "\x1b[H\x1b[J"
 #define ANSI_MOVE_CURSOR_TO "\x1b[%d;%dH"
+#define ANSI_MOVE_CURSOR_COL "\x1b[%dG" // Move cursor to column
 #define ANSI_ERASE_LINE "\x1b[2K" // from cursor position and after
 
 typedef struct {
