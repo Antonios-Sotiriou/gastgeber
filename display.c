@@ -72,8 +72,8 @@ Terminal displayRoomReservationLogo() {
     Terminal term;
     term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\                \x1b[32mReservations Panel\x1b[0m                /\n", 10, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH ''''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH\\                \x1b[32mReservations Panel\x1b[0m               /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);
     displayErrorLog();
 
     return term;
@@ -83,17 +83,17 @@ void displayRoomInfoLogo() {
     Terminal term;
     term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\            \x1b[32mDisplay Room Informations\x1b[0m             /\n", 10, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH ''''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);   
+    printf("\x1b[%d;%dH\\            \x1b[32mDisplay Room Informations\x1b[0m            /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);   
     displayErrorLog();
 }
 void displayRoomInfo(struct Room room) {
 
     Terminal term = tercon_init_rows_cols();
-    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 15, (term.columns - 105) / 2);
-    printf("\x1b[%d;%dH|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n", 16, (term.columns - 105) / 2);
-    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 17, (term.columns - 105) / 2);
-    printf("\x1b[%d;%dH|", 18, (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|", (term.columns - 105) / 2);
     displayInt(room.id, 20);
     printf("|");
     displayStr(room.name, 20);
@@ -104,18 +104,18 @@ void displayRoomInfo(struct Room room) {
     printf("|");
     displayInt(room.price, 20);
     printf("|\n");
-    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n\n", 19, (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayAllRoomsLogo() {
     
     clear_scr();
     Terminal term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\          \x1b[32mDisplay All Room Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH ''''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);  
-    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 13, (term.columns - 105) / 2);
-    printf("\x1b[%d;%dH|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n", 14, (term.columns - 105) / 2);
-    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 15, (term.columns - 105) / 2);
+    printf("\x1b[%d;%dH\\         \x1b[32mDisplay All Room Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);  
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayAllRoomsInfo(struct Room room) {
 
@@ -135,15 +135,18 @@ void displayAllRoomsInfo(struct Room room) {
 }
 void displayGuestInfoLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*    Display Guest Informations.    *\n");
-    printf("*************************************\n\n");   
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\            \x1b[32mDisplay Guest Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);  
+    displayErrorLog(); 
 }
 void displayGuestInfo(struct Guest guest) {
-    printf(" -----------------------------------------------------------------------------------\n");
-    printf("|     Guest ID       |     First Name     |      last Type     |    Nationality     |\n");
-    printf(" -----------------------------------------------------------------------------------\n");
-    printf("|");
+    Terminal term = tercon_init_rows_cols();
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
+    printf("\x1b[%dG|     Guest ID       |     First Name     |      last Type     |    Nationality     |\n", (term.columns - 84) / 2);
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
+    printf("\x1b[%dG|", (term.columns - 84) / 2);
     displayInt(guest.id, 20);
     printf("|");
     displayStr(guest.first_name, 20);
@@ -152,7 +155,7 @@ void displayGuestInfo(struct Guest guest) {
     printf("|");
     displayStr(guest.nationality, 20);
     printf("|\n");
-    printf(" -----------------------------------------------------------------------------------\n\n");
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
 }
 void displayAllGuestsLogo() {
     clear_scr();
