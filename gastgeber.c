@@ -272,6 +272,7 @@ void displayAllRooms() {
     FILE *fp;
     fp = fopen(roomsdb, "rb");
     
+    Terminal term = tercon_init_rows_cols();
     displayAllRoomsLogo();
 
     while(1) {
@@ -284,9 +285,11 @@ void displayAllRooms() {
     }
     fclose(fp);
 
-    printf("\nPress Enter to continue...");
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
     char c; 
     while((c = getc(stdin) != '\n') && c != '\t');
+    tercon_echo_on();
 }
 
 void displayGuest() {
@@ -295,35 +298,44 @@ void displayGuest() {
     FILE *fp;
     fp = fopen(guestsdb, "rb");
 
+    Terminal term = tercon_init_rows_cols();
     displayGuestInfoLogo();
 
     int guest_id;
     int found = 0;
-    char c; 
-    while((c = getc(stdin) != '\n') && c != '\t');
     
-    printf("Enter Guest ID:\n");  
+    printf("\x1b[%d;%dHEnter Guest ID: ", 13, (term.columns - 16) / 2);  
     guest_id = getnuminput(8);
-        
-    if (guest_id <= 0) {
-        printf(ANSI_COLOR_RED "\nInvalid Guest ID.\n" ANSI_COLOR_RESET);
+
+    if (guest_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input length.Must be maximum 8 chars long.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 50) / 2);  
+    } else if (guest_id == 0 || guest_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Guest ID!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 17) / 2);
+    } else if (guest_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input provided.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 17) / 2);
     } else {
         while(found == 0) {
             fread(&guest, sizeof(guest), 1, fp);
             if(feof(fp)) {
                 break;            
-            } else if(guest.id == guest_id) {
+            } else if(guest.id == guest_id && guest.id != 0) {
                 displayGuestInfo(guest);
                 found = 1;
             }
         }
     }
     fclose(fp);
-    if(found == 0) {
-        printf("No Guest found with the given ID.\nDisplay all guests with option 5 of main menu to check the Guests IDs.\n");
+
+    if(found == 0 && guest_id > 0) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 33) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHDisplay all guests with option 5 of main menu to check the Guests IDs.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 70) / 2);
     }
 
-    printf("\nPress Enter to continue...\n");  
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    char c;
+    while((c = getc(stdin) != '\n') && c != '\t');
+    tercon_echo_on();
 }
 
 void displayAllGuests() {
@@ -331,9 +343,6 @@ void displayAllGuests() {
     struct Guest guest;
     FILE *fp;
     fp = fopen(guestsdb, "rb");
-
-    // char c; 
-    // while((c = getc(stdin) != '\n') && c != '\t');
     
     displayAllGuestsLogo();
 
@@ -341,7 +350,7 @@ void displayAllGuests() {
         fread(&guest, sizeof(guest), 1, fp);
         if(feof(fp)) {
             break;            
-        } else {
+        } else if (guest.id != 0) {
             displayAllGuestsInfo(guest);
         }
     }
@@ -357,7 +366,7 @@ void modify() {
     
     int choice;
     scanf("%d", &choice);
-
+    // Switch case functions can be found with the given order in modify.c file.
     switch(choice) {
         case 1 : modifyRoom();
             break;

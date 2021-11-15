@@ -19,18 +19,17 @@ int getnuminput(int max_len) {
     char input[48];
     char cleared_num[48];
 
-    Terminal term = tercon_init_rows_cols();
-
     fgets(input, sizeof(input), stdin);
 
+    // Checking if input is greater than the given max_len
     if(strlen(input) - 1 > max_len) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        return 0;
+        return -1;
     }
-    for(int i = 0, d = 0; i <= strlen(input) - 1; i++) {
+    int i, d;
+    for(i = 0, d = 0; i <= strlen(input) - 1; i++) {
         // CHECKING FOR ALPHABET
         if ((input[i] >= 65 && input[i] <= 90) || (input[i] >= 97 && input[i] <= 122)) {
-            return 0;
+            return -2;
         // CHECKING FOR DIGITS
         } else if (input[i] >= 48 && input[i] <= 57) {
             cleared_num[d] = input[i];
@@ -39,6 +38,11 @@ int getnuminput(int max_len) {
         } else {
             continue;
         }
+    }
+    cleared_num[i] = '\0';
+    // checking if user pressed enter without to provide input.That means he entered empty input.
+    if (cleared_num[0] == '\0') {
+        return -3;
     }
     return atoi(cleared_num);
 }

@@ -174,13 +174,19 @@ void modifyGuest() {
     fp = fopen(guestsdb, "rb");
     fp1 = fopen(journal_sec, "wb");
 
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
+    // char c;
+    // while((c = getc(stdin) != '\n') && c != '\t');
 
     displayModifyGuestLogo();
 
     printf("Enter Guest ID you want to modify: ");
     int guest_id = getInteger(48, 4);
+
+    if (guest_id == 0) {
+        printf("No Guest with 0 ID exists!");
+        getc(stdin);
+        return;
+    }
 
     int found = 0;
     while(1) {
