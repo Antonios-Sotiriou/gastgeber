@@ -161,7 +161,7 @@ char* getString(int str_len) {
             printf("\nSpaces are not allowed between.\n");
             return 0;
         } else if(str_input[i] == 0) {
-            printf("\nNo input Provided.\n");
+            printf("\nNo input Provided.getString().\n");
             return 0;
         } else {
             cleaned_str = realloc(cleaned_str, sizeof(char) * dynamic_inc);

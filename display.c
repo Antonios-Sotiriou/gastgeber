@@ -45,6 +45,7 @@ void appLogo() {
 }
 
 char *displayMainLogo() {
+
     clear_scr();
     Terminal term = tercon_init_rows_cols();
     char *positioning = malloc(sizeof(char));
@@ -79,11 +80,12 @@ Terminal displayRoomReservationLogo() {
     return term;
 }
 void displayRoomInfoLogo() {
+
     clear_scr();
     Terminal term;
     term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\            \x1b[32mDisplay Room Informations\x1b[0m            /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH\\          \x1b[32mDisplaying Room Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);   
     displayErrorLog();
 }
@@ -111,7 +113,7 @@ void displayAllRoomsLogo() {
     clear_scr();
     Terminal term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\         \x1b[32mDisplay All Room Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH\\       \x1b[32mDisplaying All Room Informations\x1b[0m          /\n", 10, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);  
     printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
     printf("\x1b[%dG|      Room ID       |     Room Name      |      Room Type     |      Capacity      |       Price        |\n", (term.columns - 105) / 2);
@@ -134,14 +136,16 @@ void displayAllRoomsInfo(struct Room room) {
     printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayGuestInfoLogo() {
+
     clear_scr();
     Terminal term = tercon_init_rows_cols();
     appLogo();
-    printf("\x1b[%d;%dH\\            \x1b[32mDisplay Guest Informations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH\\          \x1b[32mDisplaying Guest Informations\x1b[0m          /\n", 10, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n", 11, (term.columns - 51) / 2);  
     displayErrorLog(); 
 }
 void displayGuestInfo(struct Guest guest) {
+
     Terminal term = tercon_init_rows_cols();
     printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
     printf("\x1b[%dG|     Guest ID       |     First Name     |      last Type     |    Nationality     |\n", (term.columns - 84) / 2);
@@ -158,16 +162,20 @@ void displayGuestInfo(struct Guest guest) {
     printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
 }
 void displayAllGuestsLogo() {
+
     clear_scr();
-    printf("*************************************\n");
-    printf("*  Display All Guests Informations. *\n");
-    printf("*************************************\n\n");
-    printf(" -----------------------------------------------------------------------------------\n");
-    printf("|     Guest ID       |     First Name     |      last Name     |    Nationality     |\n");
-    printf(" -----------------------------------------------------------------------------------\n");    
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\       \x1b[32mDisplaying All Guests Informations\x1b[0m        /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);  
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
+    printf("\x1b[%dG|     Guest ID       |     First Name     |      last Type     |    Nationality     |\n", (term.columns - 84) / 2);
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2);
 }
 void displayAllGuestsInfo(struct Guest guest) {
-    printf("|");
+
+    Terminal term = tercon_init_rows_cols();
+    printf("\x1b[%dG|", (term.columns - 84) / 2);
     displayInt(guest.id, 20);
     printf("|");
     displayStr(guest.first_name, 20);
@@ -176,19 +184,23 @@ void displayAllGuestsInfo(struct Guest guest) {
     printf("|");
     displayStr(guest.nationality, 20);
     printf("|\n");
-    printf(" -----------------------------------------------------------------------------------\n");   
+    printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2); 
 }
-void displayModifyLogo() {
+Terminal displayModifyLogo() {
+
     clear_scr();
-    printf("*****************************************************\n");
-    printf("*                Modification Panel                 *\n");
-    printf("*          Choose what you want to modify           *\n");
-    printf("*                                                   *\n");
-    printf("*****************************************************\n\n");
-    printf("Choose your action...\n\n");
-    printf("1. Modify a room\n");
-    printf("2. Modify Guest Info\n");
-    printf("0. Go Back\n\n");
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\               \x1b[32mModification Panel\x1b[0m                /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH \\        \x1b[32mChoose what you want to modify\x1b[0m         /\n", 11, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH  '''''''''''''''''''''''''''''''''''''''''''''''\n\n", 12, (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               1. Modify a room\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               2. Modify Guest Info\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
+    displayErrorLog();
+    printf("\x1b[%d;%dH               >>> ", 17, (term.columns - 51) / 2);
+
+    return term;
 }
 void displayModifyRoomLogo() {
     clear_scr();

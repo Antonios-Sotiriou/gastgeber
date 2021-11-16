@@ -30,15 +30,12 @@
 #include "header_files/userinput.h"
 #include "header_files/display.h"
 
-void modifyRoom() {
+int modifyRoom() {
 
     struct Room room;
     FILE *fp, *fp1;
     fp = fopen(roomsdb, "rb");
     fp1 = fopen(journal_sec, "wb");
-
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
 
     displayModifyRoomLogo();
 
@@ -55,7 +52,7 @@ void modifyRoom() {
             if(feof(fp)) {
                 break;
             } else if(room.id == room_id) {
-                clear_scr();
+                //clear_scr();
                 printf(ANSI_COLOR_GREEN "\nRoom Retrieved.\n\n" ANSI_COLOR_RESET);
                 printf("Room ID: %d\n", room.id);
                 printf("Room Name: %s\n", room.name);
@@ -68,6 +65,7 @@ void modifyRoom() {
                 char *room_name;
                 char *room_type;
                 int choice;
+                // scanf here must also be replaced!
                 scanf("%d", &choice);
                 getc(stdin);
                 
@@ -75,14 +73,12 @@ void modifyRoom() {
                     case 1 : clear_scr();
                         printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
                         room_name = getString(20);
-                        if(room_name != 0) {
+                        if (room_name != 0) {
                             sprintf(room.name, "%s", room_name);
-                            free(room_name);
-                            break;
-                        } else {
-                            printf("\n");
-                            return;
                         }
+                        free(room_name);
+                        getc(stdin);
+                        return;
                     case 2 : clear_scr();
                         printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
                         room_type = getSpString(20);
@@ -165,6 +161,8 @@ void modifyRoom() {
             return;
         }
     }
+    char c;
+    while((c = getc(stdin) != '\n') && c != '\t');
 }
 
 void modifyGuest() {
