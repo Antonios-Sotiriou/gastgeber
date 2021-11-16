@@ -344,6 +344,7 @@ void displayAllGuests() {
     FILE *fp;
     fp = fopen(guestsdb, "rb");
     
+    Terminal term = tercon_init_rows_cols();
     displayAllGuestsLogo();
 
     while(1) {
@@ -356,29 +357,50 @@ void displayAllGuests() {
     }
     fclose(fp);
 
-    printf("\nPress Enter to continue...\n");
-    getc(stdin);
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    char c;
+    while((c = getc(stdin) != '\n') && c != '\t');
+    tercon_echo_on();
 }
 
 void modify() {
-    
-    displayModifyLogo();
-    
-    int choice;
-    scanf("%d", &choice);
-    // Switch case functions can be found with the given order in modify.c file.
-    switch(choice) {
-        case 1 : modifyRoom();
-            break;
-        case 2 : modifyGuest();
-            break;
-        case 0 : clear_scr();
-            break;
-        default :
-            break;
-    }
 
-    printf("\nPress Enter to continue...\n");
+    while(1) {
+
+        Terminal term = displayModifyLogo();
+        int choice = getnuminput(2);
+        int case_rs = 0;
+
+        if (choice == -1 || choice == -2) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+        } else if (choice == 0 || choice == -3) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input provided!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 18) / 2);
+        } else if ((choice > 2 && choice < 20) || choice > 20) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+        } else {
+            // Switch case functions can be found with the given order in modify.c file.
+            switch(choice) {
+                case 1 : modifyRoom();
+                    case_rs = 1;
+                    break;
+                case 2 : modifyGuest();
+                    case_rs = 2;
+                    break;
+                case 20 :
+                    return;
+                default :
+                    break;
+            }
+        }
+        if (case_rs == 0) {
+            tercon_echo_off();
+            printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+            char c;
+            while((c = getc(stdin) != '\n') && c != '\t');
+            tercon_echo_on();
+        }
+    }
 }
 
 void displayReservations() {

@@ -1,7 +1,7 @@
 #ifndef MODIFY_H
 #define MODIFY_H
 
-void modifyRoom();
+int modifyRoom();
 void modifyGuest();
 
 #endif /* MODIFY_H */
