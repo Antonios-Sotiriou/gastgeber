@@ -204,18 +204,22 @@ Terminal displayModifyLogo() {
 }
 void displayModifyRoomLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*      Room Modification Panel.     *\n");
-    printf("*************************************\n\n");
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\             \x1b[32mRoom Modification Panel\x1b[0m             /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH \\        \x1b[32mChoose what you want to modify\x1b[0m         /\n", 11, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH  '''''''''''''''''''''''''''''''''''''''''''''''\n\n", 12, (term.columns - 51) / 2);   
+    displayErrorLog();
 }
 void displayModifyRoomChoices() {
-    printf("Choose what to modify...\n\n");
-    printf("1. Modify Room Name\n");
-    printf("2. Modify Room Type\n");
-    printf("3. Modify Room Capacity\n");
-    printf("4. Modify Room Price\n");
-    printf("5. Modify All\n");
-    printf("0. Go Back\n\n");
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_MOVE_CURSOR_COL "               1. Modify Room Name\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               2. Modify Room Type\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               3. Modify Room Capacity\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               4. Modify Room Price\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               5. Modify All\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               >>> ", (term.columns - 51) / 2);
 }
 void displayModifyGuestLogo() {
     clear_scr();

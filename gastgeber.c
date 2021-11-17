@@ -370,7 +370,7 @@ void modify() {
 
         Terminal term = displayModifyLogo();
         int choice = getnuminput(2);
-        int case_rs = 0;
+        //int case_rs = 0;
 
         if (choice == -1 || choice == -2) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
@@ -382,10 +382,10 @@ void modify() {
             // Switch case functions can be found with the given order in modify.c file.
             switch(choice) {
                 case 1 : modifyRoom();
-                    case_rs = 1;
+                    //case_rs = 1;
                     break;
                 case 2 : modifyGuest();
-                    case_rs = 2;
+                    //case_rs = 2;
                     break;
                 case 20 :
                     return;
@@ -393,13 +393,13 @@ void modify() {
                     break;
             }
         }
-        if (case_rs == 0) {
+        //if (case_rs == 0) {
             tercon_echo_off();
-            printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+            printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
             char c;
             while((c = getc(stdin) != '\n') && c != '\t');
             tercon_echo_on();
-        }
+        //}
     }
 }
 
