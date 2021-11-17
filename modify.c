@@ -30,111 +30,49 @@
 #include "header_files/userinput.h"
 #include "header_files/display.h"
 
-int modifyRoom() {
+void modifyRoom() {
 
     struct Room room;
+    Terminal term = tercon_init_rows_cols();
     FILE *fp, *fp1;
-    fp = fopen(roomsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
 
     displayModifyRoomLogo();
 
-    printf("Enter room ID you want to modify: ");
+    printf(ANSI_MOVE_CURSOR_TO "Enter room ID you want to modify: ", 14, (term.columns - 34) / 2);
     int room_id = getInteger(48, 4);
 
-    if(room_id < 0 || room_id > TOTAL_ROOMS) {
-        printf("\n%sRoom id out of range.%s\nDisplay all rooms with option 3 of main menu to see the IDs.\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
-    } else if(room_id == 0) {
-        printf("Watch out for spaces or letters between the numbers.\n");
+    if(room_id > TOTAL_ROOMS) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHRoom id out of range.\n"ANSI_COLOR_RESET, term.rows - 2, (term.columns - 20) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHDisplay all rooms with option 3 of main menu to see the IDs.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 60) / 2);
+    } else if (room_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return;
+    } else if (room_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+        return;
+    } else if (room_id == 0) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Room ID provided!\n"ANSI_COLOR_RESET, term.rows - 1, (term.columns - 20) / 2);
     } else {
-        while(1) {
+        fp = fopen(roomsdb, "rb");
+        fp1 = fopen(journal_sec, "wb");
+
+        while (1) {
             fread(&room, sizeof(room), 1, fp);
-            if(feof(fp)) {
+            if (feof(fp)) {
                 break;
             } else if(room.id == room_id) {
-                //clear_scr();
-                printf(ANSI_COLOR_GREEN "\nRoom Retrieved.\n\n" ANSI_COLOR_RESET);
-                printf("Room ID: %d\n", room.id);
-                printf("Room Name: %s\n", room.name);
-                printf("Room Type: %s\n", room.type);
-                printf("Room  Capacity: %d\n", room.capacity);
-                printf("Room Price: %d\n\n", room.price);
-
+                displayRoomInfo(room);
                 displayModifyRoomChoices();
-
-                char *room_name;
-                char *room_type;
-                int choice;
-                // scanf here must also be replaced!
-                scanf("%d", &choice);
-                getc(stdin);
                 
-                switch(choice) {
-                    case 1 : clear_scr();
-                        printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(20);
-                        if (room_name != 0) {
-                            sprintf(room.name, "%s", room_name);
-                        }
-                        free(room_name);
-                        getc(stdin);
-                        return;
-                    case 2 : clear_scr();
-                        printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_type = getSpString(20);
-                        if(room_type != 0) {
-                            sprintf(room.type, "%s", room_type);
-                            free(room_type);
-                            break;
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    case 3 : clear_scr();
-                        printf("%sSet Room Capacity: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room.capacity = getInteger(48, 2);
-                        break;
-                    case 4 : clear_scr();
-                        printf("%sSet Room Price: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room.price = getInteger(48, 10);
-                        break;
-                    case 5 : clear_scr();
-                        printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(20);
-                        if(room_name != 0) {
-                            sprintf(room.name, "%s", room_name);
-                            free(room_name);
-                            printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                            room_type = getSpString(20);
-                            if(room_type != 0) {
-                                sprintf(room.type, "%s", room_type);
-                                free(room_type);
-                                printf("%sSet Room Capacity: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                                room.capacity = getInteger(48, 2);
-                                printf("%sSet Room Price: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                                /********************* Must be implement a float function here for prices *****************************/
-                                room.price = getInteger(48, 10);
-                                break;
-                            } else {
-                                printf("\n");
-                                return;
-                            }
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    case 0 :
-                        return;
-                    default :
-                        return;                   
-                }
+                // Handling room modification.See at this file under end of function.
+                room = handleRoom(room);
             }
             fwrite(&room, sizeof(room), 1, fp1);
         }
         fclose(fp);
         fclose(fp1);
 
-        printf("\nShall the modifications be applied: [Y/N]?");
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
         char y = getc(stdin);
         if(y == 'Y' || y == 'y') {
             fp1 = fopen(journal_sec, "rb");
@@ -148,21 +86,110 @@ int modifyRoom() {
                     fwrite(&room, sizeof(room), 1, fp);
                 }
             }
-            printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
             getc(stdin);
             fclose(fp1);
             fclose(fp);
             remove(journal_sec);
             return;
+        } else if (y == '\n' || y == '\t') {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+            return;
         } else {
-            printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
+            tercon_clear_error_log();
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
             getc(stdin);
             remove(journal_sec);
             return;
         }
     }
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
+}
+
+
+
+struct Room handleRoom(struct Room room) {
+
+    char *room_name;
+    char *room_type;
+    Terminal term = tercon_init_rows_cols();
+    
+    while (1) {
+        
+        int choice = getnuminput(2);
+        if (choice == -1 || choice == -2) {
+            break;
+        } else if (choice == 0 || choice == -3) {
+            break;
+        } else if ((choice > 5 && choice < 20) || choice > 20) {
+            break;
+        } else {       
+            switch(choice) {
+                case 1 :
+                    displayModifyRoomLogo();
+                    tercon_move_y_x(15, 0);
+                    displayRoomInfo(room);
+                    printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
+                    room_name = getString(20);
+                    if (room_name != 0) {
+                        sprintf(room.name, "%s", room_name);
+                    }
+                    free(room_name);
+                    return room;
+                case 2 :
+                    displayModifyRoomLogo();
+                    tercon_move_y_x(15, 0);
+                    displayRoomInfo(room);
+                    printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                    room_type = getSpString(20);
+                    if(room_type != 0) {
+                        sprintf(room.type, "%s", room_type);
+                    }
+                    free(room_type);
+                    return room;
+                case 3 :
+                    displayModifyRoomLogo();
+                    tercon_move_y_x(15, 0);
+                    displayRoomInfo(room);
+                    printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
+                    room.capacity = getInteger(48, 2);
+                    return room;
+                case 4 :
+                    displayModifyRoomLogo();
+                    tercon_move_y_x(15, 0);
+                    displayRoomInfo(room);
+                    printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
+                    room.price = getInteger(48, 10);
+                    return room;
+                case 5 :
+                    displayModifyRoomLogo();
+                    tercon_move_y_x(15, 0);
+                    displayRoomInfo(room);
+                    printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
+                    room_name = getString(20);
+                    if(room_name != 0) {
+                        sprintf(room.name, "%s", room_name);
+                        free(room_name);
+                        printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                        room_type = getSpString(20);
+                        if(room_type != 0) {
+                            sprintf(room.type, "%s", room_type);
+                            free(room_type);
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
+                            room.capacity = getInteger(48, 2);
+                            /********************* Must be implement a float function here for prices *****************************/
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
+                            room.price = getInteger(48, 10);
+                        }
+                    }
+                    return room;
+                case 20 :
+                    return room;
+                default :
+                    return room;                   
+            }
+        }
+    }
+    return room;
 }
 
 void modifyGuest() {
