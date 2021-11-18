@@ -186,7 +186,7 @@ void displayAllGuestsInfo(struct Guest guest) {
     printf("|\n");
     printf("\x1b[%dG -----------------------------------------------------------------------------------\n", (term.columns - 84) / 2); 
 }
-Terminal displayModifyLogo() {
+void displayModifyLogo() {
 
     clear_scr();
     Terminal term = tercon_init_rows_cols();
@@ -199,8 +199,6 @@ Terminal displayModifyLogo() {
     printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
     displayErrorLog();
     printf("\x1b[%d;%dH               >>> ", 17, (term.columns - 51) / 2);
-
-    return term;
 }
 void displayModifyRoomLogo() {
     clear_scr();
@@ -221,7 +219,7 @@ void displayModifyRoomChoices() {
     printf(ANSI_MOVE_CURSOR_COL "               4. Modify Room Price\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               5. Modify All\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
-    printf(ANSI_MOVE_CURSOR_COL "\x1b[2K               >>> ", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL ANSI_ERASE_LINE "               >>> ", (term.columns - 51) / 2);
 }
 void displayModifyGuestLogo() {
     clear_scr();
