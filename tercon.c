@@ -47,6 +47,22 @@ void tercon_clear_error_log() {
     printf("\x1b[%d;%dH                                                                                ", term.rows, (term.columns - 80) / 2);
 }
 
+void tercon_clear_lines(int from, int to) {
+    /**********************************************************************************  
+        Clear lines of terminal.If [from] is greater than [to] clear from bottom to top
+        else clear from top to bottom
+    **********************************************************************************/
+    if (from > to) {
+        for (int i = from; i >= to; i--) {
+            printf("\x1b[%d;0H\x1b[2K", i);
+        }
+    } else if (from < to) {
+        for (int i = from; i <= to; i++) {
+            printf("\x1b[%d;0H\x1b[2K", i);
+        }
+    }
+}
+
 void tercon_get_cols_rows(int *cols, int *rows) {
 
     struct winsize size;

@@ -213,13 +213,15 @@ void displayModifyRoomLogo() {
 }
 void displayModifyRoomChoices() {
     Terminal term = tercon_init_rows_cols();
+    tercon_move_y_x(20, 0);
+    tercon_clear_lines(30, 20);
     printf(ANSI_MOVE_CURSOR_COL "               1. Modify Room Name\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               2. Modify Room Type\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               3. Modify Room Capacity\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               4. Modify Room Price\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               5. Modify All\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
-    printf(ANSI_MOVE_CURSOR_COL "               >>> ", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "\x1b[2K               >>> ", (term.columns - 51) / 2);
 }
 void displayModifyGuestLogo() {
     clear_scr();
