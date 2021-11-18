@@ -366,16 +366,20 @@ void displayAllGuests() {
 
 void modify() {
 
+    Terminal term = tercon_init_rows_cols();
+
     while(1) {
 
-        Terminal term = displayModifyLogo();
+        displayModifyLogo();
         int choice = getnuminput(2);
         // This is the following cases return value.It will be probably usefull so it is wise to save it to case_rv variable.
         int case_rv = 0;
 
-        if (choice == -1 || choice == -2) {
+        if (choice == -1) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
-        } else if (choice == 0 || choice == -3) {
+        } else if (choice == -2) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+        } else if (choice == -3) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input provided!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 18) / 2);
         } else if ((choice > 2 && choice < 20) || choice > 20) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
@@ -581,7 +585,6 @@ void main_error() {
 
     while((c = getc(stdin) != '\n') && c != '\t');
 
-    clear_scr();
     tercon_echo_on();
 }
 

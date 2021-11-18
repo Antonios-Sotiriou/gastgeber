@@ -13,7 +13,7 @@ void displayGuestInfoLogo();
 void displayGuestInfo(struct Guest guest);
 void displayAllGuestsLogo();
 void displayAllGuestsInfo(struct Guest guest);
-Terminal displayModifyLogo();
+void displayModifyLogo();
 void displayModifyRoomLogo();
 void displayModifyRoomChoices();
 void displayModifyGuestLogo();

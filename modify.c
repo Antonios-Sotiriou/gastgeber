@@ -51,9 +51,7 @@ int modifyRoom() {
     displayModifyRoomLogo();
     
     int result = handleRoom(rooms);
-    if (result == 20) {
-        return 20;
-    } else if (result != 0) {
+    if (result != 0) {
         return result;
     }
     return 0;
@@ -84,23 +82,27 @@ int handleRoom(struct Room rooms[]) {
         for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
             if (rooms[i].id == room_id) {
                 displayRoomInfo(rooms[i]);
+                
                 char *room_name;
                 char *room_type;
                 while (modified == 0) {      
                     displayModifyRoomChoices();              
+                    
                     int choice = getnuminput(2);
+                    tercon_clear_error_log();
                     if (choice == -1) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
                     } else if (choice == -2) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
-                    } else if (choice == -3) {
-                        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Option provided!\n"ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
+                    } else if (choice == 0 || choice == -3) {
+                        //printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Option provided!\n"ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
+                        tercon_clear_error_log();
                     } else if ((choice > 5 && choice < 20) || choice > 20) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
-                    } else {     
+                    } else {
+                        tercon_clear_lines(26, 20);
                         switch(choice) {
                             case 1 :
-                                tercon_clear_lines(26, 20);
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
                                 room_name = getString(20);
                                 if (room_name != 0) {
@@ -110,7 +112,6 @@ int handleRoom(struct Room rooms[]) {
                                 free(room_name);
                                 break;
                             case 2 :
-                                tercon_clear_lines(26, 20);
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
                                 room_type = getSpString(20);
                                 if(room_type != 0) {
@@ -120,17 +121,14 @@ int handleRoom(struct Room rooms[]) {
                                 free(room_type);
                                 break;
                             case 3 :
-                                tercon_clear_lines(26, 20);
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
                                 rooms[i].capacity = getInteger(48, 2);
                                 modified = 1;
                             case 4 :
-                                tercon_clear_lines(26, 20);
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
                                 rooms[i].price = getInteger(48, 10);
                                 modified = 1;
                             case 5 :
-                                tercon_clear_lines(26, 20);
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
                                 room_name = getString(20);
                                 if(room_name != 0) {
