@@ -21,8 +21,11 @@ int getnuminput(int max_len) {
 
     fgets(input, sizeof(input), stdin);
 
-    // Checking if input is greater than the given max_len
+    // Checking if input is greater than the given max_len.If it is,
+    // consume all the chars until new line or tab.
     if(strlen(input) - 1 > max_len) {
+        char c;
+        while ((c = getc(stdin) != '\n') && c != '\t');
         return -1;
     }
     int i, d;
@@ -126,8 +129,12 @@ int getInteger(int str_len, int int_len) {
 
     fgets(str_input, sizeof(str_input), stdin);
 
+    // Checking if input is greater than the given max_len.If it is,
+    // consume all the chars until new line or tab.
     if(strlen(str_input) - 1 >= int_len) {
         // Invalid number length.
+        char c;
+        while ((c = getc(stdin) != '\n') && c != '\t');
         return -1;
     } else {
         for(int i = 0; i <= strlen(str_input) - 1; i++) {
@@ -155,7 +162,7 @@ char* getString(int str_len) {
     fgets(str_input, sizeof(str_input), stdin);
     int i;
     int dynamic_inc = 1;
-    // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.Not sure if thats needed because anyway we caount until -2 str elements. 
+    // strlen(str_input) - 2 here to exclude \n and \0 chars that appended at the end.Not sure if thats needed because anyway we count until -2 str elements. 
     for(i = 0; i <= strlen(str_input) - 2; i++) {
         if(str_input[i] == ' ' || str_input[i] == '\t') {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHSpaces are not allowed between.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);

@@ -32,6 +32,7 @@ typedef struct {
 Terminal tercon_init_rows_cols();
 void tercon_clear_screen();
 void tercon_clear_error_log();
+void tercon_clear_lines();
 void tercon_get_cols_rows(int *cols, int *rows);
 void tercon_move_y_x(int y, int x);
 void tercon_enter_alt_screen();
