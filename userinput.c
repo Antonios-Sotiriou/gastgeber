@@ -14,6 +14,11 @@
  ******************************************************/
 #include "header_files/userinput.h"
 
+void buffer_clear() {
+    char c;
+    while((c = getc(stdin) != '\n') && c != '\t');
+}
+
 int getnuminput(int max_len) {
 
     char input[48];
@@ -21,11 +26,7 @@ int getnuminput(int max_len) {
 
     fgets(input, sizeof(input), stdin);
 
-    // Checking if input is greater than the given max_len.If it is,
-    // consume all the chars until new line or tab.
     if(strlen(input) - 1 > max_len) {
-        char c;
-        while ((c = getc(stdin) != '\n') && c != '\t');
         return -1;
     }
     int i, d;
@@ -129,12 +130,8 @@ int getInteger(int str_len, int int_len) {
 
     fgets(str_input, sizeof(str_input), stdin);
 
-    // Checking if input is greater than the given max_len.If it is,
-    // consume all the chars until new line or tab.
     if(strlen(str_input) - 1 >= int_len) {
         // Invalid number length.
-        char c;
-        while ((c = getc(stdin) != '\n') && c != '\t');
         return -1;
     } else {
         for(int i = 0; i <= strlen(str_input) - 1; i++) {
