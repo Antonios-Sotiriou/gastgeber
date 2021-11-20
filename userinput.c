@@ -21,33 +21,33 @@ void buffer_clear() {
 
 int getnuminput(int max_len) {
 
-    char input[48];
-    char cleared_num[48];
+    char cleared_num[max_len + 1];
+    int buffer_overflow = 0;
+    int i = 0;
 
-    fgets(input, sizeof(input), stdin);
-
-    if(strlen(input) - 1 > max_len) {
-        return -1;
-    }
-    int i, d;
-    for(i = 0, d = 0; i <= strlen(input) - 1; i++) {
+    while (!buffer_overflow) {
+        char c = getc(stdin);
+        if (c == '\n' || c == EOF) {
+            buffer_overflow = 1;
+        } else if (i < max_len) {
         // CHECKING FOR ALPHABET
-        if ((input[i] >= 65 && input[i] <= 90) || (input[i] >= 97 && input[i] <= 122)) {
-            return -2;
-        // CHECKING FOR DIGITS
-        } else if (input[i] >= 48 && input[i] <= 57) {
-            cleared_num[d] = input[i];
-            d++;
-        // OTHERWISE SPECIAL CHARACTER
+            if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                return -1;
+            // CHECKING FOR DIGITS
+            } else if (c >= 48 && c <= 57) {
+                cleared_num[i] = c;
+                i++;
+            // OTHERWISE SPECIAL CHARACTER BUT ALLOW SPACES
+            } else if (c != ' ') {
+                return -2;
+            }
         } else {
-            continue;
+            // Given input exceeds wanted length
+            return -3;
         }
     }
     cleared_num[i] = '\0';
-    // checking if user pressed enter without to provide input.That means he entered empty input.
-    if (cleared_num[0] == '\0') {
-        return -3;
-    }
+    
     return atoi(cleared_num);
 }
 int getformatedDate(char *room_date) { 
@@ -218,4 +218,32 @@ char* getSpString(int str_len) {
         return cleaned_str;
     }
 }
+/*
+int getnuminput(int max_len) {
+
+    char input[48];
+    char cleared_num[48];
+
+    fgets(input, sizeof(input), stdin);
+
+    if(strlen(input) - 1 > max_len) {
+        printf(ANSI_COLOR_RED "\nInvalid number length!\n" ANSI_COLOR_RESET);
+        return 0;
+    }
+    for(int i = 0, d = 0; i <= strlen(input) - 1; i++) {
+        // CHECKING FOR ALPHABET
+        if ((input[i] >= 65 && input[i] <= 90) || (input[i] >= 97 && input[i] <= 122)) {
+            return 0;
+        // CHECKING FOR DIGITS
+        } else if (input[i] >= 48 && input[i] <= 57) {
+            cleared_num[d] = input[i];
+            d++;
+        // OTHERWISE SPECIAL CHARACTER
+        } else {
+            continue;
+        }
+    }
+    return atoi(cleared_num);
+}
+*/
 
