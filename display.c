@@ -198,7 +198,7 @@ void displayModifyLogo() {
     printf(ANSI_MOVE_CURSOR_COL "               2. Modify Guest Info\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
     displayErrorLog();
-    printf("\x1b[%d;%dH               >>> ", 17, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH\x1b[2K               >>> ", 17, (term.columns - 51) / 2);
 }
 void displayModifyRoomLogo() {
     clear_scr();

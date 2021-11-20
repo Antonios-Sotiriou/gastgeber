@@ -366,22 +366,31 @@ void modify() {
     while(1) {
 
         displayModifyLogo();
-        int choice = getnuminput(2);
+        int choice = getnuminput(4);
+        // We need this error value here for handling errors and consume also the buffer when needed.
+        int error = 0;
         // This is the following cases return value.It will be probably usefull so it is wise to save it to case_rv variable.
         int case_rv = 0;
         if (choice == -1) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+            error = 1;
         } else if (choice == -2) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+            error = 1;
         } else if (choice == -3) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input provided!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 18) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+            error = 1;
         } else if ((choice > 2 && choice < 20) || choice > 20) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+            error = 2;
         } else {
             // Switch case functions can be found with the given order in modify.c file.
             switch(choice) {
                 case 1 :
                     case_rv = modifyRoom();
+                    if (case_rv != 20) {
+                        error = 2;
+                    }
                     break;
                 case 2 : modifyGuest();
                     break;
@@ -391,10 +400,13 @@ void modify() {
                     break;
             }
         }
-        if (case_rv != 20) {
+        if (error != 0) {
             tercon_echo_off();
-            printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue...Modify" ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+            printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
             buffer_clear();
+            if (error == 1) {
+                getc(stdin);
+            }
             tercon_echo_on();
         }
     }

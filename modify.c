@@ -88,17 +88,22 @@ int handleRoom(struct Room rooms[]) {
                 while (modified == 0) {      
                     displayModifyRoomChoices();              
                     
-                    int choice = getnuminput(2);
+                    int choice = getnuminput(4);
                     tercon_clear_error_log();
+                    int error = 0;
                     if (choice == -1) {
-                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 1;
                     } else if (choice == -2) {
-                        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
-                    } else if (choice == 0 || choice == -3) {
-                        //printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Option provided!\n"ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
-                        tercon_clear_error_log();
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 1;
+                    } else if (choice == -3) {
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 1;
                     } else if ((choice > 5 && choice < 20) || choice > 20) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+                        printf(ANSI_MOVE_CURSOR_TO ANSI_ERASE_LINE "               >>> ", 26, (term.columns - 51) / 2);
+                        error = 2;
                     } else {
                         tercon_clear_lines(26, 20);
                         switch(choice) {
@@ -152,6 +157,9 @@ int handleRoom(struct Room rooms[]) {
                             default :
                                 break;                  
                         }
+                    }
+                    if (error != 0 && error != 2) {
+                        buffer_clear();
                     }
                 }
             }
