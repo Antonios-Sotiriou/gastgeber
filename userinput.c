@@ -29,7 +29,7 @@ int getnuminput(int max_len) {
         char c = getc(stdin);
         if (c == '\n' || c == EOF) {
             buffer_overflow = 1;
-        } else if (i < max_len) {
+        } else if (i <= max_len) {
         // CHECKING FOR ALPHABET
             if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
                 return -1;
@@ -47,7 +47,7 @@ int getnuminput(int max_len) {
         }
     }
     cleared_num[i] = '\0';
-    
+
     return atoi(cleared_num);
 }
 int getformatedDate(char *room_date) { 

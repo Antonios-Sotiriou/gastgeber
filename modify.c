@@ -50,14 +50,14 @@ int modifyRoom() {
 
     displayModifyRoomLogo();
     
-    int result = handleRoom(rooms);
+    int result = modifyRoomPanel(rooms);
     if (result != 0) {
         return result;
     }
     return 0;
 }
 
-int handleRoom(struct Room rooms[]) {
+int modifyRoomPanel(struct Room rooms[]) {
 
     Terminal term = tercon_init_rows_cols();
 
@@ -81,29 +81,28 @@ int handleRoom(struct Room rooms[]) {
     } else {
         for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
             if (rooms[i].id == room_id) {
-                displayRoomInfo(rooms[i]);
                 
                 char *room_name;
                 char *room_type;
-                while (modified == 0) {      
-                    displayModifyRoomChoices();              
+                int cap;
+                int prc;
+                while (modified == 0) {
                     
+                    displayModifyRoomChoices(rooms[i]);
                     int choice = getnuminput(4);
-                    tercon_clear_error_log();
                     int error = 0;
                     if (choice == -1) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
                         error = 1;
                     } else if (choice == -2) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
-                        error = 1;
+                        error = 2;
                     } else if (choice == -3) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
-                        error = 1;
+                        error = 3;
                     } else if ((choice > 5 && choice < 20) || choice > 20) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
-                        printf(ANSI_MOVE_CURSOR_TO ANSI_ERASE_LINE "               >>> ", 26, (term.columns - 51) / 2);
-                        error = 2;
+                        error = 4;
                     } else {
                         tercon_clear_lines(26, 20);
                         switch(choice) {
@@ -113,6 +112,9 @@ int handleRoom(struct Room rooms[]) {
                                 if (room_name != 0) {
                                     sprintf(rooms[i].name, "%s", room_name);
                                     modified = 1;
+                                } else {
+                                    // Error 4 here to use the following error clauses without to consume the buffer because it is already empty.
+                                    error = 4;
                                 }
                                 free(room_name);
                                 break;
@@ -122,35 +124,79 @@ int handleRoom(struct Room rooms[]) {
                                 if(room_type != 0) {
                                     sprintf(rooms[i].type, "%s", room_type);
                                     modified = 1;
+                                } else {
+                                    error = 4;
                                 }
                                 free(room_type);
                                 break;
                             case 3 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
-                                rooms[i].capacity = getInteger(48, 2);
-                                modified = 1;
+                                cap = getInteger(48, 2);
+                                if (cap != 0) {
+                                    rooms[i].capacity = cap;
+                                    modified = 1;
+                                } else {
+                                    printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Capacity provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
+                                    error = 4;
+                                }
+                                break;
                             case 4 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                rooms[i].price = getInteger(48, 10);
-                                modified = 1;
+                                prc = getInteger(48, 10);
+                                if (prc != 0) {
+                                    rooms[i].price = prc;
+                                    modified = 1;
+                                } else {
+                                    printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Price provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+                                    error = 4;
+                                }
+                                break;
                             case 5 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
                                 room_name = getString(20);
                                 if(room_name != 0) {
-                                    sprintf(rooms[i].name, "%s", room_name);
-                                    free(room_name);
                                     printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
                                     room_type = getSpString(20);
                                     if(room_type != 0) {
-                                        sprintf(rooms[i].type, "%s", room_type);
-                                        free(room_type);
                                         printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
-                                        rooms[i].capacity = getInteger(48, 2);
-                                        /********************* Must be implement a float function here for prices *****************************/
-                                        printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                        rooms[i].price = getInteger(48, 10);
-                                        modified = 1;
+                                        cap = getInteger(48, 2);
+                                        if (cap != 0) {
+                                            /********************* Must be implement a float function here for prices *****************************/
+                                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
+                                            prc = getInteger(48, 10);
+                                            if (prc != 0) {
+                                                sprintf(rooms[i].name, "%s", room_name);
+                                                sprintf(rooms[i].type, "%s", room_type);
+                                                rooms[i].capacity = cap;
+                                                rooms[i].price = prc;
+                                                free(room_name);
+                                                free(room_type);
+                                                modified = 1;
+                                                break;
+                                            } else {
+                                                printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Price provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+                                                free(room_name);
+                                                free(room_type);
+                                                error = 4;
+                                                break;
+                                            }
+                                        } else {
+                                            printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Capacity provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
+                                            free(room_name);
+                                            free(room_type);
+                                            error = 4;
+                                            break;
+                                        }
+                                    } else {
+                                        free(room_name);
+                                        free(room_type);
+                                        error = 4;
+                                        break;
                                     }
+                                } else {
+                                    free(room_name);
+                                    error = 4;
+                                    break;
                                 }
                             case 20 :
                                 return 20;
@@ -158,39 +204,52 @@ int handleRoom(struct Room rooms[]) {
                                 break;                  
                         }
                     }
-                    if (error != 0 && error != 2) {
+                    if (error != 0) {
+                        if (error < 4) {
+                            buffer_clear();
+                        }
+                        tercon_echo_off();
+                        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
                         buffer_clear();
+                        tercon_echo_on();
                     }
                 }
             }
         }
     }
     if (modified) {
-        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
-        char y = getc(stdin);
-        if(y == 'Y' || y == 'y') {
-            FILE *fp;
-            fp = fopen(roomsdb, "wb");
-            for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
-                fwrite(&rooms[i], sizeof(rooms[i]), 1, fp);
-            }
-            printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
-            getc(stdin);
-            fclose(fp);
-            return 0;
-        } else if (y == '\n' || y == '\t') {
-            tercon_clear_error_log();
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-            return 9;
-        } else {
-            tercon_clear_error_log();
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-            getc(stdin);
-            return 9;
-        }
+        // Finally promp user to apply modifications.If he applies this function returns 0;
+        applyRoomModification(rooms);
     }
     // return 10 here means Unmodified
     return 10;
+}
+
+int applyRoomModification(struct Room rooms[]) {
+
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
+    char y = getc(stdin);
+    if(y == 'Y' || y == 'y') {
+        FILE *fp;
+        fp = fopen(roomsdb, "wb");
+        for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
+            fwrite(&rooms[i], sizeof(rooms[i]), 1, fp);
+        }
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+        getc(stdin);
+        fclose(fp);
+        return 0;
+    } else if (y == '\n' || y == '\t') {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 9;
+    } else {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        getc(stdin);
+        return 9;
+    }
 }
 
 void modifyGuest() {

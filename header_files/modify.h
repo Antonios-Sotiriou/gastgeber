@@ -2,7 +2,8 @@
 #define MODIFY_H
 
 int modifyRoom();
-int handleRoom(struct Room rooms[]);
+int modifyRoomPanel(struct Room rooms[]);
+int applyRoomModification(struct Room rooms[]);
 void modifyGuest();
 
 #endif /* MODIFY_H */

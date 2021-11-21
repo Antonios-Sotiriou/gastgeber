@@ -209,10 +209,12 @@ void displayModifyRoomLogo() {
     printf("\x1b[%d;%dH  '''''''''''''''''''''''''''''''''''''''''''''''\n\n", 12, (term.columns - 51) / 2);   
     displayErrorLog();
 }
-void displayModifyRoomChoices() {
+void displayModifyRoomChoices(struct Room room) {
+    clear_scr();
     Terminal term = tercon_init_rows_cols();
-    tercon_move_y_x(20, 0);
-    tercon_clear_lines(30, 20);
+    displayModifyRoomLogo();
+    printf(ANSI_MOVE_CURSOR_TO "Modifying Room: %d\n", 14, (term.columns - 16) / 2, room.id);
+    displayRoomInfo(room);
     printf(ANSI_MOVE_CURSOR_COL "               1. Modify Room Name\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               2. Modify Room Type\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               3. Modify Room Capacity\n", (term.columns - 51) / 2);
