@@ -85,7 +85,10 @@ int modifyRoomPanel(struct Room rooms[]) {
                 char *room_name;
                 char *room_type;
                 int cap;
+                // Price here in the future should be changed to a float number! 
                 int prc;
+                // check which resourses must be freed
+                int free_rs = 0;
                 while (modified == 0) {
                     
                     displayModifyRoomChoices(rooms[i]);
@@ -116,7 +119,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                     // Error 4 here to use the following error clauses without to consume the buffer because it is already empty.
                                     error = 4;
                                 }
-                                free(room_name);
+                                free_rs = 1;
                                 break;
                             case 2 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
@@ -127,7 +130,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                 } else {
                                     error = 4;
                                 }
-                                free(room_type);
+                                free_rs = 2;
                                 break;
                             case 3 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
@@ -169,32 +172,28 @@ int modifyRoomPanel(struct Room rooms[]) {
                                                 sprintf(rooms[i].type, "%s", room_type);
                                                 rooms[i].capacity = cap;
                                                 rooms[i].price = prc;
-                                                free(room_name);
-                                                free(room_type);
+                                                free_rs = 3;
                                                 modified = 1;
                                                 break;
                                             } else {
                                                 printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Price provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
-                                                free(room_name);
-                                                free(room_type);
+                                                free_rs = 3;
                                                 error = 4;
                                                 break;
                                             }
                                         } else {
                                             printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Capacity provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
-                                            free(room_name);
-                                            free(room_type);
+                                            free_rs = 3;
                                             error = 4;
                                             break;
                                         }
                                     } else {
-                                        free(room_name);
-                                        free(room_type);
+                                        free_rs = 3;
                                         error = 4;
                                         break;
                                     }
                                 } else {
-                                    free(room_name);
+                                    free_rs = 1;
                                     error = 4;
                                     break;
                                 }
@@ -202,6 +201,16 @@ int modifyRoomPanel(struct Room rooms[]) {
                                 return 20;
                             default :
                                 break;                  
+                        }
+                    }
+                    if (free_rs != 0){
+                        if (free_rs == 1) {
+                            free(room_name);
+                        } else if (free_rs == 2) {
+                            free(room_type);
+                        } else if (free_rs == 3) {
+                            free(room_name);
+                            free(room_type);
                         }
                     }
                     if (error != 0) {
