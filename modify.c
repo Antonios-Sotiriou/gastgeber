@@ -280,7 +280,6 @@ int modifyGuest() {
             dynamic_inc++;
         }
     }
-    printf("Number of Guests: %d\n", index);
     fclose(fp);
     // To make our life easier, here we are copying the dynamically allocated struct array, to a normal struct array,
     // so we can free the resources here, a) to avoid making next functions more complicated, b) avoid creating a ton of else clauses
@@ -288,18 +287,17 @@ int modifyGuest() {
     struct Guest guests[index - 1];
     for(int i = 0; i <= index - 1; i++) {
         guests[i] = guests_par[i];
-        printf("Guests Length name: %s\n", guests[i].first_name);
     }
     free(guests_par);
-    getc(stdin);
-    //displayModifyGuestLogo();
 
-    //int result = modifyGuestPanel(guests);
+    displayModifyGuestLogo();
 
-    return 0;
+    int result = modifyGuestPanel(guests);
+
+    return result;
 }
 
-/*
+
 int modifyGuestPanel(struct Guest guests[]) {
 
     printf("Enter Guest ID you want to modify: ");
@@ -311,8 +309,8 @@ int modifyGuestPanel(struct Guest guests[]) {
         return;
     }
 
-    int found = 0;
-    while(1) {
+    int modified = 0;
+    while(!modified) {
         fread(&guest, sizeof(guest), 1, fp);
         if(feof(fp)) {
             break;
@@ -406,35 +404,38 @@ int modifyGuestPanel(struct Guest guests[]) {
     }
 
     if(found == 1) {
-        printf("\nShall the modifications be applied: [Y/N]?");
-        char y = getc(stdin);
-        if(y == 'Y' || y == 'y') {
-            fp1 = fopen(journal_sec, "rb");
-            fp = fopen(guestsdb, "wb");
-
-            while(1) {
-                fread(&guest, sizeof(guest), 1, fp1);
-                if(feof(fp1)) {
-                    break;
-                } else {
-                    fwrite(&guest, sizeof(guest), 1, fp);
-                }
-            }
-            printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            fclose(fp1);
-            fclose(fp);
-            remove(journal_sec);
-            return;
-        } else {
-            printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            remove(journal_sec);
-            return;
-        }
+        int result = applyGuestModification(guests);
+        return result;
     } else {
         printf(ANSI_COLOR_RED "\nNo Guest found with the given ID.\n" ANSI_COLOR_RESET);
     }
+    return 10;
 }
 
-*/
+int applyGuestModification (struct Guest guests[]) {
+
+    Terminal term = tercon_init_rows_cols();
+    printf("\nShall the modifications be applied: [Y/N]?");
+    char y = getc(stdin);
+    if(y == 'Y' || y == 'y') {
+        FILE *fp;
+        fp = fopen(guestsdb, "wb");
+        for (int i = 0; i <= sizeof(guests) / sizeof(guests[0]); i++) {
+            fwrite(&guests[i], sizeof(guests[i]), 1, fp);
+        }
+        printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
+        getc(stdin);
+        fclose(fp);
+        return 0;
+    } else if (y == '\n' || y == '\t') {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 9;
+    } else {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
+        getc(stdin);
+        return 9;
+    }
+}
+
