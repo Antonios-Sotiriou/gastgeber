@@ -6,6 +6,7 @@ int modifyRoomPanel(struct Room rooms[]);
 int applyRoomModification(struct Room rooms[]);
 int modifyGuest();
 int modifyGuestPanel(struct Guest guests[]);
+int applyGuestModification(struct Guest guests[]);
 
 #endif /* MODIFY_H */
 
