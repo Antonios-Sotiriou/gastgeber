@@ -4,7 +4,8 @@
 int modifyRoom();
 int modifyRoomPanel(struct Room rooms[]);
 int applyRoomModification(struct Room rooms[]);
-void modifyGuest();
+int modifyGuest();
+int modifyGuestPanel(struct Guest guests[]);
 
 #endif /* MODIFY_H */
 

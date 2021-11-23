@@ -51,10 +51,8 @@ int modifyRoom() {
     displayModifyRoomLogo();
     
     int result = modifyRoomPanel(rooms);
-    if (result != 0) {
-        return result;
-    }
-    return 0;
+
+    return result;
 }
 
 int modifyRoomPanel(struct Room rooms[]) {
@@ -88,12 +86,12 @@ int modifyRoomPanel(struct Room rooms[]) {
                 // Price here in the future should be changed to a float number! 
                 int prc;
                 // check which resourses must be freed
-                int free_rs = 0;
                 while (modified == 0) {
                     
                     displayModifyRoomChoices(rooms[i]);
                     int choice = getnuminput(4);
                     int error = 0;
+                    int free_rs = 0;
                     if (choice == -1) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
                         error = 1;
@@ -228,7 +226,8 @@ int modifyRoomPanel(struct Room rooms[]) {
     }
     if (modified) {
         // Finally promp user to apply modifications.If he applies this function returns 0;
-        applyRoomModification(rooms);
+        int result = applyRoomModification(rooms);
+        return result;
     }
     // return 10 here means Unmodified
     return 10;
@@ -261,17 +260,47 @@ int applyRoomModification(struct Room rooms[]) {
     }
 }
 
-void modifyGuest() {
+int modifyGuest() {
 
-    struct Guest guest;
-    FILE *fp, *fp1;
+    struct Guest guest, *guests_par;
+    FILE *fp;
     fp = fopen(guestsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
+    // We creating a dynamically allocated array to store guests because their number is dynamic.
+    guests_par = malloc(sizeof(struct Guest));
 
-    // char c;
-    // while((c = getc(stdin) != '\n') && c != '\t');
+    int index = 0, dynamic_inc = 2;
+    while(1) {
+        fread(&guest, sizeof(guest), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else if (guest.id != 0) {
+            guests_par = realloc(guests_par, sizeof(struct Guest) * dynamic_inc);
+            guests_par[index] = guest;
+            index++;
+            dynamic_inc++;
+        }
+    }
+    printf("Number of Guests: %d\n", index);
+    fclose(fp);
+    // To make our life easier, here we are copying the dynamically allocated struct array, to a normal struct array,
+    // so we can free the resources here, a) to avoid making next functions more complicated, b) avoid creating a ton of else clauses
+    // to the following functions and c) also keep truck and make it easier to debugg.
+    struct Guest guests[index - 1];
+    for(int i = 0; i <= index - 1; i++) {
+        guests[i] = guests_par[i];
+        printf("Guests Length name: %s\n", guests[i].first_name);
+    }
+    free(guests_par);
+    getc(stdin);
+    //displayModifyGuestLogo();
 
-    displayModifyGuestLogo();
+    //int result = modifyGuestPanel(guests);
+
+    return 0;
+}
+
+/*
+int modifyGuestPanel(struct Guest guests[]) {
 
     printf("Enter Guest ID you want to modify: ");
     int guest_id = getInteger(48, 4);
@@ -374,10 +403,7 @@ void modifyGuest() {
                     return;                   
             }
         }
-        fwrite(&guest, sizeof(guest), 1, fp1);
     }
-    fclose(fp);
-    fclose(fp1);
 
     if(found == 1) {
         printf("\nShall the modifications be applied: [Y/N]?");
@@ -411,3 +437,4 @@ void modifyGuest() {
     }
 }
 
+*/
