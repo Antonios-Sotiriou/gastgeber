@@ -225,17 +225,24 @@ void displayModifyRoomChoices(struct Room room) {
 }
 void displayModifyGuestLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*     Guest Modification Panel.     *\n");
-    printf("*************************************\n\n");
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\             \x1b[32mGuest Modification Panel\x1b[0m            /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH \\        \x1b[32mChoose what you want to modify\x1b[0m         /\n", 11, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH  '''''''''''''''''''''''''''''''''''''''''''''''\n\n", 12, (term.columns - 51) / 2);   
+    displayErrorLog();
 }
-void displayModifyGuestChoices() {
-    printf("Choose what to modify...\n\n");
-    printf("1. Modify Guest First Name\n");
-    printf("2. Modify Guest Last Name\n");
-    printf("3. Modify Guest Nationality\n");
-    printf("4. Modify All\n");
-    printf("0. Go Back\n\n");
+void displayModifyGuestChoices(struct Guest guest) {
+    clear_scr();
+    Terminal term = tercon_init_rows_cols();
+    displayModifyRoomLogo();
+    printf(ANSI_MOVE_CURSOR_TO "Modifying Guest: %d\n", 14, (term.columns - 17) / 2, guest.id);
+    displayGuestInfo(guest);
+    printf(ANSI_MOVE_CURSOR_COL "               1. Modify First Name\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               2. Modify Last Name\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               3. Modify Nationality\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL ANSI_ERASE_LINE "               >>> ", (term.columns - 51) / 2);
 }
 void displayAllReservationsLogo() {
     clear_scr();

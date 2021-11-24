@@ -209,6 +209,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                         } else if (free_rs == 3) {
                             free(room_name);
                             free(room_type);
+                            printf("TEST");
                         }
                     }
                     if (error != 0) {
@@ -300,105 +301,145 @@ int modifyGuest() {
 
 int modifyGuestPanel(struct Guest guests[]) {
 
-    printf("Enter Guest ID you want to modify: ");
-    int guest_id = getInteger(48, 4);
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_MOVE_CURSOR_TO "Enter Guest ID you want to modify: ", 14, (term.columns - 40) / 2);
+    int guest_id = getInteger(48, 6);
 
     if (guest_id == 0) {
-        printf("No Guest with 0 ID exists!");
-        getc(stdin);
-        return;
+        printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest with 0 ID exists!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+        tercon_echo_off();
+        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        buffer_clear();
+        tercon_echo_on();
+        return 1;
     }
 
+    int found = 0;
     int modified = 0;
-    while(!modified) {
-        fread(&guest, sizeof(guest), 1, fp);
-        if(feof(fp)) {
-            break;
-        } else if(guest.id == guest_id) {
-            printf(ANSI_COLOR_GREEN "\nGuest Retrieved.\n" ANSI_COLOR_RESET);
-            printf("Guest ID: %d\n\n", guest.id);
-            printf("\nGuest First Name: %s\n", guest.first_name);
-            printf("Guest Last Name: %s\n", guest.last_name);
-            printf("Guest Last Name: %s\n\n", guest.nationality);
+    for (int i = 0; i <= sizeof(guests) / sizeof(guests[0]); i++) {
+        if(guests[i].id == guest_id) {
+
             found = 1;
-
-            displayModifyGuestChoices();
-
             char *guest_first_name;
             char *guest_last_name;
             char *guest_nationality;
+            while(!modified) {
+                // Display guest info here.
+                displayModifyGuestChoices(guests[i]);
 
-            int choice;
-            scanf("%d", &choice);
-            getc(stdin);
-            
-            switch(choice) {
-                case 1 : clear_scr();
-                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_first_name = getSpString(20);
-                    if(guest_first_name != 0) {
-                        sprintf(guest.first_name, "%s", guest_first_name);
-                        free(guest_first_name);
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 2 : clear_scr();
-                    printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_last_name = getSpString(20);
-                    if(guest_last_name != 0) {
-                        sprintf(guest.last_name, "%s", guest_last_name);
-                        free(guest_last_name);
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 3 : clear_scr();
-                    printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_nationality = getSpString(20);
-                    if(guest_nationality != 0) {
-                        sprintf(guest.nationality, "%s", guest_nationality);
-                        free(guest_nationality);
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 4 : clear_scr();
-                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_first_name = getSpString(20);
-                    if(guest_first_name != 0) {
-                        sprintf(guest.first_name, "%s", guest_first_name);
-                        free(guest_first_name);
-                        printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        guest_last_name = getSpString(20);
-                        if(guest_last_name != 0) {
-                            sprintf(guest.last_name, "%s", guest_last_name);
-                            free(guest_last_name);
+                int choice = getnuminput(4);
+                int error = 0;
+                int free_rs = 0;
+                if (choice == -1) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 1;
+                } else if (choice == -2) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 2;
+                } else if (choice == -3) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 3;
+                } else if ((choice > 5 && choice < 20) || choice > 20) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+                    error = 4;
+                } else {
+                    tercon_clear_lines(26, 20);
+                    switch(choice) {
+                        case 1 :
+                            printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            guest_first_name = getSpString(20);
+                            if(guest_first_name != 0) {
+                                sprintf(guests[i].first_name, "%s", guest_first_name);
+                                modified = 1;
+                            } else {
+                                error = 4;
+                            }
+                            free_rs = 1;
+                            break;
+                        case 2 :
+                            printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            guest_last_name = getSpString(20);
+                            if(guest_last_name != 0) {
+                                sprintf(guests[i].last_name, "%s", guest_last_name);
+                                modified = 1;
+                            } else {
+                                error = 4;
+                            }
+                            free_rs = 2;
+                            break;
+                        case 3 :
                             printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
                             guest_nationality = getSpString(20);
                             if(guest_nationality != 0) {
-                                sprintf(guest.nationality, "%s", guest_nationality);
-                                free(guest_nationality);
-                                break;
+                                sprintf(guests[i].nationality, "%s", guest_nationality);
+                                modified = 1;
                             } else {
-                                printf("\n");
-                                return;
+                                error = 4;
                             }
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    } else {
-                        printf("\n");
-                        return;
+                            free_rs = 3;
+                            break;
+                        case 4 :
+                            printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            guest_first_name = getSpString(20);
+                            if(guest_first_name != 0) {              
+                                printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                                guest_last_name = getSpString(20);
+                                if(guest_last_name != 0) {                
+                                    printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                                    guest_nationality = getSpString(20);
+                                    if(guest_nationality != 0) {
+                                        sprintf(guests[i].first_name, "%s", guest_first_name);
+                                        sprintf(guests[i].nationality, "%s", guest_nationality);
+                                        sprintf(guests[i].last_name, "%s", guest_last_name);
+                                        free_rs = 5;
+                                        modified = 1;
+                                        break;
+                                    } else {
+                                        free_rs = 5;
+                                        error = 4;
+                                        break;
+                                    }
+                                } else {
+                                    free_rs = 4;
+                                    error = 4;
+                                    break;
+                                }
+                            } else {
+                                free_rs = 1;
+                                error = 4;
+                                break;
+                            }
+                        case 20 :
+                            return 20;
+                        default :
+                            break;  
                     }
-                case 0 :
-                    return;
-                default :
-                    return;                   
+                    if (free_rs != 0) {
+                        if (free_rs == 1) {
+                            free(guest_first_name);
+                        } else if (free_rs == 2) {
+                            free(guest_last_name);
+                        } else if (free_rs == 3) {
+                            free(guest_nationality);
+                        } else if (free_rs == 4) {
+                            free(guest_first_name);
+                            free(guest_last_name);
+                        } else if (free_rs == 5) {
+                            free(guest_first_name);
+                            free(guest_last_name);
+                            free(guest_nationality);                       
+                        }
+                    }
+                    if (error != 0) {
+                        if (error < 4) {
+                            buffer_clear();
+                        }
+                        tercon_echo_off();
+                        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+                        buffer_clear();
+                        tercon_echo_on();
+                    }
+                }        
             }
         }
     }
@@ -407,15 +448,19 @@ int modifyGuestPanel(struct Guest guests[]) {
         int result = applyGuestModification(guests);
         return result;
     } else {
-        printf(ANSI_COLOR_RED "\nNo Guest found with the given ID.\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 33) / 2);
+        tercon_echo_off();
+        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        buffer_clear();
+        tercon_echo_on();
+        return 2;
     }
-    return 10;
 }
 
 int applyGuestModification (struct Guest guests[]) {
 
     Terminal term = tercon_init_rows_cols();
-    printf("\nShall the modifications be applied: [Y/N]?");
+    printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
     char y = getc(stdin);
     if(y == 'Y' || y == 'y') {
         FILE *fp;
@@ -423,7 +468,7 @@ int applyGuestModification (struct Guest guests[]) {
         for (int i = 0; i <= sizeof(guests) / sizeof(guests[0]); i++) {
             fwrite(&guests[i], sizeof(guests[i]), 1, fp);
         }
-        printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
         getc(stdin);
         fclose(fp);
         return 0;
@@ -433,7 +478,7 @@ int applyGuestModification (struct Guest guests[]) {
         return 9;
     } else {
         tercon_clear_error_log();
-        printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         getc(stdin);
         return 9;
     }
