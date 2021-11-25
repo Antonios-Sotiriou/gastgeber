@@ -82,12 +82,22 @@ struct Guest handleGuest() {
         tercon_move_y_x(16, (term.columns - 51 ) /2);
         printf("  Guest Nationality: ");
         char *nationality = getSpString(20);
-        sprintf(guest.first_name, "%s", first_name);
-        sprintf(guest.last_name, "%s", last_name);
-        sprintf(guest.nationality, "%s", nationality);
-        guest.active = true;
-        free(nationality);
-        guest.id = next_id;
+        if (nationality == NULL) {
+            tercon_move_y_x(term.rows - 2, (term.columns - 29 ) / 2);
+            printf(ANSI_COLOR_RED "Guest must have a Nationality.\n" ANSI_COLOR_RESET);
+            guest.active = false;
+            free(first_name);
+            free(last_name);
+            free(nationality);
+            return guest;
+        } else {
+            sprintf(guest.first_name, "%s", first_name);
+            sprintf(guest.last_name, "%s", last_name);
+            sprintf(guest.nationality, "%s", nationality);
+            guest.active = true;
+            free(nationality);
+            guest.id = next_id;
+        }
     }
     free(first_name);
     free(last_name);

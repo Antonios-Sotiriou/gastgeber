@@ -95,7 +95,7 @@ int checkAllDates(struct Reservation res) {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day exists in this year.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 64) / 2);
         printf(ANSI_COLOR_RED "\x1b[%d;%dHFor example 29 of February or 31 of November.Error: checkAllDates()!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 68) / 2);
-        return 1;
+        return -1;
     }
     // Go to the beggining of the file and readall data again
     int num_of_days = 0;
@@ -123,7 +123,7 @@ int checkAllDates(struct Reservation res) {
     if(num_of_days != 0) {
         return num_of_days;
     } else {
-        printf("\x1b[%d;%dHShall the reservation be applied: [Y/N]? ", term.rows - 4, (term.columns - 41) / 2);
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the reservation be applied: [Y/N]? " ANSI_COLOR_RESET, term.rows - 4, (term.columns - 41) / 2);
         char c = getc(stdin);
         if(c == 'Y' || c == 'y') {
             applyReservation(starting_point, finishing_point, res.room.id);
@@ -131,9 +131,9 @@ int checkAllDates(struct Reservation res) {
             getc(stdin);
             return 0;
         } else {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation Canceled!\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 21) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation Canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
             getc(stdin);
-            return 1;
+            return -2;
         }
     }
 }

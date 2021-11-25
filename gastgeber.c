@@ -155,10 +155,10 @@ void reserve() {
             int from_date = 0;
             while(from_date == 0) {
                 if (reservation.guest.repeated_guest) {
-                    tercon_move_y_x(16, (term.columns - 51 ) /2);
+                    tercon_move_y_x(16, (term.columns - 51 ) / 2);
                     term.cursor_y = 16;
                 } else {
-                    tercon_move_y_x(17, (term.columns - 51 ) /2);
+                    tercon_move_y_x(17, (term.columns - 51 ) / 2);
                     term.cursor_y = 17;
                 }
                 printf(ANSI_ERASE_LINE "  Room reserve from date: ");
@@ -181,7 +181,7 @@ void reserve() {
             }
             int to_date = 0;
             while(to_date == 0) {
-                tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) /2);
+                tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) / 2);
                 printf(ANSI_ERASE_LINE "  To date: ");
                 int step_count = 0;
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
@@ -193,6 +193,14 @@ void reserve() {
                         createGuestEntry(reservation);
                         to_date = 1;
                         fwrite(&reservation, sizeof(reservation), 1, fp);
+                    } else if (num_of_days == -2) {
+                        // this else clause means that the user canceled the apply of the reservation so..
+                        // there is no need to ask if he wants to retry so.. skip the next if dialogue by breaking out of the loop.
+                        to_date = 1;
+                    } else if (num_of_days > 0) {
+                        // Here must implement a display improvement.When the days are alot the terminal is getting messy
+                        // thats why we break until we find a better solution.
+                        break;
                     } else {
                         step_count = 1;
                     }
@@ -200,7 +208,11 @@ void reserve() {
                     step_count = 1;
                 }
                 if (step_count != 0) {
-                    tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                    if (num_of_days > 0) {
+                        tercon_move_y_x((term.rows - 4) - num_of_days, (term.columns - 26 ) / 2);
+                    } else {
+                        tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                    }
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
                     if (c == 'y' || c == 'Y') {
@@ -226,7 +238,7 @@ void reserve() {
         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
     }
     tercon_echo_off();
-    printf(ANSI_BLINK_SLOW "Press Enter to continue..." ANSI_BLINK_OFF);
+    printf(ANSI_BLINK_SLOW "\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF);
     buffer_clear();
     tercon_echo_on();
 }
@@ -354,7 +366,7 @@ void displayAllGuests() {
     fclose(fp);
 
     tercon_echo_off();
-    printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
     buffer_clear();
     tercon_echo_on();
 }
@@ -392,7 +404,11 @@ void modify() {
                         error = 2;
                     }
                     break;
-                case 2 : modifyGuest();
+                case 2 : 
+                    case_rv = modifyGuest();
+                    if (case_rv != 20) {
+                        error = 2;
+                    }
                     break;
                 case 20 :
                     return;
