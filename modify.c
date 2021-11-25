@@ -209,7 +209,6 @@ int modifyRoomPanel(struct Room rooms[]) {
                         } else if (free_rs == 3) {
                             free(room_name);
                             free(room_type);
-                            printf("TEST");
                         }
                     }
                     if (error != 0) {
@@ -293,13 +292,13 @@ int modifyGuest() {
 
     displayModifyGuestLogo();
 
-    int result = modifyGuestPanel(guests);
+    int result = modifyGuestPanel(guests, index - 1);
 
     return result;
 }
 
 
-int modifyGuestPanel(struct Guest guests[]) {
+int modifyGuestPanel(struct Guest guests[], int arr_len) {
 
     Terminal term = tercon_init_rows_cols();
     printf(ANSI_MOVE_CURSOR_TO "Enter Guest ID you want to modify: ", 14, (term.columns - 40) / 2);
@@ -316,10 +315,10 @@ int modifyGuestPanel(struct Guest guests[]) {
 
     int found = 0;
     int modified = 0;
-    for (int i = 0; i <= sizeof(guests) / sizeof(guests[0]); i++) {
+    for (int i = 0; i <= arr_len; i++) {
         if(guests[i].id == guest_id) {
-
             found = 1;
+
             char *guest_first_name;
             char *guest_last_name;
             char *guest_nationality;
@@ -339,14 +338,14 @@ int modifyGuestPanel(struct Guest guests[]) {
                 } else if (choice == -3) {
                     printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
                     error = 3;
-                } else if ((choice > 5 && choice < 20) || choice > 20) {
+                } else if ((choice > 4 && choice < 20) || choice > 20) {
                     printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
                     error = 4;
                 } else {
                     tercon_clear_lines(26, 20);
                     switch(choice) {
                         case 1 :
-                            printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest First Name: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
                             guest_first_name = getSpString(20);
                             if(guest_first_name != 0) {
                                 sprintf(guests[i].first_name, "%s", guest_first_name);
@@ -357,7 +356,7 @@ int modifyGuestPanel(struct Guest guests[]) {
                             free_rs = 1;
                             break;
                         case 2 :
-                            printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Last Name: " ANSI_COLOR_RESET, (term.columns - 21) / 2);
                             guest_last_name = getSpString(20);
                             if(guest_last_name != 0) {
                                 sprintf(guests[i].last_name, "%s", guest_last_name);
@@ -368,7 +367,7 @@ int modifyGuestPanel(struct Guest guests[]) {
                             free_rs = 2;
                             break;
                         case 3 :
-                            printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Nationality: " ANSI_COLOR_RESET, (term.columns - 23) / 2);
                             guest_nationality = getSpString(20);
                             if(guest_nationality != 0) {
                                 sprintf(guests[i].nationality, "%s", guest_nationality);
@@ -379,13 +378,13 @@ int modifyGuestPanel(struct Guest guests[]) {
                             free_rs = 3;
                             break;
                         case 4 :
-                            printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest First Name: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
                             guest_first_name = getSpString(20);
                             if(guest_first_name != 0) {              
-                                printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Last Name: " ANSI_COLOR_RESET, (term.columns - 21) / 2);
                                 guest_last_name = getSpString(20);
                                 if(guest_last_name != 0) {                
-                                    printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                                    printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Nationality: " ANSI_COLOR_RESET, (term.columns - 23) / 2);
                                     guest_nationality = getSpString(20);
                                     if(guest_nationality != 0) {
                                         sprintf(guests[i].first_name, "%s", guest_first_name);
@@ -414,38 +413,37 @@ int modifyGuestPanel(struct Guest guests[]) {
                         default :
                             break;  
                     }
-                    if (free_rs != 0) {
-                        if (free_rs == 1) {
-                            free(guest_first_name);
-                        } else if (free_rs == 2) {
-                            free(guest_last_name);
-                        } else if (free_rs == 3) {
-                            free(guest_nationality);
-                        } else if (free_rs == 4) {
-                            free(guest_first_name);
-                            free(guest_last_name);
-                        } else if (free_rs == 5) {
-                            free(guest_first_name);
-                            free(guest_last_name);
-                            free(guest_nationality);                       
-                        }
+                }
+                if (free_rs != 0) {
+                    if (free_rs == 1) {
+                        free(guest_first_name);
+                    } else if (free_rs == 2) {
+                        free(guest_last_name);
+                    } else if (free_rs == 3) {
+                        free(guest_nationality);
+                    } else if (free_rs == 4) {
+                        free(guest_first_name);
+                        free(guest_last_name);
+                    } else if (free_rs == 5) {
+                        free(guest_first_name);
+                        free(guest_last_name);
+                        free(guest_nationality);
                     }
-                    if (error != 0) {
-                        if (error < 4) {
-                            buffer_clear();
-                        }
-                        tercon_echo_off();
-                        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+                }
+                if (error != 0) {
+                    if (error < 4) {
                         buffer_clear();
-                        tercon_echo_on();
                     }
-                }        
+                    tercon_echo_off();
+                    printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+                    buffer_clear();
+                    tercon_echo_on();
+                }
             }
         }
     }
-
     if(found == 1) {
-        int result = applyGuestModification(guests);
+        int result = applyGuestModification(guests, arr_len);
         return result;
     } else {
         printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 33) / 2);
@@ -457,7 +455,7 @@ int modifyGuestPanel(struct Guest guests[]) {
     }
 }
 
-int applyGuestModification (struct Guest guests[]) {
+int applyGuestModification (struct Guest guests[], int arr_len) {
 
     Terminal term = tercon_init_rows_cols();
     printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
@@ -465,7 +463,7 @@ int applyGuestModification (struct Guest guests[]) {
     if(y == 'Y' || y == 'y') {
         FILE *fp;
         fp = fopen(guestsdb, "wb");
-        for (int i = 0; i <= sizeof(guests) / sizeof(guests[0]); i++) {
+        for (int i = 0; i <= arr_len; i++) {
             fwrite(&guests[i], sizeof(guests[i]), 1, fp);
         }
         printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);

@@ -241,6 +241,7 @@ void displayModifyGuestChoices(struct Guest guest) {
     printf(ANSI_MOVE_CURSOR_COL "               1. Modify First Name\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               2. Modify Last Name\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               3. Modify Nationality\n", (term.columns - 51) / 2);
+    printf(ANSI_MOVE_CURSOR_COL "               4. Modify All\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL "               20. Go Back\n", (term.columns - 51) / 2);
     printf(ANSI_MOVE_CURSOR_COL ANSI_ERASE_LINE "               >>> ", (term.columns - 51) / 2);
 }
