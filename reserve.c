@@ -22,6 +22,7 @@
 #include "structures/reservations.h"
 
 #include "header_files/reserve.h"
+#include "header_files/display.h"
 
 int checkFromDate(struct Reservation res) {
 
@@ -111,8 +112,8 @@ int checkAllDates(struct Reservation res) {
                 for(int i = 1; i <= sizeof(day.room_id) / sizeof(int); i++) {
                     // Check if the room id is already in the days rooms ids.
                     if(day.room_id[i] == res.room.id) {
-                       printf("\x1b[%d;%dH|%s              Room is already reserved for those dates: %s              %s|\n", (term.rows - 2) + i, (term.columns - 82) / 2, ANSI_COLOR_RED, day.date, ANSI_COLOR_RESET);
-                       num_of_days++;
+                        printf("\x1b[%d;%dH|%s              Room is already reserved for those dates: %s              %s|\n", (term.rows - 2) + num_of_days, (term.columns - 82) / 2, ANSI_COLOR_RED, day.date, ANSI_COLOR_RESET);
+                        num_of_days++;
                     }
                 }
             }
