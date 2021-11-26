@@ -5,6 +5,7 @@
 void appLogo();
 char *displayMainLogo();
 Terminal displayRoomReservationLogo();
+void displayPreviousStep(struct Reservation res);
 void displayRoomInfoLogo();
 void displayRoomInfo(struct Room room);
 void displayAllRoomsLogo();

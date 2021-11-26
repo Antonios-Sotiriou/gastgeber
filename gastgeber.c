@@ -169,7 +169,7 @@ void reserve() {
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
                     if (c == 'y' || c == 'Y') {
-                        tercon_clear_error_log();
+                        tercon_clear_error_log(reservation);
                         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                         printf("\x1b[2K");
                         getc(stdin);
@@ -180,9 +180,13 @@ void reserve() {
                 }
             }
             int to_date = 0;
+            // reapeated here identifies in the user tried to supplied to_date more than 1 time.If so we take actions accordingly.
+            bool repeated = false;
             while(to_date == 0) {
-                tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) / 2);
-                printf(ANSI_ERASE_LINE "  To date: ");
+                if (!repeated) {
+                    tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) / 2);
+                    printf(ANSI_ERASE_LINE "  To date: ");
+                }
                 int step_count = 0;
                 if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     // we need the num_of_days here to position the cursor if the days are overflow the error printing area.
@@ -195,12 +199,8 @@ void reserve() {
                         fwrite(&reservation, sizeof(reservation), 1, fp);
                     } else if (num_of_days == -2) {
                         // this else clause means that the user canceled the apply of the reservation so..
-                        // there is no need to ask if he wants to retry so.. skip the next if dialogue by breaking out of the loop.
+                        // there is no need to ask if he wants to retry.Skip the next if dialogue by breaking out of the loop.
                         to_date = 1;
-                    } else if (num_of_days > 0) {
-                        // Here must implement a display improvement.When the days are alot the terminal is getting messy
-                        // thats why we break until we find a better solution.
-                        break;
                     } else {
                         step_count = 1;
                     }
@@ -208,18 +208,28 @@ void reserve() {
                     step_count = 1;
                 }
                 if (step_count != 0) {
-                    if (num_of_days > 0) {
-                        tercon_move_y_x((term.rows - 4) - num_of_days, (term.columns - 26 ) / 2);
+                    if (num_of_days > 2) {
+                        tercon_move_y_x(term.rows + num_of_days, (term.columns - 26 ) / 2);
                     } else {
                         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                     }
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
                     if (c == 'y' || c == 'Y') {
-                        tercon_clear_error_log();
-                        tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
-                        printf("\x1b[2K");
-                        getc(stdin);
+                        if (num_of_days > 2) {
+                            // With this function rerender whole last screen and return to to_date prompt.We need this
+                            // function here to avoid terminal mess when the already booked days are alot. 
+                            displayPreviousStep(reservation);
+                            num_of_days = 0;
+                            repeated = true;
+                            getc(stdin);
+                        } else {
+                            tercon_clear_error_log();
+                            tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                            printf("\x1b[2K");
+                            repeated = false;
+                            getc(stdin);
+                        }
                         continue;
                     } else {
                         return;
