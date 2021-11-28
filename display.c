@@ -77,6 +77,9 @@ Terminal displayRoomReservationLogo() {
     return term;
 }
 void displayPreviousStep(struct Reservation res) {
+    // Importand function to be used in reserve() primary function.Redisplays previous page 
+    // if the user received a < room is already received for NUM of days > error.Error days must be
+    // more than 2 to use this function.For less days is not needed because terminal isn't getting messy. 
     clear_scr();
     Terminal term = tercon_init_rows_cols();
     term.cursor_y = 16;
@@ -254,15 +257,17 @@ void displayModifyGuestChoices(struct Guest guest) {
 }
 void displayAllReservationsLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*      Display All Reservations.    *\n");
-    printf("*************************************\n\n");
-    printf(" --------------------------------------------------------------------------------------------------------\n");
-    printf("|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n");
-    printf(" --------------------------------------------------------------------------------------------------------\n");
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\           \x1b[32mDisplaying All Reservations\x1b[0m           /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2); 
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayAllReservationsInfo(struct Reservation reservation) {
-    printf("|");
+    Terminal term = tercon_init_rows_cols();
+    printf("\x1b[%dG|", (term.columns - 105) / 2);
     displayInt(reservation.id, 20);
     printf("|");
     displayInt(reservation.room.id, 20);
@@ -273,7 +278,7 @@ void displayAllReservationsInfo(struct Reservation reservation) {
     printf("|");
     displayStr(reservation.to_date, 20);
     printf("|\n");
-    printf("---------------------------------------------------------------------------------------------------------\n");
+    printf("\x1b[%dG---------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayDeleteResLogo() {
     clear_scr();
