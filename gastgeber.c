@@ -450,6 +450,7 @@ void modify() {
 void displayReservations() {
 
     struct Reservation res;
+    Terminal term = tercon_init_rows_cols();
     FILE *fp;
     fp = fopen(reservationsdb, "rb");
 
@@ -464,9 +465,11 @@ void displayReservations() {
         }
     }
     fclose(fp);
-    printf("Press Enter to continue...\n");
 
-    getc(stdin);
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
+    buffer_clear();
+    tercon_echo_on();
 }
 
 void deleteReservation() {
