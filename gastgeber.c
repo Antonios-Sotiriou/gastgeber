@@ -119,6 +119,12 @@ int main(int argc, char *argv[]) {
 }
 
 void reserve() {
+    /****************************************************************
+    * The function which handles the reservations.Checks the dates
+    * and room availability, and writing to the databases the guest
+    * and everythink else if they meet the requirements.
+    *         Needs to be simplyfied in the future!!!
+    ****************************************************************/
 
     struct Reservation reservation;
     FILE *fp;
@@ -184,6 +190,8 @@ void reserve() {
             bool repeated = false;
             while(to_date == 0) {
                 if (!repeated) {
+                    // User goes for first time throught the function.Print < To date > prompt.If user comes again
+                    // through the function the displayPreviousStep() function is responsible to handle the output.
                     tercon_move_y_x(term.cursor_y + 1, (term.columns - 51 ) / 2);
                     printf(ANSI_ERASE_LINE "  To date: ");
                 }
@@ -207,6 +215,7 @@ void reserve() {
                 } else {
                     step_count = 1;
                 }
+                // Steps are importand to set correct the cursor and prompt for retry.
                 if (step_count != 0) {
                     if (num_of_days > 2) {
                         tercon_move_y_x(term.rows + num_of_days, (term.columns - 26 ) / 2);
