@@ -481,17 +481,20 @@ void deleteReservation() {
 
     displayDeleteResLogo();
     printf(ANSI_MOVE_CURSOR_COL "Enter Reservation's id you want to delete: ", (term.columns - 43) / 2);
-    int res_id = getInteger(48, 10);
+    int res_id = getnuminput(6);
     int found = 0;
 
     if (res_id == 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHThere is no Reservation with 0 ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2);
         found = 2;
     } else if (res_id == -1) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
         found = 2;  
     } else if (res_id == -2) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        found = 2;
+    } else if (res_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         found = 2;   
     }
     while(found == 0) {
@@ -530,6 +533,9 @@ void deleteReservation() {
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
     buffer_clear();
+    if (res_id < 0) {
+        getc(stdin);
+    }
     tercon_echo_on();
 }
 
