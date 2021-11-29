@@ -22,6 +22,7 @@ void displayModifyGuestChoices(struct Guest guest);
 void displayAllReservationsLogo();
 void displayAllReservationsInfo(struct Reservation reservation);
 void displayDeleteResLogo();
+void displayReservationInfo(struct Reservation reservation);
 void displayAnnuallyAvailabillityLogo();
 void displayRoomsPerDay(struct Day st_arr[], int i);
 void displayRoomAnnuallyReservationsLogo();

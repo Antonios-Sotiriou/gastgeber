@@ -282,9 +282,30 @@ void displayAllReservationsInfo(struct Reservation reservation) {
 }
 void displayDeleteResLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*         Delete Reservation.       *\n");
-    printf("*************************************\n\n");
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\               \x1b[32mDelete Reservation\x1b[0m                /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);
+    displayErrorLog();
+    tercon_move_y_x(13, 0);
+}
+void displayReservationInfo(struct Reservation reservation) {
+    Terminal term = tercon_init_rows_cols();
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+    printf("\x1b[%dG|", (term.columns - 105) / 2);
+    displayInt(reservation.id, 20);
+    printf("|");
+    displayInt(reservation.room.id, 20);
+    printf("|");
+    displayInt(reservation.guest.id, 20);
+    printf("|");
+    displayStr(reservation.from_date, 20);
+    printf("|");
+    displayStr(reservation.to_date, 20);
+    printf("|\n");
+    printf("\x1b[%dG---------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
 void displayAnnuallyAvailabillityLogo() {
     clear_scr();

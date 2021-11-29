@@ -460,7 +460,7 @@ void displayReservations() {
         fread(&res, sizeof(res), 1, fp);
         if(feof(fp)) {
             break;            
-        } else {
+        } else if (res.id != 0) {
             displayAllReservationsInfo(res);
         }
     }
@@ -475,52 +475,62 @@ void displayReservations() {
 void deleteReservation() {
 
     struct Reservation res;
+    Terminal term = tercon_init_rows_cols();
     FILE *fp;
     fp = fopen(reservationsdb, "rb");
 
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
-
     displayDeleteResLogo();
-    printf("Enter Reservation's id you want to delete: ");
+    printf(ANSI_MOVE_CURSOR_COL "Enter Reservation's id you want to delete: ", (term.columns - 43) / 2);
     int res_id = getInteger(48, 10);
     int found = 0;
 
+    if (res_id == 0) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHThere is no Reservation with 0 ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2);
+        found = 2;
+    } else if (res_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        found = 2;  
+    } else if (res_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
+        found = 2;   
+    }
     while(found == 0) {
         fread(&res, sizeof(res), 1, fp);
         if(feof(fp)) {
             break;
-        } else if(res.id == res_id && res_id != 0) {
-            printf("Reservation's Id to be deleted: %d\n", res.id);
-            printf("Reservation's Room ID: %d\n", res.room.id);
-            printf("Reservation's Guests's ID: %d\n", res.guest.id);
-            printf("Reservation's From Date: %s\n", res.from_date);
-            printf("Reservation's To Date: %s\n", res.to_date);
-            printf(ANSI_COLOR_RED "Are you sure you want to delete the Reservation: [Y/N]? " ANSI_COLOR_RESET);
+        } else if(res.id == res_id) {
+            displayReservationInfo(res);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHAre you sure you want to delete the Reservation: [Y/N]? " ANSI_COLOR_RESET, term.rows - 4, (term.columns - 56) / 2);
             char c = getc(stdin);
             if(c == 'Y' || c == 'y') {
+                // Following function can be found in delete_reservation.c file.This function is responsible
+                // to start the delete reservation functions familly.It collects reservation's dates and deletes room from dates.
                 getResDatesToDelete(res);
-                printf("Deleting Reservation...\n\n");
                 getc(stdin);
                 found = 1;
+            } else if (c == '\n' || c == ' ') {
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation deletion canceled." ANSI_COLOR_RESET, term.rows - 1, (term.columns - 30) / 2);
+                found = 2;
             } else {
-                printf(ANSI_COLOR_GREEN "Reservation deletion canceled." ANSI_COLOR_RESET);
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation deletion canceled." ANSI_COLOR_RESET, term.rows - 1, (term.columns - 30) / 2);
                 getc(stdin);
-                found = -1;
+                found = 2;
             }
         }
     }
     fclose(fp);
     if(found == 0 && res_id != 0) {
-        printf("No Reservation found with this ID: %d\n", found);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Reservation found with this ID: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2, res_id);
     } else if(found == 1) {
+        // Following function can be found in delete_reservation.c file.It deletes the reservation.
         applyReservationDelete(res_id);
-        printf("Reservation has been deleted.\n");
-    } else if(found == -1) {
-        printf("\n");
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHReservation has been deleted.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
     }
 
-    printf("Press Enter to continue...\n");
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    buffer_clear();
+    tercon_echo_on();
 }
 
 void displayAnnuallyAvailabillity() {
