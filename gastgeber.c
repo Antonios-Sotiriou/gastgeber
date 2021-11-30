@@ -543,6 +543,7 @@ void displayAnnuallyAvailabillity() {
 
     struct Day day;
     struct Day *st_arr;
+    Terminal term = tercon_init_rows_cols();
     st_arr = malloc(sizeof(struct Day));
     
     FILE *fp;
@@ -552,17 +553,16 @@ void displayAnnuallyAvailabillity() {
     char str_year[5];
 
     displayAnnuallyAvailabillityLogo();
-    printf("Which year would you like to display? ");
-
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
+    printf(ANSI_MOVE_CURSOR_TO "Which year would you like to display?: ", 13, (term.columns - 39) / 2);
 
     input_year = getInteger(48, 5);
     int i = 0;
     int dynamic_inc = 1;
+    int error = 0;
 
     if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
-        printf(ANSI_COLOR_RED "\nYear out of range: %d\n" ANSI_COLOR_RESET, input_year);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHYear out of range: %d" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2, input_year);
+        error = 1;
     } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
         sprintf(str_year, "%d", input_year);
         while(1) {
@@ -579,12 +579,19 @@ void displayAnnuallyAvailabillity() {
             }
         }
     } else if(input_year == 0) {
-        printf(ANSI_COLOR_RED "\nUndefined year parsing...!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHUndefined year parsing...!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+        error = 2;
     }
     fclose(fp);
     // Process and display.
     displayRoomsPerDay(st_arr, i);
-    printf("\nPress Enter to continue...");
+    tercon_echo_off();
+    if (error) {
+        printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    }
+    printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
+    buffer_clear();
+    tercon_echo_on();
 }
 
 void displayRoomAnnuallyReservations() {

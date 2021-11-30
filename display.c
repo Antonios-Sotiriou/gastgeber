@@ -309,22 +309,26 @@ void displayReservationInfo(struct Reservation reservation) {
 }
 void displayAnnuallyAvailabillityLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*       Annually Reservations.      *\n");
-    printf("*************************************\n\n");   
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\             \x1b[32mAnnually Availabillity\x1b[0m              /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);
+    displayErrorLog();
 }
 void displayRoomsPerDay(struct Day st_arr[], int i) {
     
+    Terminal term = tercon_init_rows_cols();
     for(int x = 0; x <= i - 1; x++) {
         char month[11];
         int month_days = 0;
         if(strcmp(st_arr[x].day, "01") == 0) {
-            printf(ANSI_COLOR_GREEN "\n\n\t\t\t\t\t\t\t\t\t%s\n" ANSI_COLOR_RESET, st_arr[x].month_name);
+            printf("\n");
+            printf(ANSI_COLOR_GREEN "\x1b[%dG%s\n" ANSI_COLOR_RESET, abs((term.columns - strlen(st_arr[x].month_name)) / 2), st_arr[x].month_name);
             while (strcmp(st_arr[x].month_name, month) != 0) {
                 sprintf(month, "%s", st_arr[x].month_name);
                 for(int d = 0; d <= i - 1; d++) {
                     if(strcmp(st_arr[d].month_name, month) == 0) {
-                        printf("| %s ", st_arr[d].day);
+                        printf("| %s ",  st_arr[d].day);
                         month_days++;
                     }
                 }
