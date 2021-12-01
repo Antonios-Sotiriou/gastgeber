@@ -144,7 +144,7 @@ void reserve() {
 
         printf("\x1b[%d;%dH  Enter Room ID(%d-%d): ", term.cursor_y, (term.columns - 51) / 2, 1, TOTAL_ROOMS); 
         term.cursor_y += 1;
-        room_id = getnuminput(5);
+        room_id = getnuminput(5, true);
         
         if (room_id < 1 || room_id > TOTAL_ROOMS) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
@@ -273,7 +273,7 @@ void displayRoom() {
 
     int room_id; 
     printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", 13, (term.columns - 21) / 2, 1, TOTAL_ROOMS);  
-    room_id = getnuminput(5);
+    room_id = getnuminput(5, true);
         
     if (room_id < 1 || room_id > TOTAL_ROOMS) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
@@ -333,7 +333,7 @@ void displayGuest() {
     int found = 0;
     
     printf("\x1b[%d;%dHEnter Guest ID: ", 13, (term.columns - 16) / 2);  
-    guest_id = getnuminput(8);
+    guest_id = getnuminput(8, true);
 
     if (guest_id == -1) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input length.Must be maximum 8 chars long.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 50) / 2);  
@@ -397,7 +397,7 @@ void modify() {
     while(1) {
 
         displayModifyLogo();
-        int choice = getnuminput(4);
+        int choice = getnuminput(4, true);
         // We need this error value here for handling errors and consume also the buffer when needed.
         int error = 0;
         // This is the following cases return value.It will be probably usefull so it is wise to save it to case_rv variable.
@@ -481,7 +481,7 @@ void deleteReservation() {
 
     displayDeleteResLogo();
     printf(ANSI_MOVE_CURSOR_COL "Enter Reservation's id you want to delete: ", (term.columns - 43) / 2);
-    int res_id = getnuminput(6);
+    int res_id = getnuminput(6, true);
     int found = 0;
 
     if (res_id == 0) {
@@ -555,7 +555,7 @@ void displayAnnuallyAvailabillity() {
     displayAnnuallyAvailabillityLogo();
     printf(ANSI_MOVE_CURSOR_TO "Which year would you like to display?: ", 13, (term.columns - 39) / 2);
 
-    input_year = getInteger(48, 5);
+    input_year = getnuminput(6, true);
     int i = 0;
     int dynamic_inc = 1;
     int error = 0;
@@ -563,6 +563,16 @@ void displayAnnuallyAvailabillity() {
     if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHYear out of range: %d" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2, input_year);
         error = 1;
+        if (input_year == -1) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
+            error = 2;
+        } else if (input_year == -2) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
+            error = 3;
+        } else if (input_year == -3) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+            error = 4;
+        }
     } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
         sprintf(str_year, "%d", input_year);
         while(1) {
@@ -580,16 +590,22 @@ void displayAnnuallyAvailabillity() {
         }
     } else if(input_year == 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHUndefined year parsing...!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
-        error = 2;
+        error = 5;
     }
     fclose(fp);
-    // Process and display.
-    displayRoomsPerDay(st_arr, i);
+
     tercon_echo_off();
     if (error) {
         printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        if (error != 1 && error != 5) {
+            buffer_clear();
+        }
+    } else {
+        // Process and display.
+        tercon_clear_lines(term.rows, 14);
+        displayRoomsPerDay(st_arr, i);
+        printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
     }
-    printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
     buffer_clear();
     tercon_echo_on();
 }
