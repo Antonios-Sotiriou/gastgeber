@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <time.h>
 /**********************************************
  * Color Initialisation and Terminal management 
@@ -14,12 +15,15 @@
  ******************************************************/
 #include "header_files/userinput.h"
 
+/* Clears buffer until it meets a New Line.It doesn't consume the New Line char. */
 void buffer_clear() {
     char c;
     while((c = getc(stdin) != '\n') && c != '\t');
 }
-
-int getnuminput(int max_len) {
+/* Get an Integer of length [ max_len ].
+   If allow [ spaces = true ], allow spaces at start, middle or between.
+   Returns the Integer without spaces. */
+int getnuminput(int max_len, bool spaces) {
 
     char cleared_num[max_len + 1];
     int buffer_overflow = 0;
@@ -38,7 +42,11 @@ int getnuminput(int max_len) {
                 cleared_num[i] = c;
                 i++;
             // OTHERWISE SPECIAL CHARACTER BUT ALLOW SPACES
-            } else if (c != ' ') {
+            } else if (spaces) {
+                if (c != ' ') {
+                    return -2;
+                }
+            } else {
                 return -2;
             }
         } else {
@@ -116,7 +124,7 @@ int getformatedDate(char *room_date) {
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
     return 1;
 }
-
+/* Get integer */
 int getInteger(int str_len, int int_len) {
 
     /**************************************

@@ -324,6 +324,7 @@ void displayRoomsPerDay(struct Day st_arr[], int i) {
         if(strcmp(st_arr[x].day, "01") == 0) {
             printf("\n");
             printf(ANSI_COLOR_GREEN "\x1b[%dG%s\n" ANSI_COLOR_RESET, abs((term.columns - strlen(st_arr[x].month_name)) / 2), st_arr[x].month_name);
+            printf(ANSI_MOVE_CURSOR_COL, (term.columns - 156) / 2);
             while (strcmp(st_arr[x].month_name, month) != 0) {
                 sprintf(month, "%s", st_arr[x].month_name);
                 for(int d = 0; d <= i - 1; d++) {
@@ -334,10 +335,11 @@ void displayRoomsPerDay(struct Day st_arr[], int i) {
                 }
             }
             printf("|\n");
+            printf(ANSI_MOVE_CURSOR_COL, (term.columns - 156) / 2);
             for(int m = 0; m <= month_days * 5; m++) {
                 printf("-");
             }
-            printf("\n|");
+            printf("\n\x1b[%dG|", (term.columns - 156) / 2);
         }
         int num_of_rooms = 0;
         for(int z = 0; z <= sizeof(st_arr[x].room_id) / sizeof(int) - 1; z++) {

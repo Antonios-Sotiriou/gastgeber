@@ -89,7 +89,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                 while (modified == 0) {
                     
                     displayModifyRoomChoices(rooms[i]);
-                    int choice = getnuminput(4);
+                    int choice = getnuminput(4, true);
                     int error = 0;
                     int free_rs = 0;
                     if (choice == -1) {
@@ -326,7 +326,7 @@ int modifyGuestPanel(struct Guest guests[], int arr_len) {
                 // Display guest info here.
                 displayModifyGuestChoices(guests[i]);
 
-                int choice = getnuminput(4);
+                int choice = getnuminput(4, true);
                 int error = 0;
                 int free_rs = 0;
                 if (choice == -1) {
