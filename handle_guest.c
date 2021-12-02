@@ -13,7 +13,7 @@
 /*********************
  * Global constants 
  ********************/
-
+#include "header_files/global/guests_db_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
  **********************************************/
@@ -21,8 +21,6 @@
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/reservations.h"

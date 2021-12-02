@@ -1,6 +1,6 @@
 #ifndef GUEST_H
 #define GUEST_H
-#include <stdbool.h>
+//#include <stdbool.h>
 
 struct Guest {
     int id;

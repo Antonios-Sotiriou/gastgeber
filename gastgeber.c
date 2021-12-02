@@ -12,11 +12,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <signal.h>
 /*********************
  * Global constants 
  ********************/
-#include "header_files/global_vars.h"
+#include "header_files/global/global_vars.h"
+#include "header_files/global/res_db_path.h"
+#include "header_files/global/rooms_db_path.h"
+#include "header_files/global/days_db_path.h"
+#include "header_files/global/guests_db_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
  **********************************************/
@@ -24,8 +27,6 @@
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
@@ -541,8 +542,7 @@ void deleteReservation() {
 
 void displayAnnuallyAvailabillity() {
 
-    struct Day day;
-    struct Day *st_arr;
+    struct Day day, *st_arr;
     Terminal term = tercon_init_rows_cols();
     st_arr = malloc(sizeof(struct Day));
     

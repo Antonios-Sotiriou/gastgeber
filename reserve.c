@@ -3,10 +3,13 @@
 *********************/
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
-#include "header_files/global_vars.h"
+#include "header_files/global/global_vars.h"
+#include "header_files/global/days_db_path.h"
+#include "header_files/global/journal_main_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
  **********************************************/
@@ -14,8 +17,6 @@
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
@@ -128,6 +129,7 @@ int checkAllDates(struct Reservation res) {
         char c = getc(stdin);
         if(c == 'Y' || c == 'y') {
             applyReservation(starting_point, finishing_point, res.room.id);
+            tercon_clear_error_log();
             printf(ANSI_COLOR_GREEN "\x1b[%d;%dHReservation applied success.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 28) / 2);
             getc(stdin);
             return 0;
@@ -144,7 +146,7 @@ void applyReservation(int start, int finish, int res_room_id) {
     struct Day day;
     FILE *fp, *fp1;
     fp = fopen(daysdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
+    fp1 = fopen(journal_main, "wb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -162,7 +164,7 @@ void applyReservation(int start, int finish, int res_room_id) {
     fclose(fp1);
 
     fp = fopen(daysdb, "wb");
-    fp1 = fopen(journal_sec, "rb");
+    fp1 = fopen(journal_main, "rb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp1);
@@ -174,6 +176,6 @@ void applyReservation(int start, int finish, int res_room_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_sec);
+    remove(journal_main);
 }
 
