@@ -8,10 +8,13 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
-#include "header_files/global_vars.h"
+#include "header_files/global/global_vars.h"
+#include "header_files/global/rooms_db_path.h"
+#include "header_files/global/guests_db_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
  **********************************************/
@@ -19,8 +22,6 @@
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
