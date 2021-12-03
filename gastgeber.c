@@ -130,7 +130,7 @@ void reserve() {
     struct Reservation reservation;
     FILE *fp;
     fp = fopen(reservationsdb, "ab");
-
+    
     Terminal term = displayRoomReservationLogo();
     term.cursor_x = 0;
     term.cursor_y = 13;
@@ -182,6 +182,7 @@ void reserve() {
                         getc(stdin);
                         continue;
                     } else {
+                        fclose(fp);
                         return;
                     }
                 }
@@ -242,6 +243,7 @@ void reserve() {
                         }
                         continue;
                     } else {
+                        fclose(fp);
                         return;
                     }
                 }
@@ -614,9 +616,6 @@ void displayRoomAnnuallyReservations() {
 
     displayRoomAnnuallyReservationsLogo();
 
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
-
     printf("Enter room ID you want to display: ");
     int room_id = getInteger(48, 5);
     if(room_id <= 0 || room_id > TOTAL_ROOMS) {
@@ -633,15 +632,13 @@ void displayRoomAnnuallyReservations() {
         }
     }
 
+    buffer_clear();
     printf("Press Enter to continue...");
 }
 
 void displayAllRoomsAnnuallyReservations() {
 
     displayAllRoomsAnnuallyReservationsLogo();
-
-    char c; 
-    while((c = getc(stdin) != '\n') && c != '\t');
 
     printf("Enter which year you want to display: ");
     int input_year = getInteger(48, 5);
@@ -653,20 +650,19 @@ void displayAllRoomsAnnuallyReservations() {
         displayAllRoomsAnnuallyReservationsInfo(input_year);
     }
 
+    buffer_clear();
     printf("Press Enter to continue...");
 }
 
 void main_error() {
 
-    char c;
     Terminal term = tercon_init_rows_cols();
     tercon_echo_off();
 
     printf(ANSI_COLOR_GREEN "\x1b[%d;%dHPress Enter to continue..." ANSI_COLOR_RESET, term.rows - 4, (term.columns - 28) / 2);
     printf("\x1b[%d;%dH          >>> ", 22, (term.columns - 51) / 2);
 
-    while((c = getc(stdin) != '\n') && c != '\t');
-
+    buffer_clear();
     tercon_echo_on();
 }
 
