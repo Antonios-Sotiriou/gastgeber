@@ -17,6 +17,8 @@
 
 int compareDates(char *from_date, char *to_date) {
 
+    Terminal term = tercon_init_rows_cols();
+
     int from_day;
     int from_month;
     int from_year;
@@ -24,9 +26,6 @@ int compareDates(char *from_date, char *to_date) {
     int to_day;
     int to_month;
     int to_year;
-
-    Terminal term = tercon_init_rows_cols();
-
     sscanf(from_date, "%d/%d/%d", &from_day, &from_month, &from_year);
     sscanf(to_date, "%d/%d/%d", &to_day, &to_month, &to_year);
 

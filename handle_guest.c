@@ -13,6 +13,7 @@
 /*********************
  * Global constants 
  ********************/
+#include "header_files/global/global_vars.h"
 #include "header_files/global/guests_db_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
@@ -28,16 +29,23 @@
 #include "header_files/init_dbs.h"
 #include "header_files/userinput.h"
 #include "header_files/handle_guest.h"
+#include "header_files/joins.h"
 
 struct Guest handleGuest() {
 
     struct Guest guest;
     FILE *fp;
-    fp = fopen(guestsdb, "rb");
-    Terminal term = tercon_init_rows_cols();
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file handleGuest()");
+        exit(127);
+    }
 
     int next_id = getNextGuestEntry();
 
+    Terminal term = tercon_init_rows_cols();
     // Move cursor to the right position
     tercon_move_y_x(14, (term.columns - 51 ) / 2);
     printf("  Guest First Name: ");
@@ -47,6 +55,7 @@ struct Guest handleGuest() {
         printf(ANSI_COLOR_RED "Guest must have a First Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         free(first_name);
+        fclose(fp);
         return guest;
     }
     tercon_move_y_x(15, (term.columns - 51 ) /2);
@@ -57,6 +66,7 @@ struct Guest handleGuest() {
         printf(ANSI_COLOR_RED "Guest must have a Last Name.\n" ANSI_COLOR_RESET);
         guest.active = false;
         free(last_name);
+        fclose(fp);
         return guest;
     }
 
@@ -99,7 +109,7 @@ struct Guest handleGuest() {
     }
     free(first_name);
     free(last_name);
-
+    
     return guest;
 }
 
@@ -107,7 +117,13 @@ void createGuestEntry(struct Reservation res) {
 
     struct Guest guest;
     FILE *fp;
-    fp = fopen(guestsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file createGuestEntry()");
+        exit(127);
+    }
 
     int found = 0;
     while(found == 0) {
@@ -119,12 +135,12 @@ void createGuestEntry(struct Reservation res) {
             fclose(fp);
         }
     }
+
     if(found == 0) {
-        fp = fopen(guestsdb, "ab");
+        fp = fopen(abs_path, "ab");
         guest = res.guest;
         fwrite(&guest, sizeof(guest), 1, fp);
         fclose(fp);
     }
-
 }
 

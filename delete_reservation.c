@@ -3,6 +3,7 @@
 *********************/
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 /*********************
  * Global constants 
@@ -24,12 +25,19 @@
 #include "structures/reservations.h"
 
 #include "header_files/delete_reservation.h"
+#include "header_files/joins.h"
 
 void getResDatesToDelete(struct Reservation res) {
 
     struct Day day;
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file getResDatesToDelete()");
+        exit(127);
+    }
 
     int starting_point;
     int finishing_point;
@@ -53,8 +61,17 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
 
     struct Day day;
     FILE *fp, *fp1;
-    fp = fopen(daysdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file deleteRoomFromDates()");
+        remove(journal_path);
+        exit(127);
+    }
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -71,8 +88,8 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp = fopen(daysdb, "wb");
-    fp1 = fopen(journal_sec, "rb");
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp1);
@@ -84,16 +101,25 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_sec);
+    remove(journal_path);
 }
 
 void applyReservationDelete(int res_id) {
 
     struct Reservation res;
     FILE *fp, *fp1;
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate reservationsdb file applyReservationDelete()");
+        remove(journal_path);
+        exit(127);
+    }
 
-    fp = fopen(reservationsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
     while(1) {
         fread(&res, sizeof(res), 1, fp);
         if(feof(fp)) {
@@ -105,8 +131,8 @@ void applyReservationDelete(int res_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp1 = fopen(journal_sec, "rb");
-    fp = fopen(reservationsdb, "wb");
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
     while(1) {
          fread(&res, sizeof(res), 1, fp1);
         if(feof(fp1)) {
@@ -118,6 +144,6 @@ void applyReservationDelete(int res_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_sec);
+    remove(journal_path);
 }
 
