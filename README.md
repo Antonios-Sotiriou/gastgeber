@@ -14,7 +14,9 @@ Before you run this command please delete all files from data folder so new data
 ./gastgeber init
 ```
 If you don't see any errors software is ready for use.
-
+```
+./gastgeber
+```
 From gastgeber.c file you can choose the total number of rooms and also<br>
 the years range.As starting year it is advised to use the current year because<br>
 noone can make a reservation to the Past unfortunatly.At least so far.
