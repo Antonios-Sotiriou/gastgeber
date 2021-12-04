@@ -40,6 +40,7 @@
 #include "header_files/delete_reservation.h"
 #include "header_files/modify.h"
 #include "header_files/handle_guest.h"
+#include "header_files/joins.h"
 
 /* functionality functions */
 void reserve();
@@ -63,6 +64,8 @@ int main(int argc, char *argv[]) {
         createRoomsDb();
         createReservationsDb();
         createGuestsDb();
+        printf(ANSI_BLINK_SLOW "\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF);
+        buffer_clear();
     }
 
     int choice;
@@ -126,16 +129,18 @@ void reserve() {
     * and everythink else if they meet the requirements.
     *         Needs to be simplyfied in the future!!!
     ****************************************************************/
-
     struct Reservation reservation;
     FILE *fp;
-    fp = fopen(reservationsdb, "ab");
-    
+    // Setting dynamically the absolut path.
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "ab");
+
     Terminal term = displayRoomReservationLogo();
     term.cursor_x = 0;
     term.cursor_y = 13;
+    
     int num_of_days = 0;
-
     int room_id;
     int found = 0;
     // counter function which finds the last reservation record! Can be found in init_dbs.c file
@@ -269,7 +274,13 @@ void displayRoom() {
 
     struct Room room;
     FILE *fp;
-    fp = fopen(roomsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate roomsdb file displayRoom()");
+        exit(127);
+    }
 
     Terminal term = tercon_init_rows_cols();
     displayRoomInfoLogo();
@@ -302,7 +313,13 @@ void displayAllRooms() {
 
     struct Room room;
     FILE *fp;
-    fp = fopen(roomsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate roomsdb file displayAllRooms()");
+        exit(127);
+    }
     
     Terminal term = tercon_init_rows_cols();
     displayAllRoomsLogo();
@@ -327,7 +344,13 @@ void displayGuest() {
 
     struct Guest guest;
     FILE *fp;
-    fp = fopen(guestsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file displayGuest()");
+        exit(127);
+    }
 
     Terminal term = tercon_init_rows_cols();
     displayGuestInfoLogo();
@@ -372,7 +395,13 @@ void displayAllGuests() {
 
     struct Guest guest;
     FILE *fp;
-    fp = fopen(guestsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file displayAllGuests()");
+        exit(127);
+    }
     
     Terminal term = tercon_init_rows_cols();
     displayAllGuestsLogo();
@@ -453,10 +482,16 @@ void modify() {
 void displayReservations() {
 
     struct Reservation res;
-    Terminal term = tercon_init_rows_cols();
     FILE *fp;
-    fp = fopen(reservationsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate reservationsdb file displayReservations()");
+        exit(127);
+    }
 
+    Terminal term = tercon_init_rows_cols();
     displayAllReservationsLogo();
 
     while(1) {
@@ -478,10 +513,16 @@ void displayReservations() {
 void deleteReservation() {
 
     struct Reservation res;
-    Terminal term = tercon_init_rows_cols();
     FILE *fp;
-    fp = fopen(reservationsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate reservationsdb file deleteReservation()");
+        exit(127);
+    }
 
+    Terminal term = tercon_init_rows_cols();
     displayDeleteResLogo();
     printf(ANSI_MOVE_CURSOR_COL "Enter Reservation's id you want to delete: ", (term.columns - 43) / 2);
     int res_id = getnuminput(6, true);
@@ -545,12 +586,17 @@ void deleteReservation() {
 void displayAnnuallyAvailabillity() {
 
     struct Day day, *st_arr;
-    Terminal term = tercon_init_rows_cols();
     st_arr = malloc(sizeof(struct Day));
-    
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file displayAnnuallyAvailabillity()");
+        exit(127);
+    }
 
+    Terminal term = tercon_init_rows_cols();
     int input_year;
     char str_year[5];
 

@@ -3,6 +3,7 @@
 *********************/
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 /*********************
  * Global constants 
@@ -24,12 +25,19 @@
 
 #include "header_files/reserve.h"
 #include "header_files/display.h"
+#include "header_files/joins.h"
 
 int checkFromDate(struct Reservation res) {
 
     struct Day day;
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file checkFromDate()");
+        exit(127);
+    }
 
     Terminal term = tercon_init_rows_cols();
 
@@ -48,6 +56,7 @@ int checkFromDate(struct Reservation res) {
                 if(day.room_id[i] == res.room.id) {
                     tercon_clear_error_log();
                     printf(ANSI_COLOR_RED "\x1b[%d;%dHRoom is already reserved for this date: %s\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 50) / 2, day.date);
+                    fclose(fp);
                     return 1;
                 }
             }
@@ -70,7 +79,13 @@ int checkAllDates(struct Reservation res) {
 
     struct Day day;
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file checkFromDate()");
+        exit(127);
+    }
 
     Terminal term = tercon_init_rows_cols();
 
@@ -97,6 +112,7 @@ int checkAllDates(struct Reservation res) {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHCheck the dates please.Be sure that this day exists in this year.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 64) / 2);
         printf(ANSI_COLOR_RED "\x1b[%d;%dHFor example 29 of February or 31 of November.Error: checkAllDates()!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 68) / 2);
+        fclose(fp);
         return -1;
     }
     // Go to the beggining of the file and readall data again
@@ -145,8 +161,17 @@ void applyReservation(int start, int finish, int res_room_id) {
 
     struct Day day;
     FILE *fp, *fp1;
-    fp = fopen(daysdb, "rb");
-    fp1 = fopen(journal_main, "wb");
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_main);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file checkFromDate()");
+        remove(journal_path);
+        exit(127);
+    }
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -163,8 +188,8 @@ void applyReservation(int start, int finish, int res_room_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp = fopen(daysdb, "wb");
-    fp1 = fopen(journal_main, "rb");
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp1);
@@ -176,6 +201,6 @@ void applyReservation(int start, int finish, int res_room_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_main);
+    remove(journal_path);
 }
 

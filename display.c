@@ -31,6 +31,7 @@
 
 #include "header_files/tercon.h"
 #include "header_files/display.h"
+#include "header_files/joins.h"
 
 void appLogo() {
     Terminal term = tercon_init_rows_cols();
@@ -400,9 +401,14 @@ void displayRoomAnnuallyReservationsLogo() {
 void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
 
     struct Day day;
-
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file displayRoomAnnuallyReservationInfo()");
+        exit(127);
+    }
     
     int days_counter = 0;
     char str_year[5];
@@ -452,13 +458,21 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
 
     struct Day day;
     struct Room room;
-
     FILE *fp, *fp1, *fp2;
-    fp = fopen(daysdb, "rb");
-    fp1 = fopen(roomsdb, "rb");
-    fp2 = fopen(output, "w");
-    //fp2 = fopen("/dev/pts/1", "w");
-    
+    char abs_path_a[PATH_LENGTH];
+    char abs_path_b[PATH_LENGTH];
+    char abs_path_c[PATH_LENGTH];
+    joinHome(abs_path_a, daysdb);
+    joinHome(abs_path_b, roomsdb);
+    joinHome(abs_path_c, output);
+    fp = fopen(abs_path_a, "rb");
+    fp1 = fopen(abs_path_b, "rb");
+    fp2 = fopen(abs_path_c, "w");
+    if (fp == NULL || fp1 == NULL) {
+        perror("Could not locate file displayAllRoomsAnnuallyReservationsInfo()");
+        exit(127);
+    }
+
     int days_counter = 0;
     char str_year[5];
     sprintf(str_year, "%d", input_year);

@@ -2,6 +2,7 @@
 * Build in libraries
 *********************/
 #include <stdio.h>
+#include <stdlib.h>
 #include<stdbool.h>
 /*********************
  * Global constants 
@@ -24,15 +25,18 @@
 #include "structures/reservations.h"
 
 #include "header_files/init_dbs.h"
+#include "header_files/joins.h"
 
 void createDaysDb() {
 
-    FILE *fp;
-    fp = fopen(daysdb, "rb");
     struct Day day;
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
 
     if(fp == NULL) {
-        fp = fopen(daysdb, "wb");
+        fp = fopen(abs_path, "wb");
         printf("Creating days Database.Please wait.\n");
 
         int year;
@@ -85,11 +89,11 @@ void createDaysDb() {
                 }
             }
         }
-        fclose(fp);
         printf("Days database successfully created!\n");
     } else {
         printf("Days database already exists.\n");
     }
+    fclose(fp);
 }
 
 int get_first_day(int year) {
@@ -101,12 +105,14 @@ int get_first_day(int year) {
 
 void createRoomsDb() {
 
-    FILE *fp;
-    fp = fopen(roomsdb, "rb");
     struct Room room;
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
 
     if(fp == NULL) {
-        fp = fopen(roomsdb, "wb");
+        fp = fopen(abs_path, "wb");
         printf("Creating rooms Database.Please wait.\n");
         for(int i = 1; i <= TOTAL_ROOMS; i++) {
             room.id = i;
@@ -116,21 +122,23 @@ void createRoomsDb() {
             room.price = 0;
             fwrite(&room, sizeof(room), 1, fp);
         }
-        fclose(fp);
         printf("Rooms database successfully created!\n");
     } else {
         printf("Rooms database already exists.\n");
     }
+    fclose(fp);
 }
 
 void createReservationsDb() {
 
-    FILE *fp;
-    fp = fopen(reservationsdb, "rb");
     struct Reservation reservation;
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "rb");
 
     if(fp == NULL) {
-        fp = fopen(reservationsdb, "wb");
+        fp = fopen(abs_path, "wb");
         printf("Creating Reservations Database.Please wait.\n");
         
         reservation.id = 0;
@@ -140,21 +148,23 @@ void createReservationsDb() {
         sprintf(reservation.to_date, "%s", "None");
         fwrite(&reservation, sizeof(reservation), 1, fp);
 
-        fclose(fp);
         printf("Reservations database successfully created!\n");
     } else {
         printf("Reservations database already exists.\n");
     }
+    fclose(fp);
 }
 
 void createGuestsDb() {
 
-    FILE *fp;
-    fp = fopen(guestsdb, "rb");
     struct Guest guest;
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
 
     if(fp == NULL) {
-        fp = fopen(guestsdb, "wb");
+        fp = fopen(abs_path, "wb");
         printf("Creating Guests Database.Please wait.\n");
         
         guest.id = 0;
@@ -165,19 +175,24 @@ void createGuestsDb() {
         guest.repeated_guest = false;
         fwrite(&guest, sizeof(guest), 1, fp);
 
-        fclose(fp);
         printf("Guests database successfully created!\n");
     } else {
         printf("Guests database already exists.\n");
     }
+    fclose(fp);
 }
 
 int getNextReservationEntry() {
 
     struct Reservation reservation;
     FILE *fp;
-    fp = fopen(reservationsdb, "rb");
-    
+    char abs_path[200];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate reservationsdb file getNextReservationEntry()");
+        exit(127);
+    } 
     // counter to find the last reservation record!
     int next_id = 0;
     while(1) {
@@ -196,8 +211,13 @@ int getNextGuestEntry() {
 
     struct Guest guest;
     FILE *fp;
-    fp = fopen(guestsdb, "rb");
-    
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file getNextGuestEntry()");
+        exit(127);
+    }
     // counter to find the last reservation record!
     int next_id = 0;
     while(1) {

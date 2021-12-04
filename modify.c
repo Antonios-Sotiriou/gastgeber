@@ -30,12 +30,19 @@
 #include "header_files/modify.h"
 #include "header_files/userinput.h"
 #include "header_files/display.h"
+#include "header_files/joins.h"
 
 int modifyRoom() {
 
     struct Room room, rooms[TOTAL_ROOMS];
     FILE *fp;
-    fp = fopen(roomsdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate roomsdb file modifyRoom()");
+        exit(127);
+    }
 
     int index = 0;
     while(1) {
@@ -241,7 +248,10 @@ int applyRoomModification(struct Room rooms[]) {
     char y = getc(stdin);
     if(y == 'Y' || y == 'y') {
         FILE *fp;
-        fp = fopen(roomsdb, "wb");
+        char abs_path[PATH_LENGTH];
+        joinHome(abs_path, roomsdb);
+        fp = fopen(abs_path, "wb");
+
         for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
             fwrite(&rooms[i], sizeof(rooms[i]), 1, fp);
         }
@@ -264,10 +274,16 @@ int applyRoomModification(struct Room rooms[]) {
 int modifyGuest() {
 
     struct Guest guest, *guests_par;
-    FILE *fp;
-    fp = fopen(guestsdb, "rb");
     // We creating a dynamically allocated array to store guests because their number is dynamic.
     guests_par = malloc(sizeof(struct Guest));
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file modifyGuest()");
+        exit(127);
+    }
 
     int index = 0, dynamic_inc = 2;
     while(1) {
@@ -463,7 +479,10 @@ int applyGuestModification (struct Guest guests[], int arr_len) {
     char y = getc(stdin);
     if(y == 'Y' || y == 'y') {
         FILE *fp;
-        fp = fopen(guestsdb, "wb");
+        char abs_path[PATH_LENGTH];
+        joinHome(abs_path, guestsdb);
+        fp = fopen(abs_path, "wb");
+
         for (int i = 0; i <= arr_len; i++) {
             fwrite(&guests[i], sizeof(guests[i]), 1, fp);
         }
