@@ -20,8 +20,8 @@ void buffer_clear() {
     char c;
     while((c = getc(stdin) != '\n') && c != '\t');
 }
-/* Get an Integer of length [ max_len ].
-   If allow [ spaces = true ], allow spaces at start, middle or between.
+/* Get an Unsigned Integer of length [ max_len ].
+   If [ spaces = true ], allow spaces at start, middle or between.
    Returns the Integer without spaces. */
 int getnuminput(int max_len, bool spaces) {
 

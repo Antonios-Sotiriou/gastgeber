@@ -470,6 +470,7 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
     fp2 = fopen(abs_path_c, "w");
     if (fp == NULL || fp1 == NULL) {
         perror("Could not locate file displayAllRoomsAnnuallyReservationsInfo()");
+        fclose(fp2);
         exit(127);
     }
 

@@ -43,6 +43,7 @@
 #include "header_files/joins.h"
 
 /* functionality functions */
+void gastgeber();
 void reserve();
 void displayRoom();
 void displayAllRooms();
@@ -67,9 +68,14 @@ int main(int argc, char *argv[]) {
         printf(ANSI_BLINK_SLOW "\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF);
         buffer_clear();
     }
+    gastgeber();
+
+    return 1;
+}
+
+void gastgeber() {
 
     int choice;
-
     while(1) {
         // All the functions that start with the word [ display ] and are not part of the following
         // [ switch ],can be found in display.c file.
@@ -119,13 +125,12 @@ int main(int argc, char *argv[]) {
         }
         free(positioning);
     }
-    return 1;
 }
 
 void reserve() {
     /****************************************************************
     * The function which handles the reservations.Checks the dates
-    * and room availability, and writing to the databases the guest
+    * and room availability, writes to the databases the guest
     * and everythink else if they meet the requirements.
     *         Needs to be simplyfied in the future!!!
     ****************************************************************/
@@ -143,6 +148,7 @@ void reserve() {
     int num_of_days = 0;
     int room_id;
     int found = 0;
+    int error = 0;
     // counter function which finds the last reservation record! Can be found in init_dbs.c file
     int next_id = getNextReservationEntry();
 
@@ -150,10 +156,22 @@ void reserve() {
 
         printf("\x1b[%d;%dH  Enter Room ID(%d-%d): ", term.cursor_y, (term.columns - 51) / 2, 1, TOTAL_ROOMS); 
         term.cursor_y += 1;
-        room_id = getnuminput(5, true);
-        
-        if (room_id < 1 || room_id > TOTAL_ROOMS) {
+        room_id = getnuminput(5, false);
+
+        if ((room_id < 1 && room_id >= 0) || room_id > TOTAL_ROOMS) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
+            break;
+        } else if (room_id == -1) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+            error = 1;
+            break;
+        } else if (room_id == -2) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+            error = 2;
+            break;
+        } else if (room_id == -3) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+            error = 3;
             break;
         } else {
             reservation.id = next_id;
@@ -185,6 +203,10 @@ void reserve() {
                         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                         printf("\x1b[2K");
                         getc(stdin);
+                        continue;
+                    } else if (c == '\n' || c == '\t') {
+                        tercon_clear_lines(term.rows - 4, term.rows - 5);
+                        tercon_clear_error_log();
                         continue;
                     } else {
                         fclose(fp);
@@ -247,6 +269,10 @@ void reserve() {
                             getc(stdin);
                         }
                         continue;
+                    } else if (c == '\n' || c == '\t') {
+                        tercon_clear_lines(term.rows - 4, term.rows - 5);
+                        tercon_clear_error_log();
+                        continue;
                     } else {
                         fclose(fp);
                         return;
@@ -266,6 +292,9 @@ void reserve() {
     }
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF);
+    if (error) {
+        buffer_clear();
+    }
     buffer_clear();
     tercon_echo_on();
 }
@@ -286,11 +315,21 @@ void displayRoom() {
     displayRoomInfoLogo();
 
     int room_id; 
+    int error = 0;
     printf("\x1b[%d;%dHEnter Room ID(%d-%d): ", 13, (term.columns - 21) / 2, 1, TOTAL_ROOMS);  
     room_id = getnuminput(5, true);
         
-    if (room_id < 1 || room_id > TOTAL_ROOMS) {
+    if ((room_id < 1 && room_id >= 0) || room_id > TOTAL_ROOMS) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Room ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 16) / 2);
+    } else if (room_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        error = 1;
+    } else if (room_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        error = 2;
+    } else if (room_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        error = 3;
     } else {
         while(1) {
             fread(&room, sizeof(room), 1, fp);
@@ -305,6 +344,9 @@ void displayRoom() {
 
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    if (error) {
+        buffer_clear();
+    }
     buffer_clear();
     tercon_echo_on();
 }
@@ -357,16 +399,20 @@ void displayGuest() {
 
     int guest_id;
     int found = 0;
+    int error = 0;
     
     printf("\x1b[%d;%dHEnter Guest ID: ", 13, (term.columns - 16) / 2);  
     guest_id = getnuminput(8, true);
 
     if (guest_id == -1) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input length.Must be maximum 8 chars long.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 50) / 2);  
-    } else if (guest_id == 0 || guest_id == -2) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid Guest ID!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 17) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        error = 1;        
+    } else if (guest_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        error = 2;       
     } else if (guest_id == -3) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo input provided.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 17) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        error = 3;
     } else {
         while(found == 0) {
             fread(&guest, sizeof(guest), 1, fp);
@@ -380,13 +426,16 @@ void displayGuest() {
     }
     fclose(fp);
 
-    if(found == 0 && guest_id > 0) {
+    if(found == 0 && guest_id >= 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 33) / 2);
         printf(ANSI_COLOR_RED "\x1b[%d;%dHDisplay all guests with option 5 of main menu to check the Guests IDs.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 70) / 2);
     }
 
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    if (error) {
+        buffer_clear();
+    }
     buffer_clear();
     tercon_echo_on();
 }
@@ -527,19 +576,23 @@ void deleteReservation() {
     printf(ANSI_MOVE_CURSOR_COL "Enter Reservation's id you want to delete: ", (term.columns - 43) / 2);
     int res_id = getnuminput(6, true);
     int found = 0;
+    int error= 0;
 
     if (res_id == 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHThere is no Reservation with 0 ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2);
         found = 2;
     } else if (res_id == -1) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
-        found = 2;  
-    } else if (res_id == -2) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
         found = 2;
+        error = 1;
+    } else if (res_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        found = 2;
+        error = 2;
     } else if (res_id == -3) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        found = 2;   
+        found = 2;
+        error = 3;
     }
     while(found == 0) {
         fread(&res, sizeof(res), 1, fp);
@@ -555,7 +608,7 @@ void deleteReservation() {
                 getResDatesToDelete(res);
                 getc(stdin);
                 found = 1;
-            } else if (c == '\n' || c == ' ') {
+            } else if (c == '\n' || c == '\t') {
                 printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation deletion canceled." ANSI_COLOR_RESET, term.rows - 1, (term.columns - 30) / 2);
                 found = 2;
             } else {
@@ -566,7 +619,7 @@ void deleteReservation() {
         }
     }
     fclose(fp);
-    if(found == 0 && res_id != 0) {
+    if(found == 0 && res_id > 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Reservation found with this ID: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2, res_id);
     } else if(found == 1) {
         // Following function can be found in delete_reservation.c file.It deletes the reservation.
@@ -577,8 +630,8 @@ void deleteReservation() {
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
     buffer_clear();
-    if (res_id < 0) {
-        getc(stdin);
+    if (error) {
+        buffer_clear();
     }
     tercon_echo_on();
 }
