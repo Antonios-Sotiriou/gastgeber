@@ -149,6 +149,9 @@ int checkAllDates(struct Reservation res) {
             printf(ANSI_COLOR_GREEN "\x1b[%d;%dHReservation applied success.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 28) / 2);
             getc(stdin);
             return 0;
+        } else if (c == '\n' || c == '\t') {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation Canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
+            return -2;
         } else {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHReservation Canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
             getc(stdin);
@@ -169,6 +172,7 @@ void applyReservation(int start, int finish, int res_room_id) {
     fp1 = fopen(journal_path, "wb");
     if (fp == NULL) {
         perror("Could not locate daysdb file checkFromDate()");
+        fclose(fp1);
         remove(journal_path);
         exit(127);
     }

@@ -69,6 +69,7 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fp1 = fopen(journal_path, "wb");
     if (fp == NULL) {
         perror("Could not locate daysdb file deleteRoomFromDates()");
+        fclose(fp1);
         remove(journal_path);
         exit(127);
     }
@@ -116,6 +117,7 @@ void applyReservationDelete(int res_id) {
     fp1 = fopen(journal_path, "wb");
     if (fp == NULL) {
         perror("Could not locate reservationsdb file applyReservationDelete()");
+        fclose(fp1);
         remove(journal_path);
         exit(127);
     }
