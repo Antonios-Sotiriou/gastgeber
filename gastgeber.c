@@ -661,19 +661,18 @@ void displayAnnuallyAvailabillity() {
     int dynamic_inc = 1;
     int error = 0;
 
-    if((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
+    if((input_year < STARTING_YEAR && input_year >= 0) || input_year > FINISHING_YEAR) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHYear out of range: %d" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2, input_year);
         error = 1;
-        if (input_year == -1) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
-            error = 2;
-        } else if (input_year == -2) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax for letters or spaces!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 46) / 2);
-            error = 3;
-        } else if (input_year == -3) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-            error = 4;
-        }
+    } else if (input_year == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        error = 2;
+    } else if (input_year == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        error = 3;
+    } else if (input_year == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        error = 4;
     } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
         sprintf(str_year, "%d", input_year);
         while(1) {
@@ -689,16 +688,13 @@ void displayAnnuallyAvailabillity() {
                 dynamic_inc++;
             }
         }
-    } else if(input_year == 0) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHUndefined year parsing...!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
-        error = 5;
     }
     fclose(fp);
 
     tercon_echo_off();
     if (error) {
         printf(ANSI_BLINK_SLOW "\x1b[%d;%dHPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
-        if (error != 1 && error != 5) {
+        if (error > 1) {
             buffer_clear();
         }
     } else {
