@@ -483,18 +483,18 @@ void modify() {
         int error = 0;
         // This is the following cases return value.It will be probably usefull so it is wise to save it to case_rv variable.
         int case_rv = 0;
-        if (choice == -1) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+        if ((choice > 2 && choice < 20) || choice > 20) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
             error = 1;
+        }else if (choice == -1) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+            error = 2;
         } else if (choice == -2) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
-            error = 1;
+            error = 3;
         } else if (choice == -3) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
-            error = 1;
-        } else if ((choice > 2 && choice < 20) || choice > 20) {
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
-            error = 2;
+            error = 4;
         } else {
             // Switch case functions can be found with the given order in modify.c file.
             switch(choice) {
@@ -516,12 +516,12 @@ void modify() {
                     break;
             }
         }
-        if (error != 0) {
+        if (error) {
             tercon_echo_off();
             printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
             buffer_clear();
-            if (error == 1) {
-                getc(stdin);
+            if (error > 1) {
+                buffer_clear();
             }
             tercon_echo_on();
         }
@@ -581,18 +581,19 @@ void deleteReservation() {
     if (res_id == 0) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHThere is no Reservation with 0 ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 37) / 2);
         found = 2;
+        error = 1;
     } else if (res_id == -1) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
         found = 2;
-        error = 1;
+        error = 2;
     } else if (res_id == -2) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
         found = 2;
-        error = 2;
+        error = 3;
     } else if (res_id == -3) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         found = 2;
-        error = 3;
+        error = 4;
     }
     while(found == 0) {
         fread(&res, sizeof(res), 1, fp);
@@ -630,7 +631,7 @@ void deleteReservation() {
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
     buffer_clear();
-    if (error) {
+    if (error && error > 1) {
         buffer_clear();
     }
     tercon_echo_on();
@@ -709,44 +710,118 @@ void displayAnnuallyAvailabillity() {
 
 void displayRoomAnnuallyReservations() {
 
+    Terminal term = tercon_init_rows_cols();
     displayRoomAnnuallyReservationsLogo();
 
-    printf("Enter room ID you want to display: ");
-    int room_id = getInteger(48, 5);
-    if(room_id <= 0 || room_id > TOTAL_ROOMS) {
-        printf(ANSI_COLOR_RED "\nProvide a correct room ID.\nYou can check the room IDs from option 3 in main menu.\n\n" ANSI_COLOR_RESET);
+    printf(ANSI_MOVE_CURSOR_TO "Enter room ID you want to display: ", 13, (term.columns - 36) / 2);
+    int room_id = getnuminput(6, false);
+    int error = 0;
+    if(room_id == 0 || room_id > TOTAL_ROOMS) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a correct room ID.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 26) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHYou can check the room IDs from option 3 in main menu.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 54) / 2);
+        error = 1;
+    } else if (room_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        error = 2;
+    } else if (room_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        error = 3;
+    } else if (room_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        error = 4;
     } else {
-        printf("Room ID: %d\n", room_id);
-        printf("Enter which year you want to display: ");
-        int input_year = getInteger(48, 5);
-        if ((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
-            printf(ANSI_COLOR_RED "\nProvide a correct year.\nAre you sure year is in range of Software STARTING_YEAR - FINISHING_YEAR?\n\n" ANSI_COLOR_RESET);
+        printf(ANSI_MOVE_CURSOR_TO "Enter which year you want to display: ", 14, (term.columns - 38) / 2);
+        int input_year = getnuminput(6, false);
+        if ((input_year < STARTING_YEAR && input_year >= 0) || input_year > FINISHING_YEAR) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a correct year.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 23) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHAre you sure year is in range STARTING_YEAR - FINISHING_YEAR?\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 61) / 2);
+        } else if (input_year == -1) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+            error = 2;
+        } else if (input_year == -2) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+            error = 3;
+        } else if (input_year == -3) {
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+            error = 4;
         } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
-            printf("Year: %d\nDisplaying Room Annually Reservations...\n\n", input_year);
+            tercon_clear_lines(14, 13);
             displayRoomAnnuallyReservationsInfo(room_id, input_year);
         }
     }
 
+    tercon_echo_off();
+    printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
     buffer_clear();
-    printf("Press Enter to continue...");
+    if (error && error > 1) {
+        buffer_clear();
+    }
+    tercon_echo_on();
 }
 
 void displayAllRoomsAnnuallyReservations() {
 
-    displayAllRoomsAnnuallyReservationsLogo();
-
-    printf("Enter which year you want to display: ");
-    int input_year = getInteger(48, 5);
-
-    if ((input_year < STARTING_YEAR && input_year != 0) || input_year > FINISHING_YEAR) {
-        printf(ANSI_COLOR_RED "\nProvide a correct year.\nAre you sure year is in range of Software STARTING_YEAR - FINISHING_YEAR?\n\n" ANSI_COLOR_RESET);
-    } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
-        printf("Year: %d\nDisplaying Room Annually Reservations...\n\n", input_year);
-        displayAllRoomsAnnuallyReservationsInfo(input_year);
+    struct Room room, rooms_arr[TOTAL_ROOMS - 1];
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate file displayAllRoomsAnnuallyReservationsInfo()");
+        exit(127);
     }
 
+    Terminal term = tercon_init_rows_cols();
+    displayAllRoomsAnnuallyReservationsLogo();
+
+    printf(ANSI_MOVE_CURSOR_TO "Enter which year you want to display: ", 13, (term.columns - 38) / 2);
+    int input_year = getnuminput(6, false);
+    int error = 0;
+    int displaying = 0;
+
+    if ((input_year < STARTING_YEAR && input_year >= 0) || input_year > FINISHING_YEAR) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a correct year.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 23) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHAre you sure year is in range of STARTING_YEAR - FINISHING_YEAR?\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 64) / 2);
+        error = 1;
+    } else if (input_year == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        error = 2;
+    } else if (input_year == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        error = 3;
+    } else if (input_year == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        error = 4;
+    } else if(input_year >= STARTING_YEAR && input_year <= FINISHING_YEAR) {
+        int index = 0;
+        while(1) {
+            fread(&room, sizeof(room), 1, fp);
+            if(feof(fp)) {
+                break;
+            } else {
+                rooms_arr[index] = room;
+                index++;
+            }
+        }
+        fclose(fp);
+        displaying = 1;
+        displayAllRoomsAnnuallyReservationsInfo(rooms_arr, input_year);
+    }
+
+    tercon_echo_off();
+    if (displaying) {
+        printf(ANSI_BLINK_SLOW "\x1b[%dG\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
+    } else {
+        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+    }
     buffer_clear();
-    printf("Press Enter to continue...");
+    if (error) {
+        fclose(fp);
+        if (error > 1) {
+            buffer_clear();
+        }
+    }
+    tercon_echo_on();
 }
 
 void main_error() {
