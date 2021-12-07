@@ -394,12 +394,15 @@ void displayStr(char *str, int dis_len) {
 }
 void displayRoomAnnuallyReservationsLogo() {
     clear_scr();
-    printf("*************************************\n");
-    printf("*    Annually Room Reservations.    *\n");
-    printf("*************************************\n\n");   
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\           \x1b[32mRoom Annually Reservations\x1b[0m            /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);
+    displayErrorLog();
 }
 void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
 
+    Terminal term = tercon_init_rows_cols();
     struct Day day;
     FILE *fp;
     char abs_path[PATH_LENGTH];
@@ -414,16 +417,16 @@ void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
     char str_year[5];
     sprintf(str_year, "%d", input_year);
 
-    printf("Displaying Year %d\n", input_year);
-    printf("Room Availabillity for Room ID: %d\n", room_id);
-
+    printf(ANSI_MOVE_CURSOR_TO "Displaying Year %d\n", 13, (term.columns - 20) / 2, input_year);
+    printf(ANSI_MOVE_CURSOR_TO "Room Availabillity for Room ID: %d\n", 14, (term.columns - 36) / 2, room_id);
     while(1) {
         fread(&day, sizeof(day), 1, fp);
         if(feof(fp)) {
             break;
         } else if(strcmp(day.year, str_year) == 0) {
             if(strcmp(day.day, "01") == 0) {
-                printf("\n|");
+                printf("\n");
+                printf(ANSI_MOVE_CURSOR_COL "|", (term.columns - 106) / 2);
                 displayStr(day.month_name, 11);
                 printf("|");
             }
@@ -446,31 +449,30 @@ void displayRoomAnnuallyReservationsInfo(int room_id, int input_year) {
     }
     fclose(fp);
 
-    printf("\n\nDays counter: %d\n\n", days_counter);
+    printf("\n\n");
+    printf(ANSI_MOVE_CURSOR_COL "Days counter: %d\n", (term.columns - 18) / 2, days_counter);
 }
 void displayAllRoomsAnnuallyReservationsLogo() {
     clear_scr();
-    printf("*********************************************\n");
-    printf("*    Annually Reservations for all Rooms    *\n");
-    printf("*********************************************\n\n");   
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\         \x1b[32mAll Rooms Annually Reservations\x1b[0m         /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);
+    displayErrorLog();
 }
-void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
+void displayAllRoomsAnnuallyReservationsInfo(struct Room rooms_arr[], int input_year) {
 
     struct Day day;
-    struct Room room;
-    FILE *fp, *fp1, *fp2;
+    FILE *fp, *fp1;
     char abs_path_a[PATH_LENGTH];
     char abs_path_b[PATH_LENGTH];
-    char abs_path_c[PATH_LENGTH];
     joinHome(abs_path_a, daysdb);
-    joinHome(abs_path_b, roomsdb);
-    joinHome(abs_path_c, output);
+    joinHome(abs_path_b, output);
     fp = fopen(abs_path_a, "rb");
-    fp1 = fopen(abs_path_b, "rb");
-    fp2 = fopen(abs_path_c, "w");
-    if (fp == NULL || fp1 == NULL) {
+    fp1 = fopen(abs_path_b, "w");
+    if (fp == NULL) {
         perror("Could not locate file displayAllRoomsAnnuallyReservationsInfo()");
-        fclose(fp2);
+        fclose(fp1);
         exit(127);
     }
 
@@ -478,23 +480,18 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
     char str_year[5];
     sprintf(str_year, "%d", input_year);
 
+    Terminal term = tercon_init_rows_cols();
     printf("Displaying Year %d\n", input_year);
-    fprintf(fp2, "Displaying Year %d\n", input_year);
+    fprintf(fp1, "Displaying Year %d\n", input_year);
     printf("|  Room IDs |");
-    fprintf(fp2, "|  Room IDs |");
+    fprintf(fp1, "|  Room IDs |");
 
-    while(1) {
-        fread(&room, sizeof(room), 1, fp1);
-        if(feof(fp1)) {
-            break;
-        } else {
-            displayInt(room.id, 5);
-            printf("|");
-            fprintf(fp2, " %3d ", room.id);
-            fprintf(fp2, "|");
-        }
+    for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
+        displayInt(rooms_arr[i].id, 5);
+        printf("|");
+        fprintf(fp1, " %3d ", rooms_arr[i].id);
+        fprintf(fp1, "|");
     }
-    fclose(fp1);
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -503,36 +500,36 @@ void displayAllRoomsAnnuallyReservationsInfo(int input_year) {
         } else if(strcmp(day.year, str_year) == 0) {
             if(strcmp(day.day, "01") == 0) {
                 printf("\n|");
-                fprintf(fp2, "\n|");
+                fprintf(fp1, "\n|");
                 displayStr(day.month_name, 11);
-                fprintf(fp2, " %9s ", day.month_name);
+                fprintf(fp1, " %9s ", day.month_name);
                 printf("|");
-                fprintf(fp2, "|");
+                fprintf(fp1, "|");
             }
             printf("\n");
-            fprintf(fp2, "\n");
+            fprintf(fp1, "\n");
             printf("|     %s    |", day.day);
-            fprintf(fp2, "|     %2s    |", day.day);
+            fprintf(fp1, "|     %2s    |", day.day);
             days_counter++;
             for(int i = 1; i <= TOTAL_ROOMS; i++) {
                 if(day.room_id[i] > 0 && day.room_id[i] <= TOTAL_ROOMS) {
                     printf(" ");
-                    fprintf(fp2, " ");
+                    fprintf(fp1, " ");
                     printf(ANSI_COLOR_GREEN_BG " X " ANSI_COLOR_RESET);
-                    fprintf(fp2, " X ");
+                    fprintf(fp1, " X ");
                     printf(" |");
-                    fprintf(fp2, " |");
+                    fprintf(fp1, " |");
                 } else {
                     printf("     |");
-                    fprintf(fp2, "     |");
+                    fprintf(fp1, "     |");
                 }
             }
         }
     }
     fclose(fp);
-    fclose(fp2);
+    fclose(fp1);
 
-    printf("\n\nDays counter: %d\n\n", days_counter);
+    printf(ANSI_MOVE_CURSOR_COL "Days counter: %d\n", (term.columns - 18) / 2, days_counter);
 }
 
 void displayErrorLog() {

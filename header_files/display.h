@@ -28,7 +28,7 @@ void displayRoomsPerDay(struct Day st_arr[], int i);
 void displayRoomAnnuallyReservationsLogo();
 void displayRoomAnnuallyReservationsInfo(int room_id, int input_year);
 void displayAllRoomsAnnuallyReservationsLogo();
-void displayAllRoomsAnnuallyReservationsInfo(int input_year);
+void displayAllRoomsAnnuallyReservationsInfo(struct Room rooms_arr[], int input_year);
 /* Global Display functions */
 void displayInt(int id, int dis_len);
 void displayStr(char *str, int dis_len);
