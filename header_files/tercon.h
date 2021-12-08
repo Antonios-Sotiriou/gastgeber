@@ -21,6 +21,8 @@
 #define ANSI_MOVE_CURSOR_TO "\x1b[%d;%dH"
 #define ANSI_MOVE_CURSOR_COL "\x1b[%dG" // Move cursor to column
 #define ANSI_ERASE_LINE "\x1b[2K" // from cursor position and after
+#define ANSI_MAXIMIZE "\x1b[10;1t"
+#define ANSI_MINIMIZE "\x1b[10;2t"
 
 typedef struct {
     int rows;

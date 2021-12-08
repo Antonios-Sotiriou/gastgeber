@@ -67,22 +67,25 @@ int modifyRoomPanel(struct Room rooms[]) {
 
     Terminal term = tercon_init_rows_cols();
 
-    printf(ANSI_MOVE_CURSOR_TO "Enter room ID you want to modify: ", 14, (term.columns - 34) / 2);
-    int room_id = getInteger(48, 4);
+    printf(ANSI_MOVE_CURSOR_TO "Enter room ID you want to modify: ", 13, (term.columns - 34) / 2);
+    int room_id = getnuminput(6, false);
     int modified = 0;
 
     if(room_id > TOTAL_ROOMS) {
         printf(ANSI_COLOR_RED "\x1b[%d;%dHRoom id out of range.\n"ANSI_COLOR_RESET, term.rows - 2, (term.columns - 20) / 2);
         printf(ANSI_COLOR_RED "\x1b[%d;%dHDisplay all rooms with option 3 of main menu to see the IDs.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 60) / 2);
         return 1;
+    } else if (room_id == 0) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo room ID provided.Zero ID!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 28) / 2);
+        return 1;
     } else if (room_id == -1) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
         return 2;
     } else if (room_id == -2) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHPlease check the syntax!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
         return 3;
-    } else if (room_id == 0) {
-        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Room ID provided!\n"ANSI_COLOR_RESET, term.rows - 1, (term.columns - 20) / 2);
+    } else if (room_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
         return 4;
     } else {
         for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
@@ -95,7 +98,8 @@ int modifyRoomPanel(struct Room rooms[]) {
                 int prc;
                 // check which resourses must be freed
                 while (modified == 0) {
-                    
+                    // Get window attributes again here in case user resizes.
+                    term = tercon_init_rows_cols();
                     displayModifyRoomChoices(rooms[i]);
                     int choice = getnuminput(4, true);
                     int error = 0;
@@ -113,7 +117,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                         printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
                         error = 4;
                     } else {
-                        tercon_clear_lines(26, 20);
+                        tercon_clear_lines(26, 19);
                         switch(choice) {
                             case 1 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
@@ -255,19 +259,18 @@ int applyRoomModification(struct Room rooms[]) {
         for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
             fwrite(&rooms[i], sizeof(rooms[i]), 1, fp);
         }
-        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
-        getc(stdin);
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
         fclose(fp);
         return 0;
     } else if (y == '\n' || y == '\t') {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        return 9;
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
     } else {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        getc(stdin);
-        return 9;
+        return 6;
     }
 }
 
@@ -318,16 +321,21 @@ int modifyGuest() {
 int modifyGuestPanel(struct Guest guests[], int arr_len) {
 
     Terminal term = tercon_init_rows_cols();
-    printf(ANSI_MOVE_CURSOR_TO "Enter Guest ID you want to modify: ", 14, (term.columns - 40) / 2);
-    int guest_id = getInteger(48, 6);
+    printf(ANSI_MOVE_CURSOR_TO "Enter Guest ID you want to modify: ", 13, (term.columns - 40) / 2);
+    int guest_id = getnuminput(6, false);
 
     if (guest_id == 0) {
         printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest with 0 ID exists!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
-        tercon_echo_off();
-        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
-        buffer_clear();
-        tercon_echo_on();
         return 1;
+    } else if (guest_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        return 2;
+    } else if (guest_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        return 3;
+    } else if (guest_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 4;
     }
 
     int found = 0;
@@ -340,6 +348,8 @@ int modifyGuestPanel(struct Guest guests[], int arr_len) {
             char *guest_last_name;
             char *guest_nationality;
             while(!modified) {
+                // Get window attributes again here in case user resizes.
+                term = tercon_init_rows_cols();
                 // Display guest info here.
                 displayModifyGuestChoices(guests[i]);
 
@@ -359,7 +369,7 @@ int modifyGuestPanel(struct Guest guests[], int arr_len) {
                     printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
                     error = 4;
                 } else {
-                    tercon_clear_lines(26, 20);
+                    tercon_clear_lines(26, 19);
                     switch(choice) {
                         case 1 :
                             printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest First Name: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
@@ -464,11 +474,8 @@ int modifyGuestPanel(struct Guest guests[], int arr_len) {
         return result;
     } else {
         printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 33) / 2);
-        tercon_echo_off();
-        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
-        buffer_clear();
-        tercon_echo_on();
-        return 2;
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
     }
 }
 
@@ -487,18 +494,17 @@ int applyGuestModification (struct Guest guests[], int arr_len) {
             fwrite(&guests[i], sizeof(guests[i]), 1, fp);
         }
         printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
-        getc(stdin);
         fclose(fp);
         return 0;
     } else if (y == '\n' || y == '\t') {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        return 9;
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
     } else {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
-        getc(stdin);
-        return 9;
+        return 6;
     }
 }
 
