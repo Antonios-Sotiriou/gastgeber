@@ -3,7 +3,7 @@
 
 /* Display functions */
 void appLogo();
-char *displayMainLogo();
+void displayMainLogo();
 Terminal displayRoomReservationLogo();
 void displayPreviousStep(struct Reservation res);
 void displayRoomInfoLogo();
