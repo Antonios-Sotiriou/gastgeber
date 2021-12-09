@@ -101,7 +101,6 @@ void gastgeber() {
         // All the [ switch ] functions can be found in this file with this order.
             switch(choice) {
                 case 1 : reserve();
-                    printf("Reached this point!\n");
                     break;
                 case 2 : displayRoom();
                     break;
@@ -219,7 +218,7 @@ void reserve() {
                         tercon_clear_error_log(reservation);
                         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                         printf("\x1b[2K");
-                        getc(stdin);
+                        buffer_clear();
                         continue;
                     } else if (c == '\n' || c == '\t') {
                         tercon_clear_lines(term.rows - 4, term.rows - 5);
@@ -277,13 +276,13 @@ void reserve() {
                             displayPreviousStep(reservation);
                             num_of_days = 0;
                             repeated = true;
-                            getc(stdin);
+                            buffer_clear();
                         } else {
                             tercon_clear_error_log();
                             tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                             printf("\x1b[2K");
                             repeated = false;
-                            getc(stdin);
+                            buffer_clear();
                         }
                         continue;
                     } else if (c == '\n' || c == '\t') {
