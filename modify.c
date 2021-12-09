@@ -144,7 +144,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                 break;
                             case 3 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
-                                cap = getInteger(48, 2);
+                                cap = getnuminput(2, false);
                                 if (cap != 0) {
                                     rooms[i].capacity = cap;
                                     modified = 1;
@@ -155,7 +155,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                 break;
                             case 4 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                prc = getInteger(48, 10);
+                                prc = getnuminput(6, false);
                                 if (prc != 0) {
                                     rooms[i].price = prc;
                                     modified = 1;
@@ -172,11 +172,11 @@ int modifyRoomPanel(struct Room rooms[]) {
                                     room_type = getSpString(20);
                                     if(room_type != 0) {
                                         printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
-                                        cap = getInteger(48, 2);
+                                        cap = getnuminput(2, false);
                                         if (cap != 0) {
                                             /********************* Must be implement a float function here for prices *****************************/
                                             printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                            prc = getInteger(48, 10);
+                                            prc = getnuminput(6, false);
                                             if (prc != 0) {
                                                 sprintf(rooms[i].name, "%s", room_name);
                                                 sprintf(rooms[i].type, "%s", room_type);

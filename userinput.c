@@ -58,6 +58,7 @@ int getnuminput(int max_len, bool spaces) {
 
     return atoi(cleared_num);
 }
+/* Accepts date input in form dd/mm/yyyy */
 int getformatedDate(char *room_date) { 
 
     char input[40];
@@ -124,35 +125,7 @@ int getformatedDate(char *room_date) {
     sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
     return 1;
 }
-/* Get integer */
-int getInteger(int str_len, int int_len) {
-
-    /**************************************
-     * Return a number of the provided int_len.To avoid input overflow give
-     * always a str_len a little bigger than int_len so we can also check if
-     * user input exceeds the required int_len.
-     * ************************************/
-    
-    int user_input = 0;
-    char str_input[str_len + 1];
-
-    fgets(str_input, sizeof(str_input), stdin);
-
-    if(strlen(str_input) - 1 >= int_len) {
-        // Invalid number length.
-        return -1;
-    } else {
-        for(int i = 0; i <= strlen(str_input) - 1; i++) {
-            if(str_input[i] >= 48 && str_input[i] <= 57) {
-                user_input = user_input * 10 + str_input[i] - '0';
-            } else if (str_input[i] != '\n') {
-                // Wrong syntax.User provided also spaces or other symbols.
-                return -2;
-            }
-        }
-    }
-    return user_input;  
-}
+/* Accepts a string of length [str_len] without spaces at start, end or between. */
 char* getString(int str_len) {
 
     /**********************************************************************
@@ -191,6 +164,7 @@ char* getString(int str_len) {
         return cleaned_str;
     }
 }
+/* Accepts a string of length [str_len] and allow spaces. */
 char* getSpString(int str_len) {
 
     /**********************************************************************
@@ -226,32 +200,4 @@ char* getSpString(int str_len) {
         return cleaned_str;
     }
 }
-/*
-int getnuminput(int max_len) {
-
-    char input[48];
-    char cleared_num[48];
-
-    fgets(input, sizeof(input), stdin);
-
-    if(strlen(input) - 1 > max_len) {
-        printf(ANSI_COLOR_RED "\nInvalid number length!\n" ANSI_COLOR_RESET);
-        return 0;
-    }
-    for(int i = 0, d = 0; i <= strlen(input) - 1; i++) {
-        // CHECKING FOR ALPHABET
-        if ((input[i] >= 65 && input[i] <= 90) || (input[i] >= 97 && input[i] <= 122)) {
-            return 0;
-        // CHECKING FOR DIGITS
-        } else if (input[i] >= 48 && input[i] <= 57) {
-            cleared_num[d] = input[i];
-            d++;
-        // OTHERWISE SPECIAL CHARACTER
-        } else {
-            continue;
-        }
-    }
-    return atoi(cleared_num);
-}
-*/
 
