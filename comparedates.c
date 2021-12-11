@@ -14,7 +14,7 @@
  * My own libraries, collection of functions and structs
  ******************************************************/
 #include "header_files/comparedates.h"
-
+/* Checks from_date and to_date if valid to each other and to date. */
 int compareDates(char *from_date, char *to_date) {
 
     Terminal term = tercon_init_rows_cols();

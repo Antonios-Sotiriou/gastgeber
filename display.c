@@ -32,7 +32,6 @@
 #include "header_files/tercon.h"
 #include "header_files/display.h"
 #include "header_files/joins.h"
-
 void appLogo() {
     Terminal term = tercon_init_rows_cols();
     printf("\x1b[%d;%dH***************************************************\n", 1, (term.columns - 51) / 2);
@@ -45,7 +44,6 @@ void appLogo() {
     printf("\x1b[%d;%dH_________|       \\___\\______|  |___|     Software\n", 8, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH***************************************************\n", 9, (term.columns - 51) / 2);
 }
-
 void displayMainLogo() {
     clear_scr();
     Terminal term = tercon_init_rows_cols();
@@ -78,7 +76,7 @@ Terminal displayRoomReservationLogo() {
 }
 void displayPreviousStep(struct Reservation res) {
     // Importand function to be used in reserve() primary function.Redisplays previous page 
-    // if the user received a < room is already received for NUM of days > error.Error days must be
+    // if the user received a "room is already received for NUM of days" error.Error days must be
     // more than 2 to use this function.For less days is not needed because terminal isn't getting messy. 
     clear_scr();
     Terminal term = tercon_init_rows_cols();

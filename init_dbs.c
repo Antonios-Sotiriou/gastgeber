@@ -26,7 +26,7 @@
 
 #include "header_files/init_dbs.h"
 #include "header_files/joins.h"
-
+/* Creates the Days Database */
 void createDaysDb() {
 
     struct Day day;
@@ -95,14 +95,14 @@ void createDaysDb() {
     }
     fclose(fp);
 }
-
+/* Finds what day is the first day of a given year. */
 int get_first_day(int year) {
 
     int day;
     day = (((year - 1) * 365) + ((year - 1) / 4) - ((year - 1) / 100) + ((year) / 400) + 1) % 7;
     return day;
 }
-
+/* Creates the Rooms Database */
 void createRoomsDb() {
 
     struct Room room;
@@ -128,7 +128,7 @@ void createRoomsDb() {
     }
     fclose(fp);
 }
-
+/* Creates the Reservations Database */
 void createReservationsDb() {
 
     struct Reservation reservation;
@@ -154,7 +154,7 @@ void createReservationsDb() {
     }
     fclose(fp);
 }
-
+/* Creates the Guests Database */
 void createGuestsDb() {
 
     struct Guest guest;
@@ -181,7 +181,8 @@ void createGuestsDb() {
     }
     fclose(fp);
 }
-
+/* Returns a number which is greater by 1 than the last reservation ID.
+    This number can be given as ID to the next applied reservation. */
 int getNextReservationEntry() {
 
     struct Reservation reservation;
@@ -206,7 +207,8 @@ int getNextReservationEntry() {
     fclose(fp);
     return next_id;
 }
-
+/* Returns a number which is greater by 1 than the last guest ID.
+    This number can be given as ID to the next applied guest. */
 int getNextGuestEntry() {
 
     struct Guest guest;

@@ -26,7 +26,8 @@
 #include "header_files/reserve.h"
 #include "header_files/display.h"
 #include "header_files/joins.h"
-
+/* Checks if Room is reserved for res.from_date.
+    Checks also if res.from_date is valid.  */
 int checkFromDate(struct Reservation res) {
 
     struct Day day;
@@ -74,7 +75,8 @@ int checkFromDate(struct Reservation res) {
     }
     return 0;
 }
-
+/* Checks if room is reserved for any of the days between res.from_date and res.to_date.
+    Also checks if dates are valid. */
 int checkAllDates(struct Reservation res) {
 
     struct Day day;
@@ -159,7 +161,7 @@ int checkAllDates(struct Reservation res) {
         }
     }
 }
-
+/* Applies the reservation by adding res_room_id in dates Database from [ start ] day until [ finish ] day. */
 void applyReservation(int start, int finish, int res_room_id) {
 
     struct Day day;
