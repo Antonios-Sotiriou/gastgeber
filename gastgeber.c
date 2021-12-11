@@ -231,7 +231,7 @@ void reserve() {
                 }
             }
             int to_date = 0;
-            // reapeated here identifies in the user tried to supplied to_date more than 1 time.If so we take actions accordingly.
+            // repeated here identifies in the user tried to supplied to_date more than 1 time.If so we take actions accordingly.
             bool repeated = false;
             while(to_date == 0) {
                 if (!repeated) {

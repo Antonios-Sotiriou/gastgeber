@@ -31,7 +31,7 @@
 #include "header_files/userinput.h"
 #include "header_files/display.h"
 #include "header_files/joins.h"
-
+/* Creates an all rooms struct array and starts the modify room functions algorithm. */
 int modifyRoom() {
 
     struct Room room, rooms[TOTAL_ROOMS];
@@ -62,7 +62,7 @@ int modifyRoom() {
 
     return result;
 }
-
+/* Displays options and manages modification for spesific room of rooms array. */
 int modifyRoomPanel(struct Room rooms[]) {
 
     Terminal term = tercon_init_rows_cols();
@@ -244,7 +244,7 @@ int modifyRoomPanel(struct Room rooms[]) {
     // return 10 here means Unmodified
     return 10;
 }
-
+/* Applies room modification by writing the rooms array to Database. */
 int applyRoomModification(struct Room rooms[]) {
 
     Terminal term = tercon_init_rows_cols();
@@ -273,7 +273,7 @@ int applyRoomModification(struct Room rooms[]) {
         return 6;
     }
 }
-
+/* Creates an all guests Dynamically allocated struct array and starts the modify guest functions algorithm. */
 int modifyGuest() {
 
     struct Guest guest, *guests_par;
@@ -316,8 +316,7 @@ int modifyGuest() {
 
     return result;
 }
-
-
+/* Displays options and manages modification for spesific guest of guests array. */
 int modifyGuestPanel(struct Guest guests[], int arr_len) {
 
     Terminal term = tercon_init_rows_cols();
@@ -478,7 +477,7 @@ int modifyGuestPanel(struct Guest guests[], int arr_len) {
         return 1;
     }
 }
-
+/* Applies guest modification by writing the guests array to Database. */
 int applyGuestModification (struct Guest guests[], int arr_len) {
 
     Terminal term = tercon_init_rows_cols();

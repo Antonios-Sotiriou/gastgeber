@@ -30,7 +30,7 @@
 #include "header_files/userinput.h"
 #include "header_files/handle_guest.h"
 #include "header_files/joins.h"
-
+/* Gets Guest informations and checks if their syntax is correct or missing. */
 struct Guest handleGuest() {
 
     struct Guest guest;
@@ -112,7 +112,8 @@ struct Guest handleGuest() {
     
     return guest;
 }
-
+/* Creates a new guest entry in Database for Reservation res.
+    Guest must not be already registered.If he is pass. */
 void createGuestEntry(struct Reservation res) {
 
     struct Guest guest;

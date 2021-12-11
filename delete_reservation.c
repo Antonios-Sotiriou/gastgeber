@@ -26,7 +26,7 @@
 
 #include "header_files/delete_reservation.h"
 #include "header_files/joins.h"
-
+/* Collects the days which will be prosessed of Reservation res. */
 void getResDatesToDelete(struct Reservation res) {
 
     struct Day day;
@@ -56,7 +56,8 @@ void getResDatesToDelete(struct Reservation res) {
 
     deleteRoomFromDates(starting_point, finishing_point, res.room.id);
 }
-
+/* Removes res_room_id from days dy changing the days room_id[res_room_id] array to 1000000 + res_room_id.
+    Remove from start day until finish. */
 void deleteRoomFromDates(int start, int finish, int res_room_id) {
 
     struct Day day;
@@ -104,7 +105,7 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
 
     remove(journal_path);
 }
-
+/* Deletes reservation from Database. */
 void applyReservationDelete(int res_id) {
 
     struct Reservation res;
