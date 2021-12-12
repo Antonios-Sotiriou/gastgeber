@@ -119,7 +119,7 @@ void createRoomsDb() {
             sprintf(room.name, "%s", "None");
             sprintf(room.type, "%s", "None");
             room.capacity = 0;
-            room.price = 0;
+            room.price = 0.00;
             fwrite(&room, sizeof(room), 1, fp);
         }
         printf("Rooms database successfully created!\n");

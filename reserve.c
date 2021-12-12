@@ -27,7 +27,7 @@
 #include "header_files/display.h"
 #include "header_files/joins.h"
 /* Checks if Room is reserved for res.from_date.
-    Checks also if res.from_date is valid.  */
+    Checks also if res.from_date is valid. */
 int checkFromDate(struct Reservation res) {
 
     struct Day day;

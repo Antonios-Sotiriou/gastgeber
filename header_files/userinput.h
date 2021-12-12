@@ -3,6 +3,7 @@
 
 void buffer_clear();
 int getnuminput(int max_len, bool spaces);
+float getfloat(int max_len);
 int getformatedDate(char *room_date);
 char* getString(int str_len);
 char* getSpString(int str_len);
