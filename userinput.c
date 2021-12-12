@@ -58,6 +58,44 @@ int getnuminput(int max_len, bool spaces) {
 
     return atoi(cleared_num);
 }
+/* Gets a float of length [ max_len ].
+    In length counts also the [ . ] float separator. */
+float getfloat(int max_len) {
+
+    char cleared_num[max_len + 1];
+    int buffer_overflow = 0;
+    int i = 0;
+    int dot_count = 0;
+
+    while (!buffer_overflow) {
+        char c = getc(stdin);
+        if (c == '\n' || c == EOF) {
+            buffer_overflow = 1;
+        } else if (i <= max_len) {
+        // CHECKING FOR ALPHABET
+            if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                return -1;
+            // CHECKING FOR DIGITS
+            } else if (c >= 48 && c <= 57) {
+                cleared_num[i] = c;
+                i++;
+            // OTHERWISE SPECIAL CHARACTER BUT ALLOW A DOT
+            } else if (c == '.' && dot_count == 0) {
+                cleared_num[i] = c;
+                i++;
+                dot_count++;
+            } else {
+                return -2;
+            }
+        } else {
+            // Given input exceeds wanted length
+            return -3;
+        }
+    }
+    cleared_num[i] = '\0';
+
+    return strtof(cleared_num, NULL);
+}
 /* Accepts date input in form dd/mm/yyyy */
 int getformatedDate(char *room_date) { 
 

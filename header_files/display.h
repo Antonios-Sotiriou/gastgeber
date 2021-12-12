@@ -31,6 +31,7 @@ void displayAllRoomsAnnuallyReservationsLogo();
 void displayAllRoomsAnnuallyReservationsInfo(struct Room rooms_arr[], int input_year);
 /* Global Display functions */
 void displayInt(int id, int dis_len);
+void displayFloat(float id, int dis_len);
 void displayStr(char *str, int dis_len);
 void displayErrorLog();
 

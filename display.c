@@ -119,7 +119,7 @@ void displayRoomInfo(struct Room room) {
     printf("|");
     displayInt(room.capacity, 20);
     printf("|");
-    displayInt(room.price, 20);
+    displayFloat(room.price, 20);
     printf("|\n");
     printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
@@ -144,7 +144,7 @@ void displayAllRoomsInfo(struct Room room) {
     printf("|");
     displayInt(room.capacity, 20);
     printf("|");
-    displayInt(room.price, 20);
+    displayFloat(room.price, 20);
     printf("|\n");
     printf("\x1b[%dG --------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
 }
@@ -359,6 +359,23 @@ void displayInt(int id, int dis_len) {
     char converted[30];
 
     sprintf(converted, "%d", id);
+    int d = (dis_len - strlen(converted)) / 2;
+
+    for(int i = 0; i <= dis_len - strlen(converted); i++) {
+        if(i < d) {
+            printf(" ");
+        } else if(i > d) {
+            printf(" ");
+        } else {
+            printf(ANSI_COLOR_YELLOW "%s" ANSI_COLOR_RESET, converted);
+        }
+    }
+}
+void displayFloat(float id, int dis_len) {
+
+    char converted[30];
+
+    sprintf(converted, "%.2f", id);
     int d = (dis_len - strlen(converted)) / 2;
 
     for(int i = 0; i <= dis_len - strlen(converted); i++) {

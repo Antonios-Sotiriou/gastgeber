@@ -95,7 +95,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                 char *room_type;
                 int cap;
                 // Price here in the future should be changed to a float number! 
-                int prc;
+                float prc;
                 // check which resourses must be freed
                 while (modified == 0) {
                     // Get window attributes again here in case user resizes.
@@ -155,7 +155,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                 break;
                             case 4 :
                                 printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                prc = getnuminput(6, false);
+                                prc = getfloat(6);
                                 if (prc != 0) {
                                     rooms[i].price = prc;
                                     modified = 1;
@@ -176,7 +176,7 @@ int modifyRoomPanel(struct Room rooms[]) {
                                         if (cap != 0) {
                                             /********************* Must be implement a float function here for prices *****************************/
                                             printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
-                                            prc = getnuminput(6, false);
+                                            prc = getfloat(6);
                                             if (prc != 0) {
                                                 sprintf(rooms[i].name, "%s", room_name);
                                                 sprintf(rooms[i].type, "%s", room_type);
