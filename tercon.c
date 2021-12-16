@@ -16,7 +16,7 @@
  * My own libraries, collection of functions and structs
  ******************************************************/
 
-/* Returns a terminal struckt with rows and columns number. */
+/* Returns a terminal struct with rows and columns number. */
 Terminal tercon_init_rows_cols() {
 
     Terminal term;
