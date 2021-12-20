@@ -21,11 +21,10 @@ If you don't see any errors software is ready for use.
 ./gastgeber
 ```
 From "header_files/global/global_vars.h" file you can choose the total number of rooms and also<br>
-the years range.As starting year it is advised to use the current year because<br>
-noone can make a reservation to the Past.At least so far.<br>
+the years range.As starting year it is advised to use the current year.<br>
 If you want to change the main folder name, you must change the paths which starting from it.<br>
 Paths can be found in "header_files/global/" directory.All files have the word path at end of their names.<br>
-There you just replace to each path file the starting name gastgeber with anythink you want.<br>
+There you just replace to each path file the starting name ** gastgeber ** with anythink you want.<br>
 
 # Enjoy...
 
