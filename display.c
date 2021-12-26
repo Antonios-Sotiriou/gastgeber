@@ -55,13 +55,14 @@ void displayMainLogo() {
     printf("\x1b[%d;%dH          5. All Guests                            \n", 14, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          6. Modify Room or Guest                  \n", 15, (term.columns - 51) / 2);
     printf("\x1b[%d;%dH          7. All Reservations                      \n", 16, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          8. Delete room Reservation               \n", 17, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          9. Annually Availabillity                \n", 18, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          10. Room Annually Reservations           \n", 19, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          11. all Rooms Annually Reservations      \n", 20, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH          20. Exit                                 \n", 21, (term.columns -51) / 2);
+    printf("\x1b[%d;%dH          8. Reservations By Date                  \n", 17, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          9. Delete room Reservation               \n", 18, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          10. Annually Availabillity               \n", 19, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          11. Room Annually Reservations           \n", 20, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          12. all Rooms Annually Reservations      \n", 21, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          20. Exit                                 \n", 22, (term.columns -51) / 2);
     displayErrorLog();
-    printf("\x1b[%d;%dH          >>> ", 22, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH          >>> ", 23, (term.columns - 51) / 2);
 }
 Terminal displayRoomReservationLogo() { 
     clear_scr();
@@ -275,6 +276,14 @@ void displayAllReservationsInfo(struct Reservation reservation) {
     displayStr(reservation.to_date, 20);
     printf("|\n");
     printf("\x1b[%dG---------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+}
+void displayReservationsByDateLogo() {
+    clear_scr();
+    Terminal term = tercon_init_rows_cols();
+    appLogo();
+    printf("\x1b[%d;%dH\\         \x1b[32mDisplaying Reservations By Date\x1b[0m         /\n", 10, (term.columns - 51) / 2);
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2); 
+    displayErrorLog();
 }
 void displayDeleteResLogo() {
     clear_scr();
