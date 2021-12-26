@@ -51,6 +51,7 @@ void displayGuest();
 void displayAllGuests();
 void modify();
 void displayReservations();
+void displayReservationsByDate();
 void deleteReservation();
 void displayAnnuallyAvailabillity();
 void displayRoomAnnuallyReservations();
@@ -85,7 +86,7 @@ void gastgeber() {
         // Can be found in userinput.c
         choice = getnuminput(4, false);
         int error = 0;
-        if ((choice > 11 && choice < 20) || choice > 20) {
+        if ((choice > 12 && choice < 20) || choice > 20) {
             printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
             error = 1;
         }else if (choice == -1) {
@@ -114,13 +115,15 @@ void gastgeber() {
                     break;
                 case 7 : displayReservations();
                     break;
-                case 8 : deleteReservation();
+                case 8 : displayReservationsByDate();
                     break;
-                case 9 : displayAnnuallyAvailabillity();
+                case 9 : deleteReservation();
                     break;
-                case 10 : displayRoomAnnuallyReservations();
+                case 10 : displayAnnuallyAvailabillity();
                     break;
-                case 11 : displayAllRoomsAnnuallyReservations();
+                case 11 : displayRoomAnnuallyReservations();
+                    break;
+                case 12 : displayAllRoomsAnnuallyReservations();
                     break;
                 case 20 : clear_scr();
                     exit(0);
@@ -575,6 +578,64 @@ void displayReservations() {
     tercon_echo_off();
     printf(ANSI_BLINK_SLOW "\x1b[%dGPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
     buffer_clear();
+    tercon_echo_on();
+}
+
+void displayReservationsByDate() {
+
+    struct Day day, request;
+    Terminal term = tercon_init_rows_cols();
+
+    displayReservationsByDateLogo();
+    int found = 0;
+    int error = 0;
+    while (found == 0) {
+        printf("\x1b[%d;%dH\x1b[2KEnter date: ", 13, (term.columns - 12) / 2);
+        if (getformatedDate(request.date) == 1) {
+            FILE *fp;
+            char abs_path[PATH_LENGTH];
+            joinHome(abs_path, daysdb);
+            fp = fopen(abs_path, "rb");
+            if (fp == NULL) {
+                perror("Could not locate daysdb file displayReservationsByDate()");
+                exit(127);
+            }
+            while (1) {
+                fread(&day, sizeof(day), 1, fp);
+                if (feof(fp)) {
+                    break;
+                } else if (strcmp(day.date, request.date) == 0) {
+                    tercon_clear_lines(14, 13);
+                    printf(ANSI_MOVE_CURSOR_COL "Displaying Reservations for date: %s", (term.columns - 44) / 2, request.date);
+                    found = 1;
+                    break;
+                }
+            }
+            fclose(fp);
+        } else {
+            printf("\x1b[%d;%dHWould you like to try again?: [Y/N]. ", term.rows - 4, (term.columns - 37) / 2);
+            char c = getc(stdin);
+            if(c == 'Y' || c == 'y') {
+                printf("\x1b[%d;%dH\x1b[2K", term.rows - 4, (term.columns - 37) / 2);
+                tercon_clear_error_log();
+                getc(stdin);
+                continue;
+            } else if (c == '\n' || c == '\t') {
+                error = 6;
+                break;
+            } else {
+                error = 5;
+                break;
+            }
+        }
+    }
+    tercon_echo_off();
+    if (!error) {
+        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        buffer_clear();
+    } else if (error && error < 6) {
+        buffer_clear();
+    }
     tercon_echo_on();
 }
 
