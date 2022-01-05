@@ -609,15 +609,22 @@ void displayReservationsByDate() {
                     printf(ANSI_MOVE_CURSOR_COL "Displaying Reservations for date: %s", (term.columns - 44) / 2, request.date);
                     found = 1;
                     break;
+                } else {
+                    found = -1;
                 }
             }
             fclose(fp);
-        } else {
+        }
+        if (found <= 0) {
+            if (found == -1) {
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHThis Day doesn't exist!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 23) / 2);
+            }
             printf("\x1b[%d;%dHWould you like to try again?: [Y/N]. ", term.rows - 4, (term.columns - 37) / 2);
             char c = getc(stdin);
             if(c == 'Y' || c == 'y') {
                 printf("\x1b[%d;%dH\x1b[2K", term.rows - 4, (term.columns - 37) / 2);
                 tercon_clear_error_log();
+                found = 0;
                 getc(stdin);
                 continue;
             } else if (c == '\n' || c == '\t') {
