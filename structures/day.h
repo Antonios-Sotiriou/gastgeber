@@ -10,7 +10,7 @@ struct Day {
     char month_name[11];
     char year[6];
     int room_id[TOTAL_ROOMS + 1];
-    int res_ids[TOTAL_ROOMS];
+    int res_ids[TOTAL_ROOMS + 1];
 };
 
 #endif /* DAY_H */

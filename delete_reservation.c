@@ -55,6 +55,7 @@ void getResDatesToDelete(struct Reservation res) {
     fclose(fp);
 
     deleteRoomFromDates(starting_point, finishing_point, res.room.id);
+    //deleteReservationsFromDates(res.id); ****************************************************************
 }
 /* Removes res_room_id from days dy changing the days room_id[res_room_id] array to 1000000 + res_room_id.
     Remove from start day until finish. */
