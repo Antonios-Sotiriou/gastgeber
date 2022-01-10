@@ -608,6 +608,11 @@ void displayReservationsByDate() {
                     tercon_clear_lines(14, 13);
                     printf(ANSI_MOVE_CURSOR_COL "Displaying Reservations for date: %s", (term.columns - 44) / 2, request.date);
                     found = 1;
+                    for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
+                        if (day.res_ids[i] < 1000000) {
+                            printf("Rooms of date %s: %d\n", day.date, day.res_ids[i]);
+                        }
+                    }
                     break;
                 } else {
                     found = -1;

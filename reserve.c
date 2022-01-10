@@ -147,6 +147,7 @@ int checkAllDates(struct Reservation res) {
         char c = getc(stdin);
         if(c == 'Y' || c == 'y') {
             applyReservation(starting_point, finishing_point, res.room.id);
+            addReservationToDates(starting_point, finishing_point, res.id);
             tercon_clear_error_log();
             printf(ANSI_COLOR_GREEN "\x1b[%d;%dHReservation applied success.\n" ANSI_COLOR_RESET, term.rows - 2, (term.columns - 28) / 2);
             getc(stdin);
@@ -209,4 +210,58 @@ void applyReservation(int start, int finish, int res_room_id) {
 
     remove(journal_path);
 }
+
+/* Applies the reservation by adding res_id in dates Database from [ start ] day until [ finish ] day. */
+void addReservationToDates(int start, int finish, int res_id) {
+
+    struct Day day;
+    FILE *fp, *fp1;
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_main);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file checkFromDate()");
+        fclose(fp1);
+        remove(journal_path);
+        exit(127);
+    }
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else {
+            // Get the days from starting day id to end day id
+            if(day.id >= start && day.id <= finish) {
+                for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
+                    if (day.res_ids[i] >= 1000000) {
+                        day.res_ids[i] = res_id;
+                        break;
+                    }
+                }
+            }
+            fwrite(&day, sizeof(day), 1, fp1);
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp1);
+        if(feof(fp1)) {
+            break;
+        }
+        fwrite(&day, sizeof(day), 1, fp);
+    }
+    fclose(fp1);
+    fclose(fp);
+
+    remove(journal_path);
+};
 

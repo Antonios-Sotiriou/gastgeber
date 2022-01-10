@@ -86,7 +86,7 @@ void createDaysDb() {
                         day.room_id[x] = x + 1000000;
                     }
                     // Initializing day.res_ids array with huge numbers which are gonna replaced by reservation IDs when a reservation takes place.
-                    for(int x = 0; x <= TOTAL_ROOMS; x++) {
+                    for(int x = 0; x <= TOTAL_ROOMS + 1; x++) {
                         day.res_ids[x] = x + 1000000;
                     }
                     fwrite(&day, sizeof(day), 1, fp);
