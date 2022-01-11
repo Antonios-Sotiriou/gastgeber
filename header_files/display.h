@@ -22,6 +22,8 @@ void displayModifyGuestChoices(struct Guest guest);
 void displayAllReservationsLogo();
 void displayAllReservationsInfo(struct Reservation reservation);
 void displayReservationsByDateLogo();
+void displayReservationsByDateHead();
+void displayReservationsByDateInfo(int res_id);
 void displayDeleteResLogo();
 void displayReservationInfo(struct Reservation reservation);
 void displayAnnuallyAvailabillityLogo();
