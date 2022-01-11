@@ -17,6 +17,7 @@
 #include "header_files/global/days_db_path.h"
 #include "header_files/global/rooms_db_path.h"
 #include "header_files/global/output_path.h"
+#include "header_files/global/res_db_path.h"
 /**********************************************
  * Color Initialisation and Terminal management 
  **********************************************/
@@ -282,8 +283,48 @@ void displayReservationsByDateLogo() {
     Terminal term = tercon_init_rows_cols();
     appLogo();
     printf("\x1b[%d;%dH\\         \x1b[32mDisplaying Reservations By Date\x1b[0m         /\n", 10, (term.columns - 51) / 2);
-    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2); 
+    printf("\x1b[%d;%dH '''''''''''''''''''''''''''''''''''''''''''''''''\n\n", 11, (term.columns - 51) / 2);
     displayErrorLog();
+}
+void displayReservationsByDateHead() {
+    Terminal term = tercon_init_rows_cols();
+    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 15, (term.columns - 105) / 2);
+    printf("\x1b[%d;%dH|   Reservation ID   |      Room Id       |      Guest ID      |     From Date      |      To Date       |\n", 16, (term.columns - 105) / 2);
+    printf("\x1b[%d;%dH --------------------------------------------------------------------------------------------------------\n", 17, (term.columns - 105) / 2);
+}
+void displayReservationsByDateInfo(int res_id) {
+    Terminal term = tercon_init_rows_cols();
+    struct Reservation reservation;
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file displayReservationsByDateInfo()");
+        exit(127);
+    }
+    int found = 0;
+    while (found == 0) {
+        fread(&reservation, sizeof(reservation), 1, fp);
+        if (feof(fp)) {
+            break;
+        } else if (reservation.id == res_id) {
+            printf("\x1b[%dG|", (term.columns - 105) / 2);
+            displayInt(reservation.id, 20);
+            printf("|");
+            displayInt(reservation.room.id, 20);
+            printf("|");
+            displayInt(reservation.guest.id, 20);
+            printf("|");
+            displayStr(reservation.from_date, 20);
+            printf("|");
+            displayStr(reservation.to_date, 20);
+            printf("|\n");
+            printf("\x1b[%dG---------------------------------------------------------------------------------------------------------\n", (term.columns - 105) / 2);
+            found = 1;
+        }
+    }
+    fclose(fp);
 }
 void displayDeleteResLogo() {
     clear_scr();

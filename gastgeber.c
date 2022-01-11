@@ -589,6 +589,7 @@ void displayReservationsByDate() {
     displayReservationsByDateLogo();
     int found = 0;
     int error = 0;
+    int res_counter = 0;
     while (found == 0) {
         printf("\x1b[%d;%dH\x1b[2KEnter date: ", 13, (term.columns - 12) / 2);
         if (getformatedDate(request.date) == 1) {
@@ -607,10 +608,15 @@ void displayReservationsByDate() {
                 } else if (strcmp(day.date, request.date) == 0) {
                     tercon_clear_lines(14, 13);
                     printf(ANSI_MOVE_CURSOR_COL "Displaying Reservations for date: %s", (term.columns - 44) / 2, request.date);
+                    // Function to print the header of the reservations border.
+                    displayReservationsByDateHead();
                     found = 1;
+                    tercon_clear_lines(term.rows, 18);
                     for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
                         if (day.res_ids[i] < 1000000) {
-                            printf("Rooms of date %s: %d\n", day.date, day.res_ids[i]);
+                            // Function which takes the reservation ids as arguments, reads the database for the reservations and prints the infos of them.
+                            displayReservationsByDateInfo(day.res_ids[i]);
+                            res_counter++;
                         }
                     }
                     break;
@@ -643,7 +649,11 @@ void displayReservationsByDate() {
     }
     tercon_echo_off();
     if (!error) {
-        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        if (res_counter < 8) {
+            printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+        } else {
+            printf(ANSI_BLINK_SLOW "\x1b[%dG\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, (term.columns - 26) / 2);
+        }
         buffer_clear();
     } else if (error && error < 6) {
         buffer_clear();
