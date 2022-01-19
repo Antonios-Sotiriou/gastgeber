@@ -55,7 +55,7 @@ void getResDatesToDelete(struct Reservation res) {
     fclose(fp);
 
     deleteRoomFromDates(starting_point, finishing_point, res.room.id);
-    //deleteReservationsFromDates(res.id); ****************************************************************
+    deleteReservationFromDates(starting_point, finishing_point, res.id);
 }
 /* Removes res_room_id from days dy changing the days room_id[res_room_id] array to 1000000 + res_room_id.
     Remove from start day until finish. */
@@ -84,6 +84,60 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
             // Get the days from starting day id to end day id
             if(day.id >= start && day.id <= finish) {
                 day.room_id[res_room_id] = 100000 + res_room_id;
+            }
+            fwrite(&day, sizeof(day), 1, fp1);
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp1);
+        if(feof(fp1)) {
+            break;
+        }
+        fwrite(&day, sizeof(day), 1, fp);
+    }
+    fclose(fp1);
+    fclose(fp);
+
+    remove(journal_path);
+}
+/* Removes reservation ID from days dy changing the days res_ids[x] array to 1000000 + res_ids[x].
+    Remove from start day until finish. */
+void deleteReservationFromDates(int start, int finish, int res_id) {
+
+    struct Day day;
+    FILE *fp, *fp1;
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file deleteReservationFromDates()");
+        fclose(fp1);
+        remove(journal_path);
+        exit(127);
+    }
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else {
+            // Get the days from starting day id to end day id
+            if(day.id >= start && day.id <= finish) {
+                for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
+                    if (day.res_ids[i] == res_id) {
+                        day.res_ids[i] = 1000000 + res_id;
+                        break;
+                    }
+                }
             }
             fwrite(&day, sizeof(day), 1, fp1);
         }
