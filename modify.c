@@ -8,19 +8,20 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
-#include "header_files/global_vars.h"
-/*********************
- * Color Initialisation
- ********************/
+#include "header_files/global/global_vars.h"
+#include "header_files/global/rooms_db_path.h"
+#include "header_files/global/guests_db_path.h"
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 #include "header_files/tercon.h"
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
@@ -29,286 +30,480 @@
 #include "header_files/modify.h"
 #include "header_files/userinput.h"
 #include "header_files/display.h"
+#include "header_files/joins.h"
+/* Creates an all rooms struct array and starts the modify room functions algorithm. */
+int modifyRoom() {
 
-void modifyRoom() {
+    struct Room room, rooms[TOTAL_ROOMS];
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, roomsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate roomsdb file modifyRoom()");
+        exit(127);
+    }
 
-    struct Room room;
-    FILE *fp, *fp1;
-    fp = fopen(roomsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
-
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
-
-    displayModifyRoomLogo();
-
-    printf("Enter room ID you want to modify: ");
-    int room_id = getInteger(48, 4);
-
-    if(room_id < 0 || room_id > TOTAL_ROOMS) {
-        printf("\n%sRoom id out of range.%s\nDisplay all rooms with option 3 of main menu to see the IDs.\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
-    } else if(room_id == 0) {
-        printf("Watch out for spaces or letters between the numbers.\n");
-    } else {
-        while(1) {
-            fread(&room, sizeof(room), 1, fp);
-            if(feof(fp)) {
-                break;
-            } else if(room.id == room_id) {
-                clear_scr();
-                printf(ANSI_COLOR_GREEN "\nRoom Retrieved.\n\n" ANSI_COLOR_RESET);
-                printf("Room ID: %d\n", room.id);
-                printf("Room Name: %s\n", room.name);
-                printf("Room Type: %s\n", room.type);
-                printf("Room  Capacity: %d\n", room.capacity);
-                printf("Room Price: %d\n\n", room.price);
-
-                displayModifyRoomChoices();
-
-                char *room_name;
-                char *room_type;
-                int choice;
-                scanf("%d", &choice);
-                getc(stdin);
-                
-                switch(choice) {
-                    case 1 : clear_scr();
-                        printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(20);
-                        if(room_name != 0) {
-                            sprintf(room.name, "%s", room_name);
-                            free(room_name);
-                            break;
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    case 2 : clear_scr();
-                        printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_type = getSpString(20);
-                        if(room_type != 0) {
-                            sprintf(room.type, "%s", room_type);
-                            free(room_type);
-                            break;
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    case 3 : clear_scr();
-                        printf("%sSet Room Capacity: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room.capacity = getInteger(48, 2);
-                        break;
-                    case 4 : clear_scr();
-                        printf("%sSet Room Price: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room.price = getInteger(48, 10);
-                        break;
-                    case 5 : clear_scr();
-                        printf("%sGive a new Room Name without spaces: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        room_name = getString(20);
-                        if(room_name != 0) {
-                            sprintf(room.name, "%s", room_name);
-                            free(room_name);
-                            printf("%sGive a new Room Type: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                            room_type = getSpString(20);
-                            if(room_type != 0) {
-                                sprintf(room.type, "%s", room_type);
-                                free(room_type);
-                                printf("%sSet Room Capacity: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                                room.capacity = getInteger(48, 2);
-                                printf("%sSet Room Price: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                                /********************* Must be implement a float function here for prices *****************************/
-                                room.price = getInteger(48, 10);
-                                break;
-                            } else {
-                                printf("\n");
-                                return;
-                            }
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    case 0 :
-                        return;
-                    default :
-                        return;                   
-                }
-            }
-            fwrite(&room, sizeof(room), 1, fp1);
-        }
-        fclose(fp);
-        fclose(fp1);
-
-        printf("\nShall the modifications be applied: [Y/N]?");
-        char y = getc(stdin);
-        if(y == 'Y' || y == 'y') {
-            fp1 = fopen(journal_sec, "rb");
-            fp = fopen(roomsdb, "wb");
-
-            while(1) {
-                fread(&room, sizeof(room), 1, fp1);
-                if(feof(fp1)) {
-                    break;
-                } else {
-                    fwrite(&room, sizeof(room), 1, fp);
-                }
-            }
-            printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            fclose(fp1);
-            fclose(fp);
-            remove(journal_sec);
-            return;
+    int index = 0;
+    while(1) {
+        fread(&room, sizeof(room), 1, fp);
+        if (feof(fp)) {
+            break;
         } else {
-            printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            remove(journal_sec);
-            return;
+            rooms[index] = room;
+            index++;
         }
     }
+    fclose(fp);
+
+    displayModifyRoomLogo();
+    
+    int result = modifyRoomPanel(rooms);
+
+    return result;
 }
+/* Displays options and manages modification for spesific room of rooms array. */
+int modifyRoomPanel(struct Room rooms[]) {
 
-void modifyGuest() {
+    Terminal term = tercon_init_rows_cols();
 
-    struct Guest guest;
-    FILE *fp, *fp1;
-    fp = fopen(guestsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
+    printf(ANSI_MOVE_CURSOR_TO "Enter room ID you want to modify: ", 13, (term.columns - 34) / 2);
+    int room_id = getnuminput(6, false);
+    int modified = 0;
 
-    char c;
-    while((c = getc(stdin) != '\n') && c != '\t');
+    if(room_id > TOTAL_ROOMS) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHRoom id out of range.\n"ANSI_COLOR_RESET, term.rows - 2, (term.columns - 20) / 2);
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHDisplay all rooms with option 3 of main menu to see the IDs.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 60) / 2);
+        return 1;
+    } else if (room_id == 0) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHNo room ID provided.Zero ID!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 28) / 2);
+        return 1;
+    } else if (room_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        return 2;
+    } else if (room_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        return 3;
+    } else if (room_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 4;
+    } else {
+        for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
+            if (rooms[i].id == room_id) {
+                
+                char *room_name;
+                char *room_type;
+                int cap;
+                // Price here in the future should be changed to a float number! 
+                float prc;
+                // check which resourses must be freed
+                while (modified == 0) {
+                    // Get window attributes again here in case user resizes.
+                    term = tercon_init_rows_cols();
+                    displayModifyRoomChoices(rooms[i]);
+                    int choice = getnuminput(4, true);
+                    int error = 0;
+                    int free_rs = 0;
+                    if (choice == -1) {
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 1;
+                    } else if (choice == -2) {
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 2;
+                    } else if (choice == -3) {
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                        error = 3;
+                    } else if ((choice > 5 && choice < 20) || choice > 20) {
+                        printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+                        error = 4;
+                    } else {
+                        tercon_clear_lines(26, 19);
+                        switch(choice) {
+                            case 1 :
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
+                                room_name = getString(20);
+                                if (room_name != 0) {
+                                    sprintf(rooms[i].name, "%s", room_name);
+                                    modified = 1;
+                                } else {
+                                    // Error 4 here to use the following error clauses without to consume the buffer because it is already empty.
+                                    error = 4;
+                                }
+                                free_rs = 1;
+                                break;
+                            case 2 :
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                                room_type = getSpString(20);
+                                if(room_type != 0) {
+                                    sprintf(rooms[i].type, "%s", room_type);
+                                    modified = 1;
+                                } else {
+                                    error = 4;
+                                }
+                                free_rs = 2;
+                                break;
+                            case 3 :
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
+                                cap = getnuminput(2, false);
+                                if (cap != 0) {
+                                    rooms[i].capacity = cap;
+                                    modified = 1;
+                                } else {
+                                    printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Capacity provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
+                                    error = 4;
+                                }
+                                break;
+                            case 4 :
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
+                                prc = getfloat(6);
+                                if (prc != 0) {
+                                    rooms[i].price = prc;
+                                    modified = 1;
+                                } else {
+                                    printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Price provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+                                    error = 4;
+                                }
+                                break;
+                            case 5 :
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Name without spaces: " ANSI_COLOR_RESET, (term.columns - 37) / 2);
+                                room_name = getString(20);
+                                if(room_name != 0) {
+                                    printf(ANSI_COLOR_GREEN "\x1b[%dGGive a new Room Type: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                                    room_type = getSpString(20);
+                                    if(room_type != 0) {
+                                        printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Capacity: " ANSI_COLOR_RESET, (term.columns - 19) / 2);
+                                        cap = getnuminput(2, false);
+                                        if (cap != 0) {
+                                            /********************* Must be implement a float function here for prices *****************************/
+                                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Room Price in form of (100.00 Currency): " ANSI_COLOR_RESET, (term.columns - 45) / 2);
+                                            prc = getfloat(6);
+                                            if (prc != 0) {
+                                                sprintf(rooms[i].name, "%s", room_name);
+                                                sprintf(rooms[i].type, "%s", room_type);
+                                                rooms[i].capacity = cap;
+                                                rooms[i].price = prc;
+                                                free_rs = 3;
+                                                modified = 1;
+                                                break;
+                                            } else {
+                                                printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Price provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+                                                free_rs = 3;
+                                                error = 4;
+                                                break;
+                                            }
+                                        } else {
+                                            printf(ANSI_COLOR_RED "\x1b[%d;%dHNo Capacity provided or Zero!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 29) / 2);
+                                            free_rs = 3;
+                                            error = 4;
+                                            break;
+                                        }
+                                    } else {
+                                        free_rs = 3;
+                                        error = 4;
+                                        break;
+                                    }
+                                } else {
+                                    free_rs = 1;
+                                    error = 4;
+                                    break;
+                                }
+                            case 20 :
+                                return 20;
+                            default :
+                                break;                  
+                        }
+                    }
+                    if (free_rs != 0){
+                        if (free_rs == 1) {
+                            free(room_name);
+                        } else if (free_rs == 2) {
+                            free(room_type);
+                        } else if (free_rs == 3) {
+                            free(room_name);
+                            free(room_type);
+                        }
+                    }
+                    if (error != 0) {
+                        if (error < 4) {
+                            buffer_clear();
+                        }
+                        tercon_echo_off();
+                        printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+                        buffer_clear();
+                        tercon_echo_on();
+                    }
+                }
+            }
+        }
+    }
+    if (modified) {
+        // Finally promp user to apply modifications.If he applies this function returns 0;
+        int result = applyRoomModification(rooms);
+        return result;
+    }
+    // return 10 here means Unmodified
+    return 10;
+}
+/* Applies room modification by writing the rooms array to Database. */
+int applyRoomModification(struct Room rooms[]) {
 
-    displayModifyGuestLogo();
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
+    char y = getc(stdin);
+    if(y == 'Y' || y == 'y') {
+        FILE *fp;
+        char abs_path[PATH_LENGTH];
+        joinHome(abs_path, roomsdb);
+        fp = fopen(abs_path, "wb");
 
-    printf("Enter Guest ID you want to modify: ");
-    int guest_id = getInteger(48, 4);
+        for (int i = 0; i <= TOTAL_ROOMS - 1; i++) {
+            fwrite(&rooms[i], sizeof(rooms[i]), 1, fp);
+        }
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+        fclose(fp);
+        return 0;
+    } else if (y == '\n' || y == '\t') {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
+    } else {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 6;
+    }
+}
+/* Creates an all guests Dynamically allocated struct array and starts the modify guest functions algorithm. */
+int modifyGuest() {
 
-    int found = 0;
+    struct Guest guest, *guests_par;
+    // We creating a dynamically allocated array to store guests because their number is dynamic.
+    guests_par = malloc(sizeof(struct Guest));
+    FILE *fp;
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, guestsdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate guestsdb file modifyGuest()");
+        exit(127);
+    }
+
+    int index = 0, dynamic_inc = 2;
     while(1) {
         fread(&guest, sizeof(guest), 1, fp);
         if(feof(fp)) {
             break;
-        } else if(guest.id == guest_id) {
-            printf(ANSI_COLOR_GREEN "\nGuest Retrieved.\n" ANSI_COLOR_RESET);
-            printf("Guest ID: %d\n\n", guest.id);
-            printf("\nGuest First Name: %s\n", guest.first_name);
-            printf("Guest Last Name: %s\n", guest.last_name);
-            printf("Guest Last Name: %s\n\n", guest.nationality);
-            found = 1;
+        } else if (guest.id != 0) {
+            guests_par = realloc(guests_par, sizeof(struct Guest) * dynamic_inc);
+            guests_par[index] = guest;
+            index++;
+            dynamic_inc++;
+        }
+    }
+    fclose(fp);
+    // To make our life easier, here we are copying the dynamically allocated struct array, to a normal struct array,
+    // so we can free the resources here, a) to avoid making next functions more complicated, b) avoid creating a ton of else clauses
+    // to the following functions and c) also keep truck and make it easier to debugg.
+    struct Guest guests[index - 1];
+    for(int i = 0; i <= index - 1; i++) {
+        guests[i] = guests_par[i];
+    }
+    free(guests_par);
 
-            displayModifyGuestChoices();
+    displayModifyGuestLogo();
+
+    int result = modifyGuestPanel(guests, index - 1);
+
+    return result;
+}
+/* Displays options and manages modification for spesific guest of guests array. */
+int modifyGuestPanel(struct Guest guests[], int arr_len) {
+
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_MOVE_CURSOR_TO "Enter Guest ID you want to modify: ", 13, (term.columns - 40) / 2);
+    int guest_id = getnuminput(6, false);
+
+    if (guest_id == 0) {
+        printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest with 0 ID exists!" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 26) / 2);
+        return 1;
+    } else if (guest_id == -1) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHWrong format.Check for letters.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 31) / 2);
+        return 2;
+    } else if (guest_id == -2) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.Check for special charackters or spaces.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 56) / 2);
+        return 3;
+    } else if (guest_id == -3) {
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid number length!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 4;
+    }
+
+    int found = 0;
+    int modified = 0;
+    for (int i = 0; i <= arr_len; i++) {
+        if(guests[i].id == guest_id) {
+            found = 1;
 
             char *guest_first_name;
             char *guest_last_name;
             char *guest_nationality;
+            while(!modified) {
+                // Get window attributes again here in case user resizes.
+                term = tercon_init_rows_cols();
+                // Display guest info here.
+                displayModifyGuestChoices(guests[i]);
 
-            int choice;
-            scanf("%d", &choice);
-            getc(stdin);
-            
-            switch(choice) {
-                case 1 : clear_scr();
-                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    /*********************  Must be implement a string function that accepts also spaces here. Guest can have more than 1 name. ******************/
-                    guest_first_name = getSpString(20);
-                    if(guest_first_name != 0) {
-                        sprintf(guest.first_name, "%s", guest_first_name);
-                        
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 2 : clear_scr();
-                    printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_last_name = getSpString(20);
-                    if(guest_last_name != 0) {
-                        sprintf(guest.last_name, "%s", guest_last_name);
-                        free(guest_last_name);
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 3 : clear_scr();
-                    printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_nationality = getSpString(20);
-                    if(guest_nationality != 0) {
-                        sprintf(guest.nationality, "%s", guest_nationality);
-                        free(guest_nationality);
-                        break;
-                    } else {
-                        printf("\n");
-                        return;
-                    }
-                case 4 : clear_scr();
-                    printf("%sSet Guest First Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                    guest_first_name = getSpString(20);
-                    if(guest_first_name != 0) {
-                        sprintf(guest.first_name, "%s", guest_first_name);
-                        free(guest_first_name);
-                        printf("%sSet Guest Last Name: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
-                        guest_last_name = getSpString(20);
-                        if(guest_last_name != 0) {
-                            sprintf(guest.last_name, "%s", guest_last_name);
-                            free(guest_last_name);
-                            printf("%sSet Guest Nationality: %s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                int choice = getnuminput(4, true);
+                int error = 0;
+                int free_rs = 0;
+                if (choice == -1) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 1;
+                } else if (choice == -2) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 2;
+                } else if (choice == -3) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHInvalid input.getnuminput() error code: %d\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2, choice);
+                    error = 3;
+                } else if ((choice > 4 && choice < 20) || choice > 20) {
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHThis number doesn't corresponds to a choice!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 44) / 2);
+                    error = 4;
+                } else {
+                    tercon_clear_lines(26, 19);
+                    switch(choice) {
+                        case 1 :
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest First Name: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                            guest_first_name = getSpString(20);
+                            if(guest_first_name != 0) {
+                                sprintf(guests[i].first_name, "%s", guest_first_name);
+                                modified = 1;
+                            } else {
+                                error = 4;
+                            }
+                            free_rs = 1;
+                            break;
+                        case 2 :
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Last Name: " ANSI_COLOR_RESET, (term.columns - 21) / 2);
+                            guest_last_name = getSpString(20);
+                            if(guest_last_name != 0) {
+                                sprintf(guests[i].last_name, "%s", guest_last_name);
+                                modified = 1;
+                            } else {
+                                error = 4;
+                            }
+                            free_rs = 2;
+                            break;
+                        case 3 :
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Nationality: " ANSI_COLOR_RESET, (term.columns - 23) / 2);
                             guest_nationality = getSpString(20);
                             if(guest_nationality != 0) {
-                                sprintf(guest.nationality, "%s", guest_nationality);
-                                free(guest_nationality);
-                                break;
+                                sprintf(guests[i].nationality, "%s", guest_nationality);
+                                modified = 1;
                             } else {
-                                printf("\n");
-                                return;
+                                error = 4;
                             }
-                        } else {
-                            printf("\n");
-                            return;
-                        }
-                    } else {
-                        printf("\n");
-                        return;
+                            free_rs = 3;
+                            break;
+                        case 4 :
+                            printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest First Name: " ANSI_COLOR_RESET, (term.columns - 22) / 2);
+                            guest_first_name = getSpString(20);
+                            if(guest_first_name != 0) {              
+                                printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Last Name: " ANSI_COLOR_RESET, (term.columns - 21) / 2);
+                                guest_last_name = getSpString(20);
+                                if(guest_last_name != 0) {                
+                                    printf(ANSI_COLOR_GREEN "\x1b[%dGSet Guest Nationality: " ANSI_COLOR_RESET, (term.columns - 23) / 2);
+                                    guest_nationality = getSpString(20);
+                                    if(guest_nationality != 0) {
+                                        sprintf(guests[i].first_name, "%s", guest_first_name);
+                                        sprintf(guests[i].nationality, "%s", guest_nationality);
+                                        sprintf(guests[i].last_name, "%s", guest_last_name);
+                                        free_rs = 5;
+                                        modified = 1;
+                                        break;
+                                    } else {
+                                        free_rs = 5;
+                                        error = 4;
+                                        break;
+                                    }
+                                } else {
+                                    free_rs = 4;
+                                    error = 4;
+                                    break;
+                                }
+                            } else {
+                                free_rs = 1;
+                                error = 4;
+                                break;
+                            }
+                        case 20 :
+                            return 20;
+                        default :
+                            break;  
                     }
-                case 0 :
-                    return;
-                default :
-                    return;                   
-            }
-        }
-        fwrite(&guest, sizeof(guest), 1, fp1);
-    }
-    fclose(fp);
-    fclose(fp1);
-
-    if(found == 1) {
-        printf("\nShall the modifications be applied: [Y/N]?");
-        char y = getc(stdin);
-        if(y == 'Y' || y == 'y') {
-            fp1 = fopen(journal_sec, "rb");
-            fp = fopen(guestsdb, "wb");
-
-            while(1) {
-                fread(&guest, sizeof(guest), 1, fp1);
-                if(feof(fp1)) {
-                    break;
-                } else {
-                    fwrite(&guest, sizeof(guest), 1, fp);
+                }
+                if (free_rs != 0) {
+                    if (free_rs == 1) {
+                        free(guest_first_name);
+                    } else if (free_rs == 2) {
+                        free(guest_last_name);
+                    } else if (free_rs == 3) {
+                        free(guest_nationality);
+                    } else if (free_rs == 4) {
+                        free(guest_first_name);
+                        free(guest_last_name);
+                    } else if (free_rs == 5) {
+                        free(guest_first_name);
+                        free(guest_last_name);
+                        free(guest_nationality);
+                    }
+                }
+                if (error != 0) {
+                    if (error < 4) {
+                        buffer_clear();
+                    }
+                    tercon_echo_off();
+                    printf(ANSI_BLINK_SLOW "\x1b[%d;%dH\x1b[2KPress Enter to continue..." ANSI_BLINK_OFF, term.rows - 4, (term.columns - 26) / 2);
+                    buffer_clear();
+                    tercon_echo_on();
                 }
             }
-            printf(ANSI_COLOR_GREEN "\nModification applied....!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            fclose(fp1);
-            fclose(fp);
-            remove(journal_sec);
-            return;
-        } else {
-            printf(ANSI_COLOR_RED "\nModification canceled!\n" ANSI_COLOR_RESET);
-            getc(stdin);
-            remove(journal_sec);
-            return;
         }
+    }
+    if(found == 1) {
+        int result = applyGuestModification(guests, arr_len);
+        return result;
     } else {
-        printf(ANSI_COLOR_RED "\nNo Guest found with the given ID.\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED ANSI_MOVE_CURSOR_TO "No Guest found with the given ID.\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 33) / 2);
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
+    }
+}
+/* Applies guest modification by writing the guests array to Database. */
+int applyGuestModification (struct Guest guests[], int arr_len) {
+
+    Terminal term = tercon_init_rows_cols();
+    printf(ANSI_COLOR_GREEN "\x1b[%d;%dHShall the modifications be applied: [Y/N]?" ANSI_COLOR_RESET, term.rows - 4, (term.columns - 42) / 2);
+    char y = getc(stdin);
+    if(y == 'Y' || y == 'y') {
+        FILE *fp;
+        char abs_path[PATH_LENGTH];
+        joinHome(abs_path, guestsdb);
+        fp = fopen(abs_path, "wb");
+
+        for (int i = 0; i <= arr_len; i++) {
+            fwrite(&guests[i], sizeof(guests[i]), 1, fp);
+        }
+        printf(ANSI_COLOR_GREEN "\x1b[%d;%dHModification applied...!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+        fclose(fp);
+        return 0;
+    } else if (y == '\n' || y == '\t') {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        // Return 1 here so we can handle in modify() the input buffer accordingly.Otherwise chars are letting in input buffer.
+        return 1;
+    } else {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHModification canceled!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 22) / 2);
+        return 6;
     }
 }
 

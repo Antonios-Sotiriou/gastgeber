@@ -3,31 +3,41 @@
 *********************/
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
 /*********************
  * Global constants 
  ********************/
-#include "header_files/global_vars.h"
-/*********************
- * Color Initialisation
- ********************/
+#include "header_files/global/global_vars.h"
+#include "header_files/global/res_db_path.h"
+#include "header_files/global/days_db_path.h"
+#include "header_files/global/journal_sec_path.h"
+/**********************************************
+ * Color Initialisation and Terminal management 
+ **********************************************/
 
 /*******************************************************
  * My own libraries, collection of functions and structs
  ******************************************************/
-#include "header_files/paths.h"
-
 #include "structures/room.h"
 #include "structures/guest.h"
 #include "structures/day.h"
 #include "structures/reservations.h"
 
 #include "header_files/delete_reservation.h"
-
+#include "header_files/joins.h"
+/* Collects the days which will be prosessed of Reservation res. */
 void getResDatesToDelete(struct Reservation res) {
 
     struct Day day;
     FILE *fp;
-    fp = fopen(daysdb, "rb");
+    char abs_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    fp = fopen(abs_path, "rb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file getResDatesToDelete()");
+        exit(127);
+    }
 
     int starting_point;
     int finishing_point;
@@ -45,14 +55,26 @@ void getResDatesToDelete(struct Reservation res) {
     fclose(fp);
 
     deleteRoomFromDates(starting_point, finishing_point, res.room.id);
+    deleteReservationFromDates(starting_point, finishing_point, res.id);
 }
-
+/* Removes res_room_id from days dy changing the days room_id[res_room_id] array to 1000000 + res_room_id.
+    Remove from start day until finish. */
 void deleteRoomFromDates(int start, int finish, int res_room_id) {
 
     struct Day day;
     FILE *fp, *fp1;
-    fp = fopen(daysdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file deleteRoomFromDates()");
+        fclose(fp1);
+        remove(journal_path);
+        exit(127);
+    }
 
     while(1) {
         fread(&day, sizeof(day), 1, fp);
@@ -69,8 +91,8 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp = fopen(daysdb, "wb");
-    fp1 = fopen(journal_sec, "rb");
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
 
     while(1) {
         fread(&day, sizeof(day), 1, fp1);
@@ -82,16 +104,80 @@ void deleteRoomFromDates(int start, int finish, int res_room_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_sec);
+    remove(journal_path);
 }
+/* Removes reservation ID from days dy changing the days res_ids[x] array to 1000000 + res_ids[x].
+    Remove from start day until finish. */
+void deleteReservationFromDates(int start, int finish, int res_id) {
 
+    struct Day day;
+    FILE *fp, *fp1;
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, daysdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate daysdb file deleteReservationFromDates()");
+        fclose(fp1);
+        remove(journal_path);
+        exit(127);
+    }
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp);
+        if(feof(fp)) {
+            break;
+        } else {
+            // Get the days from starting day id to end day id
+            if(day.id >= start && day.id <= finish) {
+                for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
+                    if (day.res_ids[i] == res_id) {
+                        day.res_ids[i] = 1000000 + res_id;
+                        break;
+                    }
+                }
+            }
+            fwrite(&day, sizeof(day), 1, fp1);
+        }
+    }
+    fclose(fp);
+    fclose(fp1);
+
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
+
+    while(1) {
+        fread(&day, sizeof(day), 1, fp1);
+        if(feof(fp1)) {
+            break;
+        }
+        fwrite(&day, sizeof(day), 1, fp);
+    }
+    fclose(fp1);
+    fclose(fp);
+
+    remove(journal_path);
+}
+/* Deletes reservation from Database. */
 void applyReservationDelete(int res_id) {
 
     struct Reservation res;
     FILE *fp, *fp1;
+    char abs_path[PATH_LENGTH];
+    char journal_path[PATH_LENGTH];
+    joinHome(abs_path, reservationsdb);
+    joinHome(journal_path, journal_sec);
+    fp = fopen(abs_path, "rb");
+    fp1 = fopen(journal_path, "wb");
+    if (fp == NULL) {
+        perror("Could not locate reservationsdb file applyReservationDelete()");
+        fclose(fp1);
+        remove(journal_path);
+        exit(127);
+    }
 
-    fp = fopen(reservationsdb, "rb");
-    fp1 = fopen(journal_sec, "wb");
     while(1) {
         fread(&res, sizeof(res), 1, fp);
         if(feof(fp)) {
@@ -103,8 +189,8 @@ void applyReservationDelete(int res_id) {
     fclose(fp);
     fclose(fp1);
 
-    fp1 = fopen(journal_sec, "rb");
-    fp = fopen(reservationsdb, "wb");
+    fp = fopen(abs_path, "wb");
+    fp1 = fopen(journal_path, "rb");
     while(1) {
          fread(&res, sizeof(res), 1, fp1);
         if(feof(fp1)) {
@@ -116,6 +202,6 @@ void applyReservationDelete(int res_id) {
     fclose(fp1);
     fclose(fp);
 
-    remove(journal_sec);
+    remove(journal_path);
 }
 

@@ -18,7 +18,33 @@
 #define ANSI_BLINK_OFF "\x1b[25m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 #define ANSI_CLEAR_SCREEN "\x1b[H\x1b[J"
+#define ANSI_MOVE_CURSOR_TO "\x1b[%d;%dH"
+#define ANSI_MOVE_CURSOR_COL "\x1b[%dG" // Move cursor to column
+#define ANSI_ERASE_LINE "\x1b[2K" // from cursor position and after
+#define ANSI_MAXIMIZE "\x1b[10;1t"
+#define ANSI_MINIMIZE "\x1b[10;2t"
 
+typedef struct {
+    int rows;
+    int columns;
+    int cursor_x;
+    int cursor_y;
+} Terminal;
+
+Terminal tercon_init_rows_cols();
+void tercon_clear_screen();
+void tercon_clear_error_log();
+void tercon_clear_lines();
+void tercon_get_cols_rows(int *cols, int *rows);
+void tercon_move_y_x(int y, int x);
+void tercon_enter_alt_screen();
+void tercon_exit_alt_screen();
+void tercon_echo_off();
+void tercon_echo_on();
+void tercon_en_raw();
+void tercon_dis_raw();
+void tercon_hide_cursor();
+void tercon_show_cursor();
 
 #endif /* TERCON_H */
 

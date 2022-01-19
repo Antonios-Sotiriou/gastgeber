@@ -2,8 +2,10 @@
 #define DISPLAY_H
 
 /* Display functions */
+void appLogo();
 void displayMainLogo();
-void displayRoomReservationLogo();
+Terminal displayRoomReservationLogo();
+void displayPreviousStep(struct Reservation res);
 void displayRoomInfoLogo();
 void displayRoomInfo(struct Room room);
 void displayAllRoomsLogo();
@@ -14,21 +16,27 @@ void displayAllGuestsLogo();
 void displayAllGuestsInfo(struct Guest guest);
 void displayModifyLogo();
 void displayModifyRoomLogo();
-void displayModifyRoomChoices();
+void displayModifyRoomChoices(struct Room room);
 void displayModifyGuestLogo();
-void displayModifyGuestChoices();
+void displayModifyGuestChoices(struct Guest guest);
 void displayAllReservationsLogo();
 void displayAllReservationsInfo(struct Reservation reservation);
+void displayReservationsByDateLogo();
+void displayReservationsByDateHead();
+void displayReservationsByDateInfo(int res_id);
 void displayDeleteResLogo();
+void displayReservationInfo(struct Reservation reservation);
 void displayAnnuallyAvailabillityLogo();
 void displayRoomsPerDay(struct Day st_arr[], int i);
 void displayRoomAnnuallyReservationsLogo();
 void displayRoomAnnuallyReservationsInfo(int room_id, int input_year);
 void displayAllRoomsAnnuallyReservationsLogo();
-void displayAllRoomsAnnuallyReservationsInfo(int input_year);
+void displayAllRoomsAnnuallyReservationsInfo(struct Room rooms_arr[], int input_year);
 /* Global Display functions */
 void displayInt(int id, int dis_len);
+void displayFloat(float id, int dis_len);
 void displayStr(char *str, int dis_len);
+void displayErrorLog();
 
 #endif /* DISPLAY_H */
 
