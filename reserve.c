@@ -235,7 +235,7 @@ void addReservationToDates(int start, int finish, int res_id) {
             break;
         } else {
             // Get the days from starting day id to end day id
-            if(day.id >= start && day.id <= finish) {
+            if (day.id >= start && day.id <= finish) {
                 for (int i = 1; i <= (sizeof(day.res_ids) / sizeof(int)) - 1; i++) {
                     if (day.res_ids[i] >= 1000000) {
                         day.res_ids[i] = res_id;

@@ -3,6 +3,7 @@
 
 void getResDatesToDelete(struct Reservation res);
 void deleteRoomFromDates(int start, int finish, int res_room_id);
+void deleteReservationFromDates(int start, int finish, int res_id);
 void applyReservationDelete(int res_id);
 
 #endif /* DELETE_RESERVATION_H */

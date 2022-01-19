@@ -616,6 +616,7 @@ void displayReservationsByDate() {
                         if (day.res_ids[i] < 1000000) {
                             // Function which takes the reservation ids as arguments, reads the database for the reservations and prints the infos of them.
                             displayReservationsByDateInfo(day.res_ids[i]);
+                            //printf("res_ids: %d\n", day.res_ids[i]);
                             res_counter++;
                         }
                     }
@@ -703,7 +704,7 @@ void deleteReservation() {
             break;
         } else if(res.id == res_id) {
             displayReservationInfo(res);
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHAre you sure you want to delete the Reservation: [Y/N]? " ANSI_COLOR_RESET, term.rows - 4, (term.columns - 56) / 2);
+            printf("\x1b[%d;%dHAre you sure you want to delete the Reservation: [Y/N]? ", term.rows - 4, (term.columns - 56) / 2);
             char c = getc(stdin);
             if(c == 'Y' || c == 'y') {
                 // Following function can be found in delete_reservation.c file.This function is responsible
