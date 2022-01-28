@@ -2,6 +2,8 @@
 ### The compiler used to run this software is "gcc (Debian 10.3.0-9) 10.3.0"
 Only standard C Libraries have been used to develop this software.<br><br>
 As a first step, create a folder named gastgeber in your home directory to clone the software in.<br>
+When you download the software from github, the software comes in a folder named gastgeber-main.<br>
+You could also rename this folder to just gastgeber instead of creating a folder named gastgeber at first step.<br>
 Thats mantatory for the paths to work properly, without you having to change the global path variables.<br><br>
 
 After you download the software you have to compile the main file to be able to run it.<br>
