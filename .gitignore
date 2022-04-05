@@ -1,1 +1,4 @@
 gastgeber
+data/*
+!data/.gitkeep
+
