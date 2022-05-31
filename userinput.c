@@ -14,6 +14,7 @@
  * My own libraries, collection of functions and structs
  ******************************************************/
 #include "header_files/userinput.h"
+#include "header_files/global/global_vars.h"
 
 /* Clears buffer until it meets a New Line.It doesn't consume the New Line char. */
 void buffer_clear() {
@@ -57,6 +58,40 @@ int getnuminput(int max_len, bool spaces) {
     cleared_num[i] = '\0';
 
     return atoi(cleared_num);
+}
+/* Accepts Date input in form dd/mm/yyyy and doesn't consume \n */
+int getDate(int max_len, char *input) {
+
+    int buffer_overflow = 0;
+    int i = 0;
+
+    while (!buffer_overflow) {
+        char c = getc(stdin);
+        if (c == '\n' || c == EOF) {
+            buffer_overflow = 1;
+        } else if (i <= max_len) {
+        // CHECKING FOR ALPHABET
+            if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                return -1;
+            // CHECKING FOR DIGITS
+            } else if (c >= 48 && c <= 57) {
+                input[i] = c;
+                i++;
+            // OTHERWISE SPECIAL CHARACTER BUT ALLOW SPACES
+            } else if (c == 47) {
+                input[i] = c;
+                i++;
+            } else {
+                return -2;
+            }
+        } else {
+            // Given input exceeds wanted length
+            return -3;
+        }
+    }
+    input[i] = '\0';
+
+    return 0;
 }
 /* Gets a float of length [ max_len ].
     In length counts also the [ . ] float separator. */
@@ -104,9 +139,9 @@ int getformatedDate(char *room_date) {
     int month;
     int year;
     time_t current_time;
-    char converted_day[20];
-    char converted_month[20];
-    char converted_year[20];
+    char converted_day[4];
+    char converted_month[4];
+    char converted_year[5];
     
     Terminal term = tercon_init_rows_cols();
 
@@ -116,51 +151,114 @@ int getformatedDate(char *room_date) {
     // for debugging purposes...
     //printf("%i/%i/%i\n", mytime -> tm_mday, mytime -> tm_mon + 1, mytime -> tm_year + 1900);
 
-    fgets(input, 40, stdin);
-    int test = sscanf(input, "%d/%d/%d", &day, &month, &year);
+    int date_test = getDate(11, input);
+    if (date_test == 0) {
+        int test = sscanf(input, "%d/%d/%d", &day, &month, &year);
 
-    if(test == 3) {
-        if(day < 0 || day > 31) {
-            tercon_clear_error_log();
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
-            return 0;
-        } else if(day > 0 && day < 10) {
-            sprintf(converted_day, "0%d/", day);
-        } else if(day > 9 && day <= 31) {
-            sprintf(converted_day, "%d/", day);
-        }
-        if(month < 0 || month > 12) {
-            tercon_clear_error_log();
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct month!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
-            return 0;
-        } else if(month > 0 && month < 10) {
-            sprintf(converted_month, "0%d/", month);
-        } else if(month > 9) {
-            sprintf(converted_month, "%d/", month);
-        }
-        if(year > mytime -> tm_year + 1900) {
-            sprintf(converted_year, "%d", year);
-        } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) > 0) {
-            sprintf(converted_year, "%d", year);
-        } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) == 0) {
-            if(day - mytime -> tm_mday >= 0) {
+        if(test == 3) {
+            if(day < 0 || day > 31) {
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
+                return 0;
+            } else if(day > 0 && day < 10) {
+                sprintf(converted_day, "0%d/", day);
+            } else if(day > 9 && day <= 31) {
+                sprintf(converted_day, "%d/", day);
+            }
+            if(month < 0 || month > 12) {
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct month!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
+                return 0;
+            } else if(month > 0 && month < 10) {
+                sprintf(converted_month, "0%d/", month);
+            } else if(month > 9) {
+                sprintf(converted_month, "%d/", month);
+            }
+            if(year > mytime -> tm_year + 1900) {
                 sprintf(converted_year, "%d", year);
+            } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) > 0) {
+                sprintf(converted_year, "%d", year);
+            } else if(year == mytime -> tm_year + 1900 && month - (mytime -> tm_mon + 1) == 0) {
+                if(day - mytime -> tm_mday >= 0) {
+                    sprintf(converted_year, "%d", year);
+                } else {
+                    tercon_clear_error_log();
+                    printf(ANSI_COLOR_RED "\x1b[%d;%dHThis day is in the past!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+                    return 0;
+                }
             } else {
                 tercon_clear_error_log();
-                printf(ANSI_COLOR_RED "\x1b[%d;%dHThis day is in the past!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a date from today to the future!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
                 return 0;
             }
         } else {
             tercon_clear_error_log();
-            printf(ANSI_COLOR_RED "\x1b[%d;%dHProvide a date from today to the future!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHThe date you entered is in wrong format!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
             return 0;
         }
+        sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
     } else {
         tercon_clear_error_log();
         printf(ANSI_COLOR_RED "\x1b[%d;%dHThe date you entered is in wrong format!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
-        return 0;
+        return date_test;
     }
-    sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
+    return 1;
+}
+/* Accepts date input in form dd/mm/yyyy.Accepts also dates in the past until Timedelta 1900*/
+int getTimelessDate(char *room_date) {
+
+    char input[40];
+    int day;
+    int month;
+    int year;
+    char converted_day[4];
+    char converted_month[4];
+    char converted_year[5];
+
+    Terminal term = tercon_init_rows_cols();
+
+    int date_test = getDate(11, input);
+    if (date_test == 0) {
+
+        int test = sscanf(input, "%d/%d/%d", &day, &month, &year);
+
+        if(test == 3) {
+            if(day < 0 || day > 31) {
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct day!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 19) / 2);
+                return 0;
+            } else if(day > 0 && day < 10) {
+                sprintf(converted_day, "0%d/", day);
+            } else if(day > 9 && day <= 31) {
+                sprintf(converted_day, "%d/", day);
+            }
+            if(month < 0 || month > 12) {
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHGive a correct month!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 21) / 2);
+                return 0;
+            } else if(month > 0 && month < 10) {
+                sprintf(converted_month, "0%d/", month);
+            } else if(month > 9) {
+                sprintf(converted_month, "%d/", month);
+            }
+            if(year < STARTING_YEAR) {
+                tercon_clear_error_log();
+                printf(ANSI_COLOR_RED "\x1b[%d;%dHNo record for this year!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 24) / 2);
+                return 0;
+            } else {
+                sprintf(converted_year, "%d", year);
+            }
+        } else {
+            tercon_clear_error_log();
+            printf(ANSI_COLOR_RED "\x1b[%d;%dHThe date you entered is in wrong format!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
+            return 0;
+        }
+        sprintf(room_date, "%s%s%s", converted_day, converted_month, converted_year);
+    } else {
+        tercon_clear_error_log();
+        printf(ANSI_COLOR_RED "\x1b[%d;%dHThe date you entered is in wrong format!\n" ANSI_COLOR_RESET, term.rows - 1, (term.columns - 40) / 2);
+        return date_test;
+    }
     return 1;
 }
 /* Accepts a string of length [str_len] without spaces at start, end or between. */
