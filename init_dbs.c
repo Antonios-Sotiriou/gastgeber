@@ -191,7 +191,7 @@ int getNextReservationEntry() {
 
     struct Reservation reservation;
     FILE *fp;
-    char abs_path[200];
+    char abs_path[PATH_LENGTH];
     joinHome(abs_path, reservationsdb);
     fp = fopen(abs_path, "rb");
     if (fp == NULL) {
