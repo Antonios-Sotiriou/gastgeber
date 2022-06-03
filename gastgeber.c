@@ -165,6 +165,7 @@ void reserve() {
     
     int num_of_days = 0;
     int room_id;
+    int date_code;
     int found = 0;
     int error = 0;
     // counter function which finds the last reservation record! Can be found in init_dbs.c file
@@ -211,20 +212,25 @@ void reserve() {
                     term.cursor_y = 17;
                 }
                 printf(ANSI_ERASE_LINE "  Room reserve from date: ");
-                if(getformatedDate(reservation.from_date) == 1 && checkFromDate(reservation) == 0) {
+                date_code = getformatedDate(reservation.from_date);
+                if(date_code == 1 && checkFromDate(reservation) == 0) {
                     from_date = 1;
                 } else {
+                    if (date_code < 0) {
+                        buffer_clear();
+                    }
                     tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
                     if (c == 'y' || c == 'Y') {
                         tercon_clear_error_log(reservation);
                         tercon_move_y_x(term.rows - 4, (term.columns - 26 ) / 2);
+                        tercon_clear_lines(term.rows - 4, 17);
                         printf("\x1b[2K");
                         buffer_clear();
                         continue;
                     } else if (c == '\n' || c == '\t') {
-                        tercon_clear_lines(term.rows - 4, term.rows - 5);
+                        tercon_clear_lines(term.rows - 4, 17);
                         tercon_clear_error_log();
                         continue;
                     } else {
@@ -236,6 +242,7 @@ void reserve() {
             int to_date = 0;
             // repeated here identifies in the user tried to supplied to_date more than 1 time.If so we take actions accordingly.
             bool repeated = false;
+            int todate_code;
             while(to_date == 0) {
                 if (!repeated) {
                     // User goes for first time throught the function.Print < To date > prompt.If user comes again
@@ -244,7 +251,8 @@ void reserve() {
                     printf(ANSI_ERASE_LINE "  To date: ");
                 }
                 int step_count = 0;
-                if(getformatedDate(reservation.to_date) == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
+                todate_code = getformatedDate(reservation.to_date);
+                if(todate_code == 1 && compareDates(reservation.from_date, reservation.to_date) == 1) {
                     // we need the num_of_days here to position the cursor if the days are overflow the error printing area.
                     num_of_days = checkAllDates(reservation);
                     if(num_of_days == 0) {
@@ -262,6 +270,9 @@ void reserve() {
                     }
                 } else {
                     step_count = 1;
+                    if (todate_code < 0) {
+                        buffer_clear();
+                    }
                 }
                 // Steps are importand to set correct the cursor and prompt for retry.
                 if (step_count != 0) {
@@ -273,6 +284,7 @@ void reserve() {
                     printf(ANSI_ERASE_LINE "Do you want to retry? [Y/N]: ");
                     char c = getc(stdin);
                     if (c == 'y' || c == 'Y') {
+                        tercon_clear_lines(term.rows - 4, 18);
                         if (num_of_days > 2) {
                             // With this function rerender whole last screen and return to to_date prompt.We need this
                             // function here to avoid terminal mess when the already booked days are alot. 
@@ -289,7 +301,7 @@ void reserve() {
                         }
                         continue;
                     } else if (c == '\n' || c == '\t') {
-                        tercon_clear_lines(term.rows - 4, term.rows - 5);
+                        tercon_clear_lines(term.rows - 4, 18);
                         tercon_clear_error_log();
                         continue;
                     } else {
@@ -587,12 +599,14 @@ void displayReservationsByDate() {
     Terminal term = tercon_init_rows_cols();
 
     displayReservationsByDateLogo();
+    int date_code;
     int found = 0;
     int error = 0;
     int res_counter = 0;
     while (found == 0) {
         printf("\x1b[%d;%dH\x1b[2KEnter date: ", 13, (term.columns - 12) / 2);
-        if (getformatedDate(request.date) == 1) {
+        date_code = getTimelessDate(request.date);
+        if (date_code == 1) {
             FILE *fp;
             char abs_path[PATH_LENGTH];
             joinHome(abs_path, daysdb);
@@ -626,6 +640,11 @@ void displayReservationsByDate() {
                 }
             }
             fclose(fp);
+        } else  if (date_code == 0) {
+            found = 0;
+        } else if (date_code < 0) {
+            found = 0;
+            buffer_clear();
         }
         if (found <= 0) {
             if (found == -1) {
@@ -636,6 +655,7 @@ void displayReservationsByDate() {
             if(c == 'Y' || c == 'y') {
                 printf("\x1b[%d;%dH\x1b[2K", term.rows - 4, (term.columns - 37) / 2);
                 tercon_clear_error_log();
+                tercon_clear_lines(term.rows - 4, 13);
                 found = 0;
                 getc(stdin);
                 continue;

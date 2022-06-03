@@ -41,7 +41,7 @@ char *join(char base[], char tail[]) {
 /* Joins tail to HOME path creating and returning an absolut new_path. */
 void joinHome(char new_path[], const char tail[]) {
 
-    char *base = getenv("HOME");
+    char *base = getenv("PWD");
 
     int i = 0, d = 0, j = 0;
 
