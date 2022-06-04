@@ -1,6 +1,6 @@
 # Hotel Reservations Software. Version 2.0.0
 ### The compiler used to run this software is "gcc (Debian 10.3.0-9) 10.3.0"
-Only standard C Libraries have been used to develop this software.<br><br>
+Only standard C Libraries have been used to develop this software.<br>
 
 As a first step, clone the software.<br>
 
@@ -11,7 +11,6 @@ To do so run the following command:
 make all
 ```
 If compiling will be success run the executable with the  **init**  argument to create the databases.<br>
-Before you run this command please delete all files from data folder so new databases can be created for you(If you want...).
 ```
 ./gastgeber init
 ```
