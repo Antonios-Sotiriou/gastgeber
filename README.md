@@ -20,8 +20,8 @@ If you don't see any errors software is ready for use.
 ```
 From "header_files/global/global_vars.h" file you can choose the total number of rooms and also<br>
 the years range.As starting year it is advised to use the current year.<br>
-Paths can be found in "header_files/global/" directory.All files have the word path at end of their names.<br>
-Global variables can also be fount in "header_files/global/" directory.<br>
+Paths can be found in "header_files/global/" directory. All files have the word path at end of their names.<br>
+Global variables can also be found in "header_files/global/" directory.<br>
 
 # Enjoy...
 
