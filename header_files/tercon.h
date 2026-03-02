@@ -1,31 +1,37 @@
 #ifndef TERCON_H
 #define TERCON_H
 
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_GREEN_BG "\x1b[48;5;34m"
-#define ANSI_COLOR_RED_BG "\x1b[48;5;196m"
-#define ANSI_COLOR_BLUE_BG "\x1b[48;5;21m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_BLUE "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN "\x1b[36m"
-#define ANSI_BOLD_FONT "\x1b[1m"
-#define ANSI_ITALIC_FONT "\x1b[3m"
+#define ANSI_COLOR_RED       "\x1b[31m"
+#define ANSI_COLOR_GREEN     "\x1b[32m"
+#define ANSI_COLOR_GREEN_BG  "\x1b[48;5;34m"
+#define ANSI_COLOR_RED_BG    "\x1b[48;5;196m"
+#define ANSI_COLOR_BLUE_BG   "\x1b[48;5;21m"
+#define ANSI_COLOR_YELLOW    "\x1b[33m"
+#define ANSI_COLOR_BLUE      "\x1b[34m"
+#define ANSI_COLOR_MAGENTA   "\x1b[35m"
+#define ANSI_COLOR_CYAN      "\x1b[36m"
+#define ANSI_BOLD_FONT       "\x1b[1m"
+#define ANSI_ITALIC_FONT     "\x1b[3m"
 #define ANSI_ITALIC_FONT_OFF "\x1b[23m"
-#define ANSI_UNDERLINE "\x1b[4m"
-#define ANSI_BLINK_SLOW "\x1b[5m"
-#define ANSI_BLINK_OFF "\x1b[25m"
-#define ANSI_COLOR_RESET "\x1b[0m"
-#define ANSI_CLEAR_SCREEN "\x1b[H\x1b[J"
-#define ANSI_MOVE_CURSOR_TO "\x1b[%d;%dH"
-#define ANSI_MOVE_CURSOR_COL "\x1b[%dG" // Move cursor to column
-#define ANSI_ERASE_LINE "\x1b[2K" // from cursor position and after
-#define ANSI_MAXIMIZE "\x1b[10;1t"
-#define ANSI_MINIMIZE "\x1b[10;2t"
-#define ANSI_NOECHO "\x1b[8m"
-#define ANSI_CURHIDE "\x1b[25l"
-#define ANSI_CURSHOW "\x1b[25h"
+#define ANSI_UNDERLINE       "\x1b[4m"
+#define ANSI_BLINK_SLOW      "\x1b[5m"
+#define ANSI_BLINK_OFF       "\x1b[25m"
+#define ANSI_COLOR_RESET     "\x1b[0m"
+#define ANSI_CLEAR_SCREEN    "\x1b[H\x1b[J"
+#define ANSI_MOVE_CURSOR_TO  "\x1b[%d;%dH"
+#define ANSI_MOVE_CURSOR_COL "\x1b[%dG"      // Move cursor to column
+#define ANSI_ERASE_LINE      "\x1b[2K"       // from cursor position and after
+#define ANSI_MAXIMIZE        "\x1b[10;1t"
+#define ANSI_MINIMIZE        "\x1b[10;2t"
+#define ANSI_NOECHO          "\x1b[8m"
+#define ANSI_CURHIDE         "\x1b[25l"
+#define ANSI_CURSHOW         "\x1b[25h"
+#define ANSI_ERASE_FTE       "\x1b[H\x1b[J"; // Erase from current cursor position until the end of the screen.
+#define ANSI_ERASE_AAH       "\x1b[2J";      // Erase entire screen and move cursor to home position (0, 0).
+#define ANSI_ERASE_FST       "\x1b[1J";      // Erase from the start of the screen until cursor position.
+#define ANSI_ERASE_FTLE      "\x1b[K";       //  or \x1b[0K . Erase from the current cursor position to the end of the line.
+#define ANSI_ERASE_FLST      "\x1b[1K";      // Erase from the start of the line to the cursor position.
+#define ANSI_ERASE_LINE      "\x1b[2K";      //Erase the entire line.
 
 typedef struct {
     int rows;
