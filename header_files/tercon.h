@@ -23,6 +23,9 @@
 #define ANSI_ERASE_LINE "\x1b[2K" // from cursor position and after
 #define ANSI_MAXIMIZE "\x1b[10;1t"
 #define ANSI_MINIMIZE "\x1b[10;2t"
+#define ANSI_NOECHO "\x1b[8m"
+#define ANSI_CURHIDE "\x1b[25l"
+#define ANSI_CURSHOW "\x1b[25h"
 
 typedef struct {
     int rows;
