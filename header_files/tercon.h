@@ -24,7 +24,7 @@
 #define ANSI_MAXIMIZE        "\x1b[10;1t"
 #define ANSI_MINIMIZE        "\x1b[10;2t"
 #define ANSI_NOECHO          "\x1b[8m"
-#define ANSI_CURHIDE         "\x1b[25l"
+#define ANSI_CURHIDE         "\x1b[25l"      // "\x1b[?25l" sometimes this is working also.
 #define ANSI_CURSHOW         "\x1b[25h"
 #define ANSI_ERASE_FTE       "\x1b[H\x1b[J"; // Erase from current cursor position until the end of the screen.
 #define ANSI_ERASE_AAH       "\x1b[2J";      // Erase entire screen and move cursor to home position (0, 0).
