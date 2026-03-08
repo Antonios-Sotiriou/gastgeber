@@ -19,19 +19,20 @@
 #define ANSI_COLOR_RESET     "\x1b[0m"
 #define ANSI_CLEAR_SCREEN    "\x1b[H\x1b[J"
 #define ANSI_MOVE_CURSOR_TO  "\x1b[%d;%dH"
-#define ANSI_MOVE_CURSOR_COL "\x1b[%dG"      // Move cursor to column
-#define ANSI_ERASE_LINE      "\x1b[2K"       // from cursor position and after
+#define ANSI_MOVE_CURSOR_COL "\x1b[%dG"       // Move cursor to column
+#define ANSI_ERASE_LINE      "\x1b[2K"        // from cursor position and after
 #define ANSI_MAXIMIZE        "\x1b[10;1t"
 #define ANSI_MINIMIZE        "\x1b[10;2t"
 #define ANSI_NOECHO          "\x1b[8m"
-#define ANSI_CURHIDE         "\x1b[25l"      // "\x1b[?25l" sometimes this is working also.
+#define ANSI_CURHIDE         "\x1b[25l"       // "\x1b[?25l" sometimes this is working also.
 #define ANSI_CURSHOW         "\x1b[25h"
-#define ANSI_ERASE_FTE       "\x1b[H\x1b[J"; // Erase from current cursor position until the end of the screen.
-#define ANSI_ERASE_AAH       "\x1b[2J";      // Erase entire screen and move cursor to home position (0, 0).
-#define ANSI_ERASE_FST       "\x1b[1J";      // Erase from the start of the screen until cursor position.
-#define ANSI_ERASE_FTLE      "\x1b[K";       //  or \x1b[0K . Erase from the current cursor position to the end of the line.
-#define ANSI_ERASE_FLST      "\x1b[1K";      // Erase from the start of the line to the cursor position.
-#define ANSI_ERASE_LINE      "\x1b[2K";      //Erase the entire line.
+#define ANSI_ERASE_FTE       "\x1b[H\x1b[J";  // Erase from current cursor position until the end of the screen.
+#define ANSI_ERASE_AAH       "\x1b[2J";       // Erase entire screen and move cursor to home position (0, 0).
+#define ANSI_ERASE_FST       "\x1b[1J";       // Erase from the start of the screen until cursor position.
+#define ANSI_ERASE_FTLE      "\x1b[K";        //  or \x1b[0K . Erase from the current cursor position to the end of the line.
+#define ANSI_ERASE_FLST      "\x1b[1K";       // Erase from the start of the line to the cursor position.
+#define ANSI_ERASE_LINE      "\x1b[2K";       //Erase the entire line.
+#define ANSI_TERM_SIZE       "\x1b[8;31;120t" // 31 rows(height) 120 columns(width)
 
 typedef struct {
     int rows;
